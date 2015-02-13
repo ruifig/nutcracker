@@ -1,0 +1,21 @@
+syntax: glob
+*.swp
+*.suo
+*.sdf
+*.opensdf
+*.ncb
+*.user
+*.pdb
+*.idb
+*.aps
+*.ilk
+
+#
+#
+tmp/*
+source/ipch/*
+
+#
+# wxWidgets
+#
+dependencies/wxWidgets/*
