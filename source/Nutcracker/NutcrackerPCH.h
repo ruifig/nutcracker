@@ -95,5 +95,18 @@ typedef  unsigned char  byte;
 #include <tchar.h>
 #include <locale>
 
+#include "czPlatform/czPlatformPrerequisites.h"
+#include "czPlatform/czPlatformStableHeaders.h"
+#include "czPlatform/czFileSystem.h"
+#include "czPlatform/czLogger.h"
+#include "czPlatform/czFile.h"
+#include "czPlatform/czFileSystem.h"
+#include "czPlatform/czAlgorithm.h"
+#include "czPlatform/czIniFile.h"
+#include "czPlatform/czFNVHash.h"
+#include "czPlatform/czUTF8String.h"
+#include "czPlatform/czScopeGuard.h"
+#include "czPlatform/czParameters.h"
+
 #define FORWARD_DECLARE_VIEWCLASS(CLASS) namespace cz { namespace view { class CLASS; } }
 

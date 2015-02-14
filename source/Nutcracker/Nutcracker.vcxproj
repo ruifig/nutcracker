@@ -55,7 +55,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile>NutcrackerPCH.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(wxWidgetsRoot)\include\msvc;$(wxWidgetsRoot)\include;$(wxWidgetsRoot)\src\stc\scintilla\include;$(wxWidgetsRoot)\src\stc\scintilla\lexlib;$(wxWidgetsRoot)\src\stc\scintilla\src;$(ProjectDir)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(wxWidgetsRoot)\include\msvc;$(wxWidgetsRoot)\include;$(wxWidgetsRoot)\src\stc\scintilla\include;$(wxWidgetsRoot)\src\stc\scintilla\lexlib;$(wxWidgetsRoot)\src\stc\scintilla\src;$(ProjectDir)\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -73,7 +73,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeaderFile>NutcrackerPCH.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(wxWidgetsRoot)\include\msvc;$(wxWidgetsRoot)\include;$(wxWidgetsRoot)\src\stc\scintilla\include;$(wxWidgetsRoot)\src\stc\scintilla\lexlib;$(wxWidgetsRoot)\src\stc\scintilla\src;$(ProjectDir)\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(wxWidgetsRoot)\include\msvc;$(wxWidgetsRoot)\include;$(wxWidgetsRoot)\src\stc\scintilla\include;$(wxWidgetsRoot)\src\stc\scintilla\lexlib;$(wxWidgetsRoot)\src\stc\scintilla\src;$(ProjectDir)\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -110,6 +110,11 @@
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(wxWidgetsRoot)\include\msvc;$(wxWidgetsRoot)\include</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(wxWidgetsRoot)\include\msvc;$(wxWidgetsRoot)\include</AdditionalIncludeDirectories>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\dependencies\czPlatform\VisualStudio\czPlatform.vcxproj">
+      <Project>{57fa36a4-c2b3-413f-a60c-4f9592f911d3}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
