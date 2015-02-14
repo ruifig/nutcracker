@@ -1,33 +1,67 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="AutoUI">
+      <UniqueIdentifier>{3e937ffd-6914-4a96-a997-8396b1e1bee3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{1e3bf449-ab4f-44ce-9125-1dd664d12855}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="View">
+      <UniqueIdentifier>{b38625d9-281a-40f6-b0b1-72b0ad07eebe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="NutcrackerApp.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="AutoUI\FileEditorGroupWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoUI\MainWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
     </ClCompile>
     <ClCompile Include="NutcrackerPCH.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="NutcrackerApp.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="View\WorkspaceWnd.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="View\MainWnd.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="View\FileEditorGroupWnd.cpp">
+      <Filter>View</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoUI\MainWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="NutcrackerApp.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="View\MainWnd.h">
+      <Filter>View</Filter>
+    </ClInclude>
+    <ClInclude Include="View\FileEditorGroupWnd.h">
+      <Filter>View</Filter>
+    </ClInclude>
     <ClInclude Include="NutcrackerPCH.h">
-      <Filter>Header Files</Filter>
+      <Filter>App</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="View\WorkspaceWnd.h">
+      <Filter>View</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

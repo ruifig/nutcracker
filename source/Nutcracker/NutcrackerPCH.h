@@ -95,5 +95,5 @@ typedef  unsigned char  byte;
 #include <tchar.h>
 #include <locale>
 
-#define FORWARD_DECLARE_VIEWCLASS(CLASS) namespace cz { namespace apcpuide { namespace view { class CLASS; } } }
+#define FORWARD_DECLARE_VIEWCLASS(CLASS) namespace cz { namespace view { class CLASS; } }
 
