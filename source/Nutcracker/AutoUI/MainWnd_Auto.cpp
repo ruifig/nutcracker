@@ -13,6 +13,7 @@
 
 ////@begin includes
 #include "../View/WorkspaceWnd.h"
+#include "../View/FileEditorGroupWnd.h"
 #include "wx/imaglist.h"
 ////@end includes
 
@@ -125,18 +126,22 @@ void MainWnd_Auto::CreateControls()
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
 		.Name(wxT("Pane2")).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
 
-	wxAuiNotebook* itemAuiNotebook8 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_DEFAULT_STYLE|wxAUI_NB_TOP );
+	cz::view::FileEditorGroupWnd* itemWindow8 = new cz::view::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
+	itemFrame1->GetAuiManager().AddPane(itemWindow8, wxAuiPaneInfo()
+		.Name(wxT("Pane4")).Centre().CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
 
-	wxPanel* itemPanel9 = new wxPanel( itemAuiNotebook8, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-	wxBoxSizer* itemBoxSizer10 = new wxBoxSizer(wxVERTICAL);
-	itemPanel9->SetSizer(itemBoxSizer10);
+	wxAuiNotebook* itemAuiNotebook9 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_DEFAULT_STYLE|wxAUI_NB_TOP );
 
-	m_logTextCtrl = new wxTextCtrl( itemPanel9, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
-	itemBoxSizer10->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
+	wxPanel* itemPanel10 = new wxPanel( itemAuiNotebook9, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+	wxBoxSizer* itemBoxSizer11 = new wxBoxSizer(wxVERTICAL);
+	itemPanel10->SetSizer(itemBoxSizer11);
 
-	itemAuiNotebook8->AddPage(itemPanel9, _("Log"), false);
+	m_logTextCtrl = new wxTextCtrl( itemPanel10, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
+	itemBoxSizer11->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
 
-	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook8, wxAuiPaneInfo()
+	itemAuiNotebook9->AddPage(itemPanel10, _("Log"), false);
+
+	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook9, wxAuiPaneInfo()
 		.Name(wxT("Pane3")).Bottom().CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
 
 	GetAuiManager().Update();

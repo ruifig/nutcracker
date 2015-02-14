@@ -20,6 +20,7 @@ BEGIN_EVENT_TABLE(WorkspaceWnd, wxPanel)
 END_EVENT_TABLE()
 
 WorkspaceWnd::WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+	: wxPanel(parent, id, pos, size, style)
 {
 	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
 	sizer->SetMinSize(wxSize(160, 250));
