@@ -22,11 +22,16 @@ Control ids
 */
 	enum
 	{
-		ID_TreeCtrl = wxID_HIGHEST + 1
+		ID_TreeCtrl = wxID_HIGHEST + 1,
+		ID_CompileFile,
+		ID_OpenContainingFolder
 	};
 
 BEGIN_EVENT_TABLE(WorkspaceWnd, wxPanel)
 	EVT_TREE_ITEM_ACTIVATED(wxID_ANY, WorkspaceWnd::OnItemActivated)
+	EVT_TREE_ITEM_MENU(ID_TreeCtrl, WorkspaceWnd::OnItemMenu)
+	EVT_MENU(ID_OpenContainingFolder, WorkspaceWnd::OnOpenContainingFolder)
+	EVT_MENU(ID_CompileFile, WorkspaceWnd::OnCompileFile)
 END_EVENT_TABLE()
 
 
@@ -133,6 +138,60 @@ void WorkspaceWnd::OnItemActivated(wxTreeEvent& event)
 		return;
 
 	gFileEditorGroupWnd->gotoFile(item, -1);
+}
+
+void WorkspaceWnd::OnItemMenu(wxTreeEvent& event)
+{
+	wxTreeItemId itemId = event.GetItem();
+	auto itemData = m_treeData.findByWxTreeItemId(itemId);
+
+    wxPoint clientpt = event.GetPoint();
+    wxPoint screenpt = ClientToScreen(clientpt);
+	wxString title;
+
+	using namespace cz::document;
+
+	switch (ProjectItemType(itemData->getItemId().itemtype))
+	{
+		case ProjectItemType::Folder:
+			break;
+
+		case ProjectItemType::File:
+		{
+			//title = "File";
+			wxMenu menu;
+			wxMenu* addmenu = new wxMenu;
+			ProjectItemId projectItemId(itemData->getItemId().id[0]);
+			auto file = gProject->getFile(projectItemId);
+			bool compilable = file->extension=="nut";
+
+			if (compilable)
+				menu.Append(ID_CompileFile, wxT("Compile"));
+			menu.Append(ID_OpenContainingFolder, wxT("Open containing folder"));
+
+			m_selectedFileId = projectItemId;
+			PopupMenu(&menu, clientpt);
+		}
+		break;
+	}
+
+	event.Skip();
+}
+
+void WorkspaceWnd::OnOpenContainingFolder(wxCommandEvent& event)
+{
+	auto file = gProject->getFile(m_selectedFileId);
+	if (!file)
+		return;
+
+	cz::UTF8String res;
+	cz::Filesystem::getSingleton().fullPath(res, file->getDirectory());
+	wxExecute(wxString("explorer \"") + res.widen() + "\"");
+}
+
+void WorkspaceWnd::OnCompileFile(wxCommandEvent& /*event*/)
+{
+	showMsg("TODO", "Not implemented yet.");
 }
 
 wxTreeItemId WorkspaceWnd::findFileTreeItem(document::ProjectItemId fileId)

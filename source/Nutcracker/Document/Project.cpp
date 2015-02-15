@@ -13,6 +13,14 @@ ProjectItem::ProjectItem(ProjectItemType type_, UTF8String fullname_, UTF8String
 	id.val = FNVHash32::compute(fullname.c_str(), fullname.sizeBytes());
 }
 
+cz::UTF8String ProjectItem::getDirectory() const
+{
+	if (type == ProjectItemType::Folder)
+		return fullname;
+	else
+		return Filename(fullname).getDirectory();
+}
+
 
 File::File(UTF8String fullname, UTF8String name) : ProjectItem(ProjectItemType::File, fullname, name)
 {

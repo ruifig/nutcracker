@@ -236,7 +236,7 @@ void FileEditorGroupWnd::OnLocateInWorkspace(wxCommandEvent& event)
 void FileEditorGroupWnd::OnOpenContainingFolder(wxCommandEvent& event)
 {
 	cz::UTF8String res;
-	cz::Filesystem::getSingleton().fullPath(res, m_selectedFileTab->getFile()->absolutepath);
+	cz::Filesystem::getSingleton().fullPath(res, m_selectedFileTab->getFile()->getDirectory());
 	wxExecute(wxString("explorer \"") + res.widen() + "\"");
 }
 

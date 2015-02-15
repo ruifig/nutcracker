@@ -31,6 +31,7 @@ struct ProjectItem
 	UTF8String name;
 	ProjectItemType type;
 	ProjectItemId id = 0;
+	UTF8String getDirectory() const;
 };
 
 // Represents a file in the project

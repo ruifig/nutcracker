@@ -30,6 +30,9 @@ public:
 private:
 	DECLARE_EVENT_TABLE()
 	void OnItemActivated(wxTreeEvent& event);
+	void OnOpenContainingFolder(wxCommandEvent& event);
+	void OnCompileFile(wxCommandEvent& event);
+	void OnItemMenu(wxTreeEvent& event);
 
 	std::shared_ptr<TreeCtrlUtil::TreeItemData> updateState(const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent,
 															const std::shared_ptr<const document::ProjectItem>& item);
@@ -39,6 +42,7 @@ private:
 	virtual void onAppEvent(const AppEvent& evt) override;
 	wxTreeCtrl* m_treeCtrl;
 	TreeCtrlUtil::TreeCtrlData m_treeData;
+	document::ProjectItemId m_selectedFileId;
 };
 
 } // namespace view
