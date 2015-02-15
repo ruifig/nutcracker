@@ -76,9 +76,6 @@
     <ClInclude Include="View\WorkspaceWnd.h">
       <Filter>View</Filter>
     </ClInclude>
-    <ClInclude Include="NutcrackerCommon.h">
-      <Filter>App</Filter>
-    </ClInclude>
     <ClInclude Include="Document\Project.h">
       <Filter>Document</Filter>
     </ClInclude>
