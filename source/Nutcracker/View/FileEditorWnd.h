@@ -44,6 +44,8 @@ private:
 	void OnMarginClick(wxStyledTextEvent& event);
 	void OnTimer(wxTimerEvent& evt);
 
+	void setCommonStyle();
+	void updateViewOptions();
 	virtual void onAppEvent(const AppEvent& evt);
 	void showAutoComplete();
 	void showCallTip(bool updatePos);

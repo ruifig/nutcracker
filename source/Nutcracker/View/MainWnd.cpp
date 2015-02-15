@@ -11,6 +11,7 @@
 #include "MainWnd.h"
 
 #include "Document/Project.h"
+#include "AppEvents.h"
 
 namespace cz
 {
@@ -73,6 +74,29 @@ void MainWnd::OnIdle(wxIdleEvent& evt)
 void MainWnd::addAsyncFunc(std::function<void()> f)
 {
 	m_asyncFuncs.send(std::move(f));
+}
+
+void MainWnd::OnMenuClick(wxCommandEvent& event)
+{
+	wxMenu* menu = static_cast<wxMenu*>(event.GetEventObject());
+	bool val = menu->IsChecked(event.GetId());
+
+	switch(event.GetId())
+	{
+		case ID_MENU_VIEW_INDENTATION:
+			uiState.view_ShowIndentationGuides = val;
+			fireAppEvent(AppEventID::ViewOptionsChanged);
+			break;
+		case ID_MENU_VIEW_WHITESPACE:
+			uiState.view_Whitespace = val;
+			fireAppEvent(AppEventID::ViewOptionsChanged);
+		break;
+		case ID_MENU_VIEW_EOL:
+			uiState.view_EOL = val;
+			fireAppEvent(AppEventID::ViewOptionsChanged);
+		break;
+	}
+
 }
 
 } // namespace view

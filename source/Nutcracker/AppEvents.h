@@ -6,7 +6,8 @@ enum class AppEventID
 {
 	OpenWorkspace,
 	NewWorkspace,
-	FileSaved
+	FileSaved,
+	ViewOptionsChanged
 };
 
 struct AppEvent

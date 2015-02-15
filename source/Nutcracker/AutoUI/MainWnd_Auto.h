@@ -82,6 +82,9 @@ public:
 	/// wxEVT_IDLE event handler for ID_MAINWND_AUTO
 	virtual void OnIdle( wxIdleEvent& event );
 
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_INDENTATION
+	virtual void OnMenuClick( wxCommandEvent& event );
+
 ////@end MainWnd_Auto event handler declarations
 
 ////@begin MainWnd_Auto member function declarations
@@ -108,6 +111,9 @@ public:
 		ID_MAINWND_AUTO = 10000,
 		ID_MENUITEM = 10001,
 		ID_MENUITEM1 = 10004,
+		ID_MENU_VIEW_INDENTATION = 10009,
+		ID_MENU_VIEW_WHITESPACE = 10010,
+		ID_MENU_VIEW_EOL = 10011,
 		ID_TOOLBAR = 10002,
 		ID_FOREIGN = 10003,
 		ID_WINDOW = 10008,

@@ -11,11 +11,29 @@
 #include "UIDefs.h"
 #include "FileEditorWnd.h"
 #include "FileEditorGroupWnd.h"
+#include "FileEditorStyles.h"
 
 namespace cz
 {
 namespace view
 {
+
+enum
+{
+	MARGIN_LINE_NUMBERS=0,
+	MARGIN_BREAKPOINTS,
+	MARGIN_FOLD,
+	ID_TextCtrl
+};
+
+// Markers
+enum
+{
+	MARK_BREAKPOINT_ON=0,
+	MARK_BREAKPOINT_OFF,
+	MARK_BREAKPOINT_INVALID,
+	MARK_DEBUGCURSOR
+};
 
 BEGIN_EVENT_TABLE(FileEditorWnd, FileEditorWnd_Auto)
 	EVT_STC_CHARADDED(ID_FileEditorTextCtrl, FileEditorWnd::OnCharacterAdded)
@@ -33,6 +51,8 @@ using namespace cz::document;
 FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 	: FileEditorWnd_Auto(parent,id,pos,size,style)
 {
+	m_textCtrl->SetSizeHints(wxSize(640, 350));
+
 }
 
 FileEditorWnd::~FileEditorWnd()
@@ -53,24 +73,141 @@ document::File* FileEditorWnd::getFile()
 	return gProject->getFile(m_fileId);
 }
 
+void FileEditorWnd::setCommonStyle()
+{
+	m_textCtrl->SetMarginWidth(MARGIN_LINE_NUMBERS, 50);
+	m_textCtrl->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
+
+	m_textCtrl->SetMarginWidth(MARGIN_BREAKPOINTS, 16);
+	m_textCtrl->SetMarginType(MARGIN_BREAKPOINTS, wxSTC_MARGIN_SYMBOL);
+	m_textCtrl->SetMarginSensitive(MARGIN_BREAKPOINTS, true);
+
+	m_textCtrl->SetWrapMode(wxSTC_WRAP_NONE);
+
+	/*
+	m_textCtrl->MarkerDefineBitmap(MARK_BREAKPOINT_ON, wxImage(breakpoint_on_xpm));
+	m_textCtrl->MarkerDefineBitmap(MARK_BREAKPOINT_OFF, wxImage(breakpoint_off_xpm));
+	m_textCtrl->MarkerDefineBitmap(MARK_BREAKPOINT_INVALID, wxImage(breakpoint_invalid_xpm));
+	m_textCtrl->MarkerDefineBitmap(MARK_DEBUGCURSOR, wxImage(debugcursor_xpm));
+	*/
+
+	// ---- Enable code folding
+	m_textCtrl->SetMarginWidth(MARGIN_FOLD, 15);
+	m_textCtrl->SetMarginType(MARGIN_FOLD, wxSTC_MARGIN_SYMBOL);
+	m_textCtrl->SetMarginMask(MARGIN_FOLD, wxSTC_MASK_FOLDERS);
+	m_textCtrl->SetMarginSensitive(MARGIN_FOLD, true);
+	m_textCtrl->SetFoldMarginColour(true, wxColour(220, 220, 220));
+	m_textCtrl->SetFoldMarginHiColour(true, clDefaultBkg);
+	//wxColour foldMarginColour(clDefaultBkg);
+	//m_textCtrl->StyleSetBackground(MARGIN_FOLD, foldMarginColour);
+
+	// Properties found from http://www.scintilla.org/SciTEDoc.html
+	m_textCtrl->SetProperty(wxT("fold"), wxT("1"));
+	m_textCtrl->SetProperty(wxT("fold.comment"), wxT("1"));
+	m_textCtrl->SetProperty(wxT("fold.compact"), wxT("1"));
+	m_textCtrl->SetProperty(wxT("fold.preprocessor"), wxT("1"));
+	// Disable automatic detection of inactive code due to #if #else #endif,
+	// since lots of defines will be outside the file
+	m_textCtrl->SetProperty("lexer.cpp.track.preprocessor", "0");
+
+	wxColour grey(100, 100, 100);
+	wxColour fcolour(240, 240, 240);
+	m_textCtrl->MarkerDefine(wxSTC_MARKNUM_FOLDER, wxSTC_MARK_BOXPLUS);
+	m_textCtrl->MarkerSetForeground(wxSTC_MARKNUM_FOLDER, fcolour);
+	m_textCtrl->MarkerSetBackground(wxSTC_MARKNUM_FOLDER, grey);
+
+	m_textCtrl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN, wxSTC_MARK_BOXMINUS);
+	m_textCtrl->MarkerSetForeground(wxSTC_MARKNUM_FOLDEROPEN, fcolour);
+	m_textCtrl->MarkerSetBackground(wxSTC_MARKNUM_FOLDEROPEN, grey);
+
+	m_textCtrl->MarkerDefine(wxSTC_MARKNUM_FOLDERSUB, wxSTC_MARK_VLINE);
+	m_textCtrl->MarkerSetForeground(wxSTC_MARKNUM_FOLDERSUB, grey);
+	m_textCtrl->MarkerSetBackground(wxSTC_MARKNUM_FOLDERSUB, grey);
+
+	m_textCtrl->MarkerDefine(wxSTC_MARKNUM_FOLDEREND, wxSTC_MARK_BOXPLUSCONNECTED);
+	m_textCtrl->MarkerSetForeground(wxSTC_MARKNUM_FOLDEREND, fcolour);
+	m_textCtrl->MarkerSetBackground(wxSTC_MARKNUM_FOLDEREND, grey);
+
+	m_textCtrl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, wxSTC_MARK_BOXMINUSCONNECTED);
+	m_textCtrl->MarkerSetForeground(wxSTC_MARKNUM_FOLDEROPENMID, fcolour);
+	m_textCtrl->MarkerSetBackground(wxSTC_MARKNUM_FOLDEROPENMID, grey);
+
+	m_textCtrl->MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL, wxSTC_MARK_TCORNER);
+	m_textCtrl->MarkerSetForeground(wxSTC_MARKNUM_FOLDERMIDTAIL, grey);
+	m_textCtrl->MarkerSetBackground(wxSTC_MARKNUM_FOLDERMIDTAIL, grey);
+
+	m_textCtrl->MarkerDefine(wxSTC_MARKNUM_FOLDERTAIL, wxSTC_MARK_LCORNER);
+	m_textCtrl->MarkerSetForeground(wxSTC_MARKNUM_FOLDERTAIL, grey);
+	m_textCtrl->MarkerSetBackground(wxSTC_MARKNUM_FOLDERTAIL, grey);
+	// ---- End of code folding part
+
+	// Indentation settings
+	auto tabWidth = m_textCtrl->GetTabWidth();
+	m_textCtrl->SetUseTabs(true);
+	m_textCtrl->SetIndent(4);
+	m_textCtrl->SetTabWidth(4);
+	m_textCtrl->SetTabIndents(true);
+	m_textCtrl->SetBackSpaceUnIndents(true);
+
+	m_textCtrl->SetWhitespaceForeground(true, gWhiteSpaceColour);
+
+	// Set indicator styles
+	for (int i = 0; i < (int)gIndicatorStyles.size(); i++)
+	{
+		m_textCtrl->IndicatorSetStyle(i, gIndicatorStyles[i].style);
+		m_textCtrl->IndicatorSetForeground(i, gIndicatorStyles[i].colour);
+		m_textCtrl->IndicatorSetAlpha(i, gIndicatorStyles[i].alpha);
+	}
+
+	m_textCtrl->SetCaretLineBackground(clCurrentLineBkg);
+	m_textCtrl->SetCaretLineVisible(true);
+}
+
 void FileEditorWnd::setFile(document::File* file, int line, int col, bool columnIsOffset)
 {
 	if (m_fileId.val == 0)
 	{
+		file->dirty = false;
 		m_fileId = file->id;
 
+		// Find the language we want
+		cz::UTF8String ext = file->extension;
+		LanguageInfo* lang = nullptr;
+		for (auto& l : gLanguages)
+		{
+			if (cz::find(l.fileextensions, ext) != l.fileextensions.end())
+			{
+				lang = &l;
+				break;
+			}
+		}
 
-		m_textCtrl->Connect(wxEVT_STC_MARGINCLICK, wxStyledTextEventHandler(FileEditorWnd::OnMarginClick), NULL, this);
-		file->dirty = false;
 		m_textCtrl->Freeze();
+
+		// Set the default shared style before StyleClearAll, because as specified in scintilla documentation,
+		// StyleClearAll will reset all other styles to wxSTC_STYLE_DEFAULT
+		setStyle(m_textCtrl, gSharedStyles[0]);
+		m_textCtrl->StyleClearAll();
+		if (lang)
+			m_textCtrl->SetLexer(lang->lexer);
+		setCommonStyle();
+		setStyles(m_textCtrl, gSharedStyles);
+		// Set styles specific to the language
+		if (lang)
+			setStyles(m_textCtrl, lang->styles);
+
+		updateViewOptions();
 	
 		m_textCtrl->SetReadOnly(false);
 		m_textCtrl->LoadFile(file->fullname.c_str(), wxTEXT_TYPE_ANY);
 		file->filetime = cz::FileTime::get(file->fullname, FileTime::kModified);
-
+		m_textCtrl->Connect(wxEVT_STC_MARGINCLICK, wxStyledTextEventHandler(FileEditorWnd::OnMarginClick), NULL, this);
 		m_textCtrl->Thaw();
 		m_textCtrl->SetSavePoint();
 		m_textCtrl->EmptyUndoBuffer();
+
+		updateErrorMarkers();
+		updateMarkers();
 
 		m_textCtrl->Fit();
 		this->Layout();
@@ -105,15 +242,89 @@ void FileEditorWnd::checkReload()
 
 void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 {
-	CZ_TODO();
-}
+	using namespace cz::document;
 
-void FileEditorWnd::updateErrorMarkers()
-{
+	switch(event.GetMargin())
+	{
+		case MARGIN_BREAKPOINTS:
+		{
+			int lineclick = m_textCtrl->LineFromPosition(event.GetPosition()) + 1;
+			// TODO
+			//gSession->toggleBreakpoint(m_file, lineclick);
+		}
+		break;
+		case MARGIN_FOLD:
+		{
+			int lineClick = m_textCtrl->LineFromPosition(event.GetPosition());
+			int levelClick = m_textCtrl->GetFoldLevel(lineClick);
+
+			if ((levelClick & wxSTC_FOLDLEVELHEADERFLAG) > 0)
+			{
+				m_textCtrl->ToggleFold(lineClick);
+			}
+		}
+		break;
+	}
 }
 
 void FileEditorWnd::updateMarkers()
 {
+	using namespace cz::document;
+
+	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_ON);
+	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_OFF);
+	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_INVALID);
+	m_textCtrl->MarkerDeleteAll(MARK_DEBUGCURSOR);
+
+	// TODO
+
+	/*
+	auto& breakpoints = gSession->getBreakpoints();
+	for(auto& b: breakpoints)
+	{
+		if (b->file == m_file)
+		{
+			if (gSession->getState()>=document::kSessionState_Running)
+			{
+				if (b->enabled)
+					m_textCtrl->MarkerAdd(b->line - 1, b->isValid() ? MARK_BREAKPOINT_ON : MARK_BREAKPOINT_INVALID);
+				else
+					m_textCtrl->MarkerAdd(b->line - 1, MARK_BREAKPOINT_OFF);
+			}
+			else
+			{
+				m_textCtrl->MarkerAdd(b->line - 1, b->enabled ? MARK_BREAKPOINT_ON : MARK_BREAKPOINT_OFF);
+			}
+		}
+	}
+
+	auto& debugpos = gSession->getLastSourcePos(m_file->isCSource());
+	if (debugpos.first == m_file)
+		m_textCtrl->MarkerAdd(debugpos.second-1, MARK_DEBUGCURSOR);
+		*/
+}
+
+void FileEditorWnd::updateErrorMarkers()
+{
+	m_textCtrl->SetIndicatorCurrent(kINDIC_Warning);
+	m_textCtrl->IndicatorClearRange(0, m_textCtrl->GetLength());
+	m_textCtrl->SetIndicatorCurrent(kINDIC_Error);
+	m_textCtrl->IndicatorClearRange(0, m_textCtrl->GetLength());
+
+	auto file = getFile();
+
+	for (auto& e : file->errorLines)
+	{
+		int line = e.line-1; // scintilla lines start at 0
+		m_textCtrl->SetIndicatorCurrent( e.isError ? kINDIC_Error : kINDIC_Warning);
+		/*
+		int length = m_textCtrl->GetLineLength(line);
+		int startpos = m_textCtrl->GetLineEndPosition(line)-length;
+		*/
+		int startpos = m_textCtrl->PositionFromLine(line);
+		int length = m_textCtrl->GetLineLength(line);
+		m_textCtrl->IndicatorFillRange(startpos, length);
+	}
 }
 
 void FileEditorWnd::OnTextChanged(wxStyledTextEvent& event)
@@ -181,8 +392,7 @@ void FileEditorWnd::OnUpdateUI(wxStyledTextEvent& event)
 	//
 	if (!m_textCtrl->GetSelectedText().Length())
 	{
-		// TODO
-		//m_textCtrl->SetIndicatorCurrent(kINDIC_WordMatch);
+		m_textCtrl->SetIndicatorCurrent(kINDIC_WordMatch);
 		m_textCtrl->IndicatorClearRange(0, m_textCtrl->GetLength());
 	}
 }
@@ -201,8 +411,7 @@ void FileEditorWnd::OnDoubleClick(wxStyledTextEvent& event)
 	int pos=m_textCtrl->FindText(0, m_textCtrl->GetLength(), txt, flags );
 	while(pos!=-1)
 	{
-		CZ_TODO();
-		//m_textCtrl->SetIndicatorCurrent(kINDIC_WordMatch);
+		m_textCtrl->SetIndicatorCurrent(kINDIC_WordMatch);
 		m_textCtrl->IndicatorFillRange(pos, txt.Length());
 		pos=m_textCtrl->FindText(pos+1, m_textCtrl->GetLength(), txt, flags );
 	}
@@ -439,8 +648,26 @@ bool FileEditorWnd::editorHasFocus()
 	return m_textCtrl->HasFocus();
 }
 
+void FileEditorWnd::updateViewOptions()
+{
+	m_textCtrl->SetIndentationGuides( uiState.view_ShowIndentationGuides ? wxSTC_IV_LOOKBOTH : wxSTC_IV_NONE);
+	m_textCtrl->SetViewWhiteSpace( uiState.view_Whitespace ? wxSTC_WS_VISIBLEALWAYS : wxSTC_WS_INVISIBLE);
+	m_textCtrl->SetViewEOL( uiState.view_EOL ? true : false);
+	m_textCtrl->SetEdgeMode(wxSTC_EDGE_LINE);
+	m_textCtrl->SetEdgeColumn(80);
+	m_textCtrl->SetEdgeColour(wxColour(210,210,210));
+}
+
 void FileEditorWnd::onAppEvent(const AppEvent& evt)
 {
+	switch (evt.id)
+	{
+		case AppEventID::ViewOptionsChanged:
+			updateViewOptions();
+			break;
+		default:
+			break;
+	};
 }
 
 void FileEditorWnd::recolourise(bool reparse)

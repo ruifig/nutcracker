@@ -41,6 +41,14 @@ struct File : public ProjectItem
 	UTF8String extension;
 	FileTime filetime;
 	bool dirty = false;
+
+	struct ErrorInfo
+	{
+		int line;
+		bool isError;
+		cz::UTF8String desc;
+	};
+	std::vector<ErrorInfo> errorLines;
 };
 
 struct Folder : public ProjectItem

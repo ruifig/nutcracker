@@ -50,6 +50,7 @@
       <Filter>AutoUI</Filter>
     </ClCompile>
     <ClCompile Include="View\FileEditorWnd.cpp" />
+    <ClCompile Include="View\FileEditorStyles.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
@@ -88,6 +89,7 @@
       <Filter>AutoUI</Filter>
     </ClInclude>
     <ClInclude Include="View\FileEditorWnd.h" />
+    <ClInclude Include="View\FileEditorStyles.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nutcracker.rc">

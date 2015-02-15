@@ -96,6 +96,7 @@
     </ClCompile>
     <ClCompile Include="UIDefs.cpp" />
     <ClCompile Include="View\FileEditorGroupWnd.cpp" />
+    <ClCompile Include="View\FileEditorStyles.cpp" />
     <ClCompile Include="View\FileEditorWnd.cpp" />
     <ClCompile Include="View\MainWnd.cpp" />
     <ClCompile Include="View\TreeCtrlUtilCode.cpp" />
@@ -112,6 +113,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UIDefs.h" />
     <ClInclude Include="View\FileEditorGroupWnd.h" />
+    <ClInclude Include="View\FileEditorStyles.h" />
     <ClInclude Include="View\FileEditorWnd.h" />
     <ClInclude Include="View\MainWnd.h" />
     <ClInclude Include="View\TreeCtrlUtilCode.h" />

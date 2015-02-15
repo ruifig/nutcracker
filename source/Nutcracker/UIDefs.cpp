@@ -7,12 +7,14 @@ namespace view
 {
 
 wxImageList gImageListSmall(16, 16);
+class MainWnd* gMainWnd;
 class WorkspaceWnd* gWorkspaceWnd;
 class FileEditorGroupWnd* gFileEditorGroupWnd;
 std::shared_ptr<document::Project> gProject;
 
-
 }
+
+UIState uiState;
 
 cz::UTF8String wxStringToUtf8(const wxString& str)
 {

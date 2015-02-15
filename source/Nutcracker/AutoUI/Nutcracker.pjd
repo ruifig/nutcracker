@@ -390,6 +390,87 @@
                 <string name="type">"dialog-control-document"</string>
               </document>
             </document>
+            <document>
+              <string name="proxy-type">"wbMenuProxy"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"menu"</string>
+              <long name="is-transient">0</long>
+              <long name="locked">0</long>
+              <long name="owns-file">1</long>
+              <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Label">"View"</string>
+              <string name="proxy-Member variable name">""</string>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <string name="title">"View"</string>
+              <long name="title-mode">0</long>
+              <string name="type">"dialog-control-document"</string>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuClick|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_VIEW_INDENTATION"</string>
+                <long name="proxy-Id value">10009</long>
+                <string name="proxy-Kind">"Check"</string>
+                <string name="proxy-Label">"Indentation guides"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Indentation guides: ID_MENU_VIEW_INDENTATION"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuClick|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_VIEW_WHITESPACE"</string>
+                <long name="proxy-Id value">10010</long>
+                <string name="proxy-Kind">"Check"</string>
+                <string name="proxy-Label">"Whitespaces"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Whitespaces: ID_MENU_VIEW_WHITESPACE"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuClick|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_VIEW_EOL"</string>
+                <long name="proxy-Id value">10011</long>
+                <string name="proxy-Kind">"Check"</string>
+                <string name="proxy-Label">"End of line"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"End of line: ID_MENU_VIEW_EOL"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+            </document>
           </document>
           <document>
             <string name="proxy-type">"wbAuiToolBarProxy"</string>
@@ -1101,13 +1182,21 @@
             <long name="is-transient">0</long>
             <long name="locked">0</long>
             <long name="owns-file">1</long>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Border">5</long>
             <string name="proxy-Member variable name">""</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+            <long name="proxy-Stretch factor">0</long>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+            <bool name="proxy-wxLEFT">1</bool>
             <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
+            <bool name="proxy-wxTOP">1</bool>
             <string name="title">"wxBoxSizer V"</string>
             <long name="title-mode">0</long>
             <string name="type">"dialog-control-document"</string>
@@ -1282,13 +1371,21 @@
             <long name="is-transient">0</long>
             <long name="locked">0</long>
             <long name="owns-file">1</long>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Border">5</long>
             <string name="proxy-Member variable name">""</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+            <long name="proxy-Stretch factor">0</long>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+            <bool name="proxy-wxLEFT">1</bool>
             <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
+            <bool name="proxy-wxTOP">1</bool>
             <string name="title">"wxBoxSizer V"</string>
             <long name="title-mode">0</long>
             <string name="type">"dialog-control-document"</string>

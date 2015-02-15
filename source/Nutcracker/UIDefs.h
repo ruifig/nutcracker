@@ -13,6 +13,7 @@ namespace document
 namespace view
 {
 	class FileEditorWnd;
+	extern class MainWnd* gMainWnd;
 	extern class WorkspaceWnd* gWorkspaceWnd;
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
 	extern wxImageList gImageListSmall;
@@ -32,6 +33,15 @@ cz::UTF8String wxStringToUtf8(const wxString& str);
 void showError(const char* title, const char* fmt, ...);
 void showMsg(const char* title, const char* fmt, ...);
 void showException(std::exception& e);
+
+struct UIState
+{
+	bool view_ShowIndentationGuides = false;
+	bool view_Whitespace = false;
+	bool view_EOL = false;
+};
+
+extern UIState uiState;
 
 }
 

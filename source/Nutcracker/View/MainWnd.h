@@ -28,6 +28,7 @@ private:
 	DECLARE_EVENT_TABLE()
 
 	virtual void OnIdle(wxIdleEvent& evt) override;
+	virtual void OnMenuClick(wxCommandEvent& event) override;
 
 	std::unique_ptr<MainWndLoggerOutput> m_logger;
 	cz::AsyncCommandQueueExplicit m_asyncFuncs;
