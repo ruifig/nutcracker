@@ -17,6 +17,7 @@ namespace view
 	extern class WorkspaceWnd* gWorkspaceWnd;
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
 	extern wxImageList gImageListSmall;
+	extern wxImageList gImageList32x32;
 	extern std::shared_ptr<document::Project> gProject;
 
 	enum
@@ -24,7 +25,14 @@ namespace view
 		SMALLIMG_IDX_FOLDER,
 		SMALLIMG_IDX_FILE_OTHER,
 		SMALLIMG_IDX_FILE_NUT,
+		SMALLIMG_IDX_NUT,
 		SMALLIMG_IDX_MAX
+	};
+
+	enum
+	{
+		BIGIMG_IDX_NUT,
+		BIGIMG_MAX
 	};
 
 }
