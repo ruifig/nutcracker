@@ -76,6 +76,12 @@ public:
 
 ////@begin MainWnd_Auto event handler declarations
 
+	/// wxEVT_CLOSE_WINDOW event handler for ID_MAINWND_AUTO
+	virtual void OnCloseWindow( wxCloseEvent& event );
+
+	/// wxEVT_IDLE event handler for ID_MAINWND_AUTO
+	virtual void OnIdle( wxIdleEvent& event );
+
 ////@end MainWnd_Auto event handler declarations
 
 ////@begin MainWnd_Auto member function declarations

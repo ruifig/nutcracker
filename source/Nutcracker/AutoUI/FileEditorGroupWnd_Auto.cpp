@@ -35,6 +35,10 @@ IMPLEMENT_DYNAMIC_CLASS( FileEditorGroupWnd_Auto, wxPanel )
 BEGIN_EVENT_TABLE( FileEditorGroupWnd_Auto, wxPanel )
 
 ////@begin FileEditorGroupWnd_Auto event table entries
+	EVT_AUINOTEBOOK_PAGE_CLOSED( ID_AUINOTEBOOK, FileEditorGroupWnd_Auto::OnPageClosed )
+	EVT_AUINOTEBOOK_PAGE_CLOSE( ID_AUINOTEBOOK, FileEditorGroupWnd_Auto::OnPageClose )
+	EVT_AUINOTEBOOK_PAGE_CHANGED( ID_AUINOTEBOOK, FileEditorGroupWnd_Auto::OnPageChanged )
+	EVT_AUINOTEBOOK_TAB_RIGHT_UP( ID_AUINOTEBOOK, FileEditorGroupWnd_Auto::OnTabRightUp )
 ////@end FileEditorGroupWnd_Auto event table entries
 
 END_EVENT_TABLE()
@@ -153,3 +157,56 @@ wxIcon FileEditorGroupWnd_Auto::GetIconResource( const wxString& name )
 	return wxNullIcon;
 ////@end FileEditorGroupWnd_Auto icon retrieval
 }
+
+
+/*
+ * wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED event handler for ID_AUINOTEBOOK
+ */
+
+void FileEditorGroupWnd_Auto::OnPageClosed( wxAuiNotebookEvent& event )
+{
+////@begin wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED event handler for ID_AUINOTEBOOK in FileEditorGroupWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED event handler for ID_AUINOTEBOOK in FileEditorGroupWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE event handler for ID_AUINOTEBOOK
+ */
+
+void FileEditorGroupWnd_Auto::OnPageClose( wxAuiNotebookEvent& event )
+{
+////@begin wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE event handler for ID_AUINOTEBOOK in FileEditorGroupWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE event handler for ID_AUINOTEBOOK in FileEditorGroupWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED event handler for ID_AUINOTEBOOK
+ */
+
+void FileEditorGroupWnd_Auto::OnPageChanged( wxAuiNotebookEvent& event )
+{
+////@begin wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED event handler for ID_AUINOTEBOOK in FileEditorGroupWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED event handler for ID_AUINOTEBOOK in FileEditorGroupWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_UP event handler for ID_AUINOTEBOOK
+ */
+
+void FileEditorGroupWnd_Auto::OnTabRightUp( wxAuiNotebookEvent& event )
+{
+////@begin wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_UP event handler for ID_AUINOTEBOOK in FileEditorGroupWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_UP event handler for ID_AUINOTEBOOK in FileEditorGroupWnd_Auto. 
+}
+

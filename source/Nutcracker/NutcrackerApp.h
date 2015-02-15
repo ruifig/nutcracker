@@ -17,7 +17,8 @@ public:
 
 	/// Called on exit
 	virtual int OnExit();
-
+private:
+	cz::PlatformRoot m_platformRoot;
 };
 
 DECLARE_APP(NutcrackerApp)

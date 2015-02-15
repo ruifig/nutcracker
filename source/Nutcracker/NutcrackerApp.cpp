@@ -1,6 +1,9 @@
 #include "NutcrackerPCH.h"
 #include "NutcrackerApp.h"
 #include "View/MainWnd.h"
+#include "Document/Project.h"
+#include "AppEvents.h"
+#include "UIDefs.h"
 
 using namespace cz::view;
 
@@ -16,7 +19,7 @@ IMPLEMENT_CLASS(NutcrackerApp, wxApp)
 BEGIN_EVENT_TABLE( NutcrackerApp, wxApp )
 END_EVENT_TABLE()
 
-NutcrackerApp::NutcrackerApp()
+NutcrackerApp::NutcrackerApp() : m_platformRoot(&cz::PlatformRoot::Config{nullptr, 0, false})
 {
 	Init();
 }
@@ -45,10 +48,35 @@ bool NutcrackerApp::OnInit()
 	wxImage::AddHandler(new wxGIFHandler);
 #endif
 
-    // create the main application window
+
+	//
+	// Initialize image lists
+	//
+	for (int i = 0; i < SMALLIMG_IDX_MAX; i++)
+		gImageListSmall.Add(wxArtProvider::GetBitmap(wxART_MISSING_IMAGE, wxART_OTHER, wxSize(16, 16)));
+
+	gImageListSmall.Replace(SMALLIMG_IDX_FOLDER, wxArtProvider::GetBitmap(wxART_FOLDER, wxART_OTHER, wxSize(16, 16)));
+	gImageListSmall.Replace(SMALLIMG_IDX_FILE_OTHER, wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_OTHER, wxSize(16, 16)));
+	gImageListSmall.Replace(SMALLIMG_IDX_FILE_NUT, wxBITMAP_PNG(APP_IMG_16x16_FILE_NUT));
+
+	// create the main application window
     MainWnd *mainWnd = new MainWnd();
 
     mainWnd->Show(true);
+
+	using namespace cz::document;
+	using namespace cz::view;
+	gProject = std::make_shared<Project>(cz::Filesystem::getSingleton().getCWD().c_str());
+	gProject->populate();
+	mainWnd->addAsyncFunc([]()
+	{
+		fireAppEvent(AppEventID::OpenWorkspace);
+	});
+
+
+	//
+	// Test project handling
+	//
 
     // success: wxApp::OnRun() will be called which will enter the main message
     // loop and the application will run. If we returned false here, the
@@ -58,5 +86,6 @@ bool NutcrackerApp::OnInit()
 
 int NutcrackerApp::OnExit()
 {
+	gProject.reset();
 	return wxApp::OnExit();
 }

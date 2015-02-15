@@ -14,15 +14,23 @@ namespace cz
 namespace view
 {
 
+class MainWndLoggerOutput;
+
 class MainWnd : public MainWnd_Auto
 {
 public:
 	MainWnd();
 	virtual ~MainWnd();
 
+	// Adds a function to be called on the next tick
+	void addAsyncFunc(std::function<void()> f);
 private:
 	DECLARE_EVENT_TABLE()
 
+	virtual void OnIdle(wxIdleEvent& evt) override;
+
+	std::unique_ptr<MainWndLoggerOutput> m_logger;
+	cz::AsyncCommandQueueExplicit m_asyncFuncs;
 };
 
 } // namespace view

@@ -14,7 +14,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <WarningLevel>Level4</WarningLevel>
       <AdditionalOptions>/wd4996 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\dependencies\czPlatform\source</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Nutcracker;$(SolutionDir)..\dependencies\czPlatform\source</AdditionalIncludeDirectories>
       <MinimalRebuild>No</MinimalRebuild>
     </ClCompile>
     <Link>

@@ -70,6 +70,18 @@ public:
 
 ////@begin FileEditorGroupWnd_Auto event handler declarations
 
+	/// wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED event handler for ID_AUINOTEBOOK
+	virtual void OnPageClosed( wxAuiNotebookEvent& event );
+
+	/// wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE event handler for ID_AUINOTEBOOK
+	virtual void OnPageClose( wxAuiNotebookEvent& event );
+
+	/// wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED event handler for ID_AUINOTEBOOK
+	virtual void OnPageChanged( wxAuiNotebookEvent& event );
+
+	/// wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_UP event handler for ID_AUINOTEBOOK
+	virtual void OnTabRightUp( wxAuiNotebookEvent& event );
+
 ////@end FileEditorGroupWnd_Auto event handler declarations
 
 ////@begin FileEditorGroupWnd_Auto member function declarations

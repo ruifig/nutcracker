@@ -37,6 +37,8 @@ IMPLEMENT_CLASS( MainWnd_Auto, wxFrame )
 BEGIN_EVENT_TABLE( MainWnd_Auto, wxFrame )
 
 ////@begin MainWnd_Auto event table entries
+	EVT_CLOSE( MainWnd_Auto::OnCloseWindow )
+	EVT_IDLE( MainWnd_Auto::OnIdle )
 ////@end MainWnd_Auto event table entries
 
 END_EVENT_TABLE()
@@ -184,3 +186,30 @@ wxIcon MainWnd_Auto::GetIconResource( const wxString& name )
 	return wxNullIcon;
 ////@end MainWnd_Auto icon retrieval
 }
+
+
+/*
+ * wxEVT_CLOSE_WINDOW event handler for ID_MAINWND_AUTO
+ */
+
+void MainWnd_Auto::OnCloseWindow( wxCloseEvent& event )
+{
+////@begin wxEVT_CLOSE_WINDOW event handler for ID_MAINWND_AUTO in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_CLOSE_WINDOW event handler for ID_MAINWND_AUTO in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_IDLE event handler for ID_MAINWND_AUTO
+ */
+
+void MainWnd_Auto::OnIdle( wxIdleEvent& event )
+{
+////@begin wxEVT_IDLE event handler for ID_MAINWND_AUTO in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_IDLE event handler for ID_MAINWND_AUTO in MainWnd_Auto. 
+}
+

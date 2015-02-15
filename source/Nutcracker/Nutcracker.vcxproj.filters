@@ -14,6 +14,9 @@
     <Filter Include="View">
       <UniqueIdentifier>{b38625d9-281a-40f6-b0b1-72b0ad07eebe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Document">
+      <UniqueIdentifier>{39ac7408-eb35-42c0-a08d-cb3dac9efd04}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutoUI\FileEditorGroupWnd_Auto.cpp">
@@ -37,6 +40,16 @@
     <ClCompile Include="View\FileEditorGroupWnd.cpp">
       <Filter>View</Filter>
     </ClCompile>
+    <ClCompile Include="Document\Project.cpp" />
+    <ClCompile Include="View\TreeCtrlUtilCode.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="UIDefs.cpp" />
+    <ClCompile Include="AppEvents.cpp" />
+    <ClCompile Include="AutoUI\FileEditorWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="View\FileEditorWnd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
@@ -63,6 +76,21 @@
     <ClInclude Include="View\WorkspaceWnd.h">
       <Filter>View</Filter>
     </ClInclude>
+    <ClInclude Include="NutcrackerCommon.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="Document\Project.h">
+      <Filter>Document</Filter>
+    </ClInclude>
+    <ClInclude Include="View\TreeCtrlUtilCode.h">
+      <Filter>View</Filter>
+    </ClInclude>
+    <ClInclude Include="UIDefs.h" />
+    <ClInclude Include="AppEvents.h" />
+    <ClInclude Include="AutoUI\FileEditorWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="View\FileEditorWnd.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nutcracker.rc">

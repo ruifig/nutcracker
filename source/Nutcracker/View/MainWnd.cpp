@@ -10,6 +10,7 @@
 #include "NutcrackerPCH.h"
 #include "MainWnd.h"
 
+#include "Document/Project.h"
 
 namespace cz
 {
@@ -19,13 +20,59 @@ namespace view
 BEGIN_EVENT_TABLE(MainWnd, MainWnd_Auto)
 END_EVENT_TABLE()
 
+//////////////////////////////////////////////////////////////////////////
+// MainWndLoogerOutput
+//
+// Thread safe logger output.
+// It will queue log messages to be processed in the main thread.
+//
+//////////////////////////////////////////////////////////////////////////
+class MainWndLoggerOutput : public cz::LoggerOutput
+{
+public:
+	MainWndLoggerOutput(cz::AsyncCommandQueueExplicit* cmdQueue, wxTextCtrl* ctrl) : m_queue(cmdQueue), m_ctrl(ctrl)
+	{
+	}
+
+	virtual void outputLog(int cat, Logger::LogLevel level, const char* str) override
+	{
+		std::string s(str);
+		m_queue->send([=]()
+		{
+			m_ctrl->AppendText(s);
+		});
+	}
+
+	cz::AsyncCommandQueueExplicit* m_queue;
+	wxTextCtrl* m_ctrl;
+};
+
+//////////////////////////////////////////////////////////////////////////
+// MainWnd
+//////////////////////////////////////////////////////////////////////////
+
 MainWnd::MainWnd()
 	: MainWnd_Auto((wxFrame*)nullptr, wxID_ANY, "Nutcracker IDE", wxDefaultPosition, wxSize(1024,768))
 {
+	m_logger = std::make_unique<MainWndLoggerOutput>(&m_asyncFuncs, m_logTextCtrl);
+	cz::Logger::getSingleton().addOutput(m_logger.get());
+
+	document::Project prj(Filesystem::getSingleton().getCWD());
+	prj.populate();
 }
 
 MainWnd::~MainWnd()
 {
+}
+
+void MainWnd::OnIdle(wxIdleEvent& evt)
+{
+	m_asyncFuncs.tick(false);
+}
+
+void MainWnd::addAsyncFunc(std::function<void()> f)
+{
+	m_asyncFuncs.send(std::move(f));
 }
 
 } // namespace view

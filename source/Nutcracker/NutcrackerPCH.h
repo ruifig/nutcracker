@@ -107,6 +107,7 @@ typedef  unsigned char  byte;
 #include "czPlatform/czUTF8String.h"
 #include "czPlatform/czScopeGuard.h"
 #include "czPlatform/czParameters.h"
+#include "czPlatform/czAsyncCommandQueue.h"
+#include "czPlatform/czFileTime.h"
 
 #define FORWARD_DECLARE_VIEWCLASS(CLASS) namespace cz { namespace view { class CLASS; } }
-
