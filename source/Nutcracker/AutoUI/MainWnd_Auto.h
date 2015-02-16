@@ -83,6 +83,12 @@ public:
 	/// wxEVT_IDLE event handler for ID_MAINWND_AUTO
 	virtual void OnIdle( wxIdleEvent& event );
 
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_OPENFILE
+	virtual void OnMenuOpenFile( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_EXIT
+	virtual void OnExitClick( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_INDENTATION
 	virtual void OnMenuClick( wxCommandEvent& event );
 
@@ -111,8 +117,7 @@ public:
 	/// Control identifiers
 	enum {
 		ID_MAINWND_AUTO = 10000,
-		ID_MENUITEM = 10001,
-		ID_MENUITEM1 = 10004,
+		ID_MENU_FILE_OPENFILE = 10004,
 		ID_MENU_VIEW_INDENTATION = 10009,
 		ID_MENU_VIEW_WHITESPACE = 10010,
 		ID_MENU_VIEW_EOL = 10011,
@@ -121,7 +126,8 @@ public:
 		ID_WINDOW = 10008,
 		ID_AUINOTEBOOK = 10005,
 		ID_PANEL = 10006,
-		ID_TEXTCTRL = 10007
+		ID_TEXTCTRL = 10007,
+		ID_PANEL1 = 10001
 	};
 ////@end MainWnd_Auto member variables
 };

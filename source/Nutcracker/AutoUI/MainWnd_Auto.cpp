@@ -39,6 +39,8 @@ BEGIN_EVENT_TABLE( MainWnd_Auto, wxFrame )
 ////@begin MainWnd_Auto event table entries
 	EVT_CLOSE( MainWnd_Auto::OnCloseWindow )
 	EVT_IDLE( MainWnd_Auto::OnIdle )
+	EVT_MENU( ID_MENU_FILE_OPENFILE, MainWnd_Auto::OnMenuOpenFile )
+	EVT_MENU( wxID_EXIT, MainWnd_Auto::OnExitClick )
 	EVT_MENU( ID_MENU_VIEW_INDENTATION, MainWnd_Auto::OnMenuClick )
 	EVT_MENU( ID_MENU_VIEW_WHITESPACE, MainWnd_Auto::OnMenuClick )
 	EVT_MENU( ID_MENU_VIEW_EOL, MainWnd_Auto::OnMenuClick )
@@ -118,44 +120,49 @@ void MainWnd_Auto::CreateControls()
 
 	wxMenuBar* menuBar = new wxMenuBar;
 	wxMenu* itemMenu3 = new wxMenu;
-	itemMenu3->Append(ID_MENUITEM, _("New workspace"), wxEmptyString, wxITEM_NORMAL);
-	itemMenu3->Append(ID_MENUITEM1, _("Open workspace"), wxEmptyString, wxITEM_NORMAL);
-	menuBar->Append(itemMenu3, _("File"));
-	wxMenu* itemMenu6 = new wxMenu;
-	itemMenu6->Append(ID_MENU_VIEW_INDENTATION, _("Indentation guides"), wxEmptyString, wxITEM_CHECK);
-	itemMenu6->Append(ID_MENU_VIEW_WHITESPACE, _("Whitespaces"), wxEmptyString, wxITEM_CHECK);
-	itemMenu6->Append(ID_MENU_VIEW_EOL, _("End of line"), wxEmptyString, wxITEM_CHECK);
-	menuBar->Append(itemMenu6, _("View"));
+	itemMenu3->Append(ID_MENU_FILE_OPENFILE, _("&Open file"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu3->AppendSeparator();
+	itemMenu3->Append(wxID_EXIT, _("E&xit"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu3, _("&File"));
+	wxMenu* itemMenu7 = new wxMenu;
+	itemMenu7->Append(ID_MENU_VIEW_INDENTATION, _("&Indentation guides"), wxEmptyString, wxITEM_CHECK);
+	itemMenu7->Append(ID_MENU_VIEW_WHITESPACE, _("&Whitespaces"), wxEmptyString, wxITEM_CHECK);
+	itemMenu7->Append(ID_MENU_VIEW_EOL, _("&End of line"), wxEmptyString, wxITEM_CHECK);
+	menuBar->Append(itemMenu7, _("&View"));
 	m_menuInterpreters = new wxMenu;
-	menuBar->Append(m_menuInterpreters, _("Interpreter"));
+	menuBar->Append(m_menuInterpreters, _("&Interpreter"));
 	itemFrame1->SetMenuBar(menuBar);
 
-	wxAuiToolBar* itemAuiToolBar11 = new wxAuiToolBar( itemFrame1, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_GRIPPER );
-	itemAuiToolBar11->Realize();
-	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar11, wxAuiPaneInfo()
+	wxAuiToolBar* itemAuiToolBar12 = new wxAuiToolBar( itemFrame1, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_GRIPPER );
+	itemAuiToolBar12->Realize();
+	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar12, wxAuiPaneInfo()
 		.ToolbarPane().Name(wxT("Pane1")).Top().Layer(10).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(false).Floatable(false).Gripper(true));
 
 	m_workspaceWnd = new cz::view::WorkspaceWnd( itemFrame1, ID_FOREIGN, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
-		.Name(wxT("Pane2")).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
+		.Name(wxT("Pane2")).Caption(_("Workspace")).MinSize(wxSize(80, 120)).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
-	cz::view::FileEditorGroupWnd* itemWindow13 = new cz::view::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
-	itemFrame1->GetAuiManager().AddPane(itemWindow13, wxAuiPaneInfo()
-		.Name(wxT("Pane4")).Centre().CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
+	cz::view::FileEditorGroupWnd* itemWindow14 = new cz::view::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
+	itemFrame1->GetAuiManager().AddPane(itemWindow14, wxAuiPaneInfo()
+		.Name(wxT("Pane4")).Centre().CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
-	wxAuiNotebook* itemAuiNotebook14 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_DEFAULT_STYLE|wxAUI_NB_TOP );
+	wxAuiNotebook* itemAuiNotebook15 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_DEFAULT_STYLE|wxAUI_NB_TOP );
 
-	wxPanel* itemPanel15 = new wxPanel( itemAuiNotebook14, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-	wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
-	itemPanel15->SetSizer(itemBoxSizer16);
+	wxPanel* itemPanel16 = new wxPanel( itemAuiNotebook15, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+	wxBoxSizer* itemBoxSizer17 = new wxBoxSizer(wxVERTICAL);
+	itemPanel16->SetSizer(itemBoxSizer17);
 
-	m_logTextCtrl = new wxTextCtrl( itemPanel15, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
-	itemBoxSizer16->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
+	m_logTextCtrl = new wxTextCtrl( itemPanel16, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
+	itemBoxSizer17->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
 
-	itemAuiNotebook14->AddPage(itemPanel15, _("Log"), false);
+	itemAuiNotebook15->AddPage(itemPanel16, _("Log"), false);
 
-	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook14, wxAuiPaneInfo()
-		.Name(wxT("Pane3")).Bottom().CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
+	wxPanel* itemPanel19 = new wxPanel( itemAuiNotebook15, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+
+	itemAuiNotebook15->AddPage(itemPanel19, _("Tab"), false);
+
+	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook15, wxAuiPaneInfo()
+		.Name(wxT("Pane3")).Caption(_("Output")).Bottom().MinSize(wxSize(80, 80)).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));
 
 	GetAuiManager().Update();
 
@@ -229,11 +236,36 @@ void MainWnd_Auto::OnIdle( wxIdleEvent& event )
  * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_IDENTATION
  */
 
-void MainWnd_Auto::OnMenuClick( wxCommandEvent& event )
+void MainWnd_Auto::OnMenuOpenFile( wxCommandEvent& event )
 {
 ////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_IDENTATION in MainWnd_Auto.
 	// Before editing this code, remove the block markers.
 	event.Skip();
 ////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_IDENTATION in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for wxID_EXIT
+ */
+
+void MainWnd_Auto::OnExitClick( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for wxID_EXIT in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for wxID_EXIT in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_INDENTATION
+ */
+
+void MainWnd_Auto::OnMenuClick( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_INDENTATION in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_INDENTATION in MainWnd_Auto. 
 }
 

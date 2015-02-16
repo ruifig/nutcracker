@@ -30,6 +30,10 @@ private:
 
 	virtual void OnIdle(wxIdleEvent& evt) override;
 	virtual void OnMenuClick(wxCommandEvent& event) override;
+	virtual void OnExitClick(wxCommandEvent& event) override;
+	virtual void OnCloseWindow(wxCloseEvent& event) override;
+	virtual void OnMenuOpenFile(wxCommandEvent& event) override;
+	void OnDropFiles(wxDropFilesEvent& event);
 
 	void OnCharHook(wxKeyEvent& event);
 	void OnQuit(wxCommandEvent& event);

@@ -327,5 +327,25 @@ FileEditorWnd* FileEditorGroupWnd::getEditorWithFocus()
 	return wnd;
 }
 
+bool FileEditorGroupWnd::hasDirtyFiles()
+{
+	bool hasDirty = false;
+	iterateFiles([&](FileEditorWnd* fwnd)
+	{
+		if (fwnd->getFile()->dirty)
+			hasDirty = true;
+	});
+
+	return hasDirty;
+}
+
+void FileEditorGroupWnd::saveAll()
+{
+	iterateFiles([&](FileEditorWnd* fwnd)
+	{
+		fwnd->save();
+	});
+}
+
 } // namespace view
 } // namespace cz

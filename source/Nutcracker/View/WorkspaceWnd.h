@@ -12,6 +12,7 @@
 #include "TreeCtrlUtilCode.h"
 #include "AppEvents.h"
 #include "Document/Project.h"
+#include "AutoUI/WorkspaceWnd_Auto.h"
 
 namespace cz
 {
@@ -19,7 +20,7 @@ namespace cz
 namespace view
 {
 
-class WorkspaceWnd : public wxPanel, public AppEventListener
+class WorkspaceWnd : public WorkspaceWnd_Auto, public AppEventListener
 {
 public:
 	WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
@@ -29,10 +30,11 @@ public:
 
 private:
 	DECLARE_EVENT_TABLE()
-	void OnItemActivated(wxTreeEvent& event);
+	virtual void OnTreeItemActivated(wxTreeEvent& event) override;
+	virtual void OnTreeItemMenu(wxTreeEvent& event) override;
 	void OnOpenContainingFolder(wxCommandEvent& event);
 	void OnRunScriptFile(wxCommandEvent& event);
-	void OnItemMenu(wxTreeEvent& event);
+	virtual void OnDirpickerctrlDirPickerChanged(wxFileDirPickerEvent& event) override;
 
 	std::shared_ptr<TreeCtrlUtil::TreeItemData> updateState(const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent,
 															const std::shared_ptr<const document::ProjectItem>& item);
@@ -40,7 +42,6 @@ private:
 	wxTreeItemId findFileTreeItem(document::ProjectItemId fileId);
 
 	virtual void onAppEvent(const AppEvent& evt) override;
-	wxTreeCtrl* m_treeCtrl;
 	TreeCtrlUtil::TreeCtrlData m_treeData;
 	document::ProjectItemId m_selectedFileId;
 };

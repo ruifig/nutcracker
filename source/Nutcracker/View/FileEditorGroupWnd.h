@@ -28,6 +28,8 @@ public:
 	FileEditorWnd* getEditorWithFocus();
 	void forceCloseAll();
 	document::File* getCurrentFile();
+	bool hasDirtyFiles();
+	void saveAll();
 private:
 	DECLARE_EVENT_TABLE()
 

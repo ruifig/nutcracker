@@ -14,6 +14,7 @@
 #include "AppEvents.h"
 #include "Document/Interpreter.h"
 #include "LaunchUtil.h"
+#include "FileEditorGroupWnd.h"
 
 using namespace cz;
 using namespace document;
@@ -34,6 +35,7 @@ enum
 
 BEGIN_EVENT_TABLE(MainWnd, MainWnd_Auto)
 	//EVT_MENU(ID_MENU_INTERPRETER_FIRST, MainWnd::OnMenuClick)
+	EVT_DROP_FILES(MainWnd::OnDropFiles)
 END_EVENT_TABLE()
 
 //////////////////////////////////////////////////////////////////////////
@@ -112,10 +114,9 @@ MainWnd::MainWnd()
 		uiState->currentInterpreter = uiState->interpreters[0].get();
 	}
 
-	document::Project prj(Filesystem::getSingleton().getCWD());
-	prj.populate();
-
 	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainWnd::OnCharHook));
+
+	DragAcceptFiles(true);
 
 }
 
@@ -143,14 +144,20 @@ void MainWnd::OnMenuClick(wxCommandEvent& event)
 		case ID_MENU_VIEW_INDENTATION:
 			uiState->view_ShowIndentationGuides = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
-			break;
+		break;
+
 		case ID_MENU_VIEW_WHITESPACE:
 			uiState->view_Whitespace = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
 		break;
+
 		case ID_MENU_VIEW_EOL:
 			uiState->view_EOL = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
+		break;
+
+		case ID_MENU_FILE_OPENFILE:
+			showMsg("TODO", "TODO");
 		break;
 	}
 
@@ -180,6 +187,76 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 		break;
 	default:
 		event.Skip();
+	}
+
+}
+
+void MainWnd::OnExitClick(wxCommandEvent& event)
+{
+	// true is to force the frame to close
+	Close(false);
+}
+
+void MainWnd::OnCloseWindow(wxCloseEvent& event)
+{
+	if (event.CanVeto() && gFileEditorGroupWnd->hasDirtyFiles())
+	{
+		try
+		{
+			int ret = wxMessageBox("Workspace has changed.\nSave changes?", wxMessageBoxCaptionStr, wxYES_NO|wxCANCEL|wxICON_QUESTION);
+			
+			if (ret==wxYES)
+			{
+				gFileEditorGroupWnd->saveAll();
+			}
+			else if (ret==wxNO)
+			{
+				// do nothing
+			}
+			else // CANCEL
+			{
+				event.Veto();
+				return;
+			}
+		}
+		catch (std::exception& e)
+		{
+			showException(e);
+			event.Veto();
+			return;
+		}
+	}
+
+	event.Skip();
+}
+
+void MainWnd::OnMenuOpenFile(wxCommandEvent& event)
+{
+	try
+	{
+		wxFileDialog openFileDialog(this, "Open file", wxGetCwd(), "", "Squirrel (*.nut)|*.nut",
+			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+
+		if (openFileDialog.ShowModal() == wxID_CANCEL)
+			return;
+
+		cz::UTF8String filename = wxStringToUtf8(openFileDialog.GetPath());
+	}
+	catch (std::exception& e)
+	{
+		showException(e);
+	}
+}
+
+void MainWnd::OnDropFiles(wxDropFilesEvent& event)
+{
+	wxString* dropped = event.GetFiles();
+	for (int i = 0; i < event.GetNumberOfFiles(); i++)
+	{
+		auto file = gProject->addLooseFile(wxStringToUtf8(*dropped));
+		if (file)
+			gFileEditorGroupWnd->gotoFile(file);
+		dropped++;
 	}
 
 }

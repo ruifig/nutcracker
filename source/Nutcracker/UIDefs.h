@@ -53,6 +53,7 @@ struct UIState
 };
 
 extern std::unique_ptr<UIState> uiState;
+extern std::unique_ptr<cz::Parameters> gParameters;
 
 }
 

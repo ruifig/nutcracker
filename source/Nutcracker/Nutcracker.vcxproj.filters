@@ -59,6 +59,7 @@
       <Filter>View</Filter>
     </ClCompile>
     <ClCompile Include="LaunchUtil.cpp" />
+    <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
@@ -103,6 +104,7 @@
       <Filter>View</Filter>
     </ClInclude>
     <ClInclude Include="LaunchUtil.h" />
+    <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nutcracker.rc">

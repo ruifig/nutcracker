@@ -36,10 +36,15 @@ bool NutcrackerApp::OnInit()
 	using namespace cz::document;
 	using namespace cz::view;
 
+	gParameters = std::make_unique<cz::Parameters>();
+	gParameters->set(argc, argv);
+
     // call the base class initialization method, currently it only parses a
     // few common command-line options but it could be do more in the future
-    if ( !wxApp::OnInit() )
-        return false;
+	// NOTE: Not calling it, as it will show an error message because the I try to use my own command lines
+    // if ( !wxApp::OnInit() )
+    //   return false;
+
 
  #if wxUSE_XPM
 	wxImage::AddHandler(new wxXPMHandler);
@@ -75,7 +80,12 @@ bool NutcrackerApp::OnInit()
 
     mainWnd->Show(true);
 
-	gProject = std::make_shared<Project>(cz::Filesystem::getSingleton().getCWD().c_str());
+
+	if (gParameters->has("workspace"))
+		gProject = std::make_shared<Project>(gParameters->get("workspace"));
+	else
+		gProject = std::make_shared<Project>();
+
 	gProject->populate();
 	mainWnd->addAsyncFunc([]()
 	{
@@ -97,5 +107,7 @@ int NutcrackerApp::OnExit()
 {
 	gProject.reset();
 	uiState.reset();
+	gParameters.reset();
 	return wxApp::OnExit();
 }
+

@@ -26,34 +26,19 @@ Control ids
 */
 	enum
 	{
-		ID_TreeCtrl = wxID_HIGHEST + 1,
 		ID_RunScriptFile,
 		ID_OpenContainingFolder
 	};
 
-BEGIN_EVENT_TABLE(WorkspaceWnd, wxPanel)
-	EVT_TREE_ITEM_ACTIVATED(wxID_ANY, WorkspaceWnd::OnItemActivated)
-	EVT_TREE_ITEM_MENU(ID_TreeCtrl, WorkspaceWnd::OnItemMenu)
+BEGIN_EVENT_TABLE(WorkspaceWnd, WorkspaceWnd_Auto)
 	EVT_MENU(ID_OpenContainingFolder, WorkspaceWnd::OnOpenContainingFolder)
 	EVT_MENU(ID_RunScriptFile, WorkspaceWnd::OnRunScriptFile)
 END_EVENT_TABLE()
 
 
-/*
-struct WorkspaceTreeItemBase : public TreeCtrlUtil::TreeItemCustomData
-{
-	WorkspaceTreeItemBase() {}
-	virtual ~WorkspaceTreeItemBase() {}
-	document::ProjectItemId id;
-};
-*/
-
 WorkspaceWnd::WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
-	: wxPanel(parent, id, pos, size, style)
+	: WorkspaceWnd_Auto(parent, id, pos, size, style)
 {
-	m_treeCtrl = new wxTreeCtrl(this, ID_TreeCtrl, wxPoint(0, 0), wxSize(160, 250),
-								wxTR_DEFAULT_STYLE | wxNO_BORDER | wxTR_HIDE_ROOT);
-
 	CZ_ASSERT(parent->IsKindOf(wxCLASSINFO(wxFrame)));
 	m_treeData = TreeCtrlUtil::TreeCtrlData(static_cast<wxFrame*>(parent), m_treeCtrl);
 	
@@ -61,13 +46,7 @@ WorkspaceWnd::WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	// other controls
 	m_treeCtrl->SetImageList(&gImageListSmall);
 
-	wxBoxSizer *sizer = new wxBoxSizer(wxVERTICAL);
-	sizer->Add(m_treeCtrl, wxSizerFlags(1).Expand());
-	sizer->SetMinSize(wxSize(160, 250));
-	SetSizer(sizer);
-
 	gWorkspaceWnd = this;
-
 }
 
 WorkspaceWnd::~WorkspaceWnd()
@@ -96,8 +75,10 @@ std::shared_ptr<TreeCtrlUtil::TreeItemData> WorkspaceWnd::updateState(
 	}
 	else if (item->type == ProjectItemType::File)
 	{
-		const UTF8String& extension = static_cast<const document::File*>(item.get())->extension;
-		if (extension == "nut")
+		auto fileItem = static_cast<const document::File*>(item.get());
+		if (fileItem->looseFile)
+			return nullptr;
+		if (fileItem->extension=="nut")
 			imgIndex = SMALLIMG_IDX_FILE_NUT;
 		else
 			imgIndex = SMALLIMG_IDX_FILE_OTHER;
@@ -132,7 +113,7 @@ void WorkspaceWnd::updateState()
 	//data->expand();
 }
 
-void WorkspaceWnd::OnItemActivated(wxTreeEvent& event)
+void WorkspaceWnd::OnTreeItemActivated(wxTreeEvent& event)
 {
 	using namespace document;
 	wxTreeItemId itemId = event.GetItem();
@@ -144,7 +125,7 @@ void WorkspaceWnd::OnItemActivated(wxTreeEvent& event)
 	gFileEditorGroupWnd->gotoFile(item, -1);
 }
 
-void WorkspaceWnd::OnItemMenu(wxTreeEvent& event)
+void WorkspaceWnd::OnTreeItemMenu(wxTreeEvent& event)
 {
 	wxTreeItemId itemId = event.GetItem();
 	auto itemData = m_treeData.findByWxTreeItemId(itemId);
@@ -229,6 +210,12 @@ void WorkspaceWnd::locateFile(document::ProjectItemId fileId)
 
 	m_treeData.getCtrl()->EnsureVisible(itemId);
 	m_treeData.getCtrl()->SelectItem(itemId);
+}
+
+void WorkspaceWnd::OnDirpickerctrlDirPickerChanged(wxFileDirPickerEvent& event)
+{
+	gProject->populate(wxStringToUtf8(m_workspaceRoot->GetTextCtrlValue()));
+
 }
 
 } // namespace view

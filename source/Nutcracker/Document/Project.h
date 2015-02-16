@@ -50,6 +50,9 @@ struct File : public ProjectItem
 		cz::UTF8String desc;
 	};
 	std::vector<ErrorInfo> errorLines;
+
+	// If the file was something we dragged or opened explicitly, and doesn't belong to the root folder
+	bool looseFile = false;
 };
 
 struct Folder : public ProjectItem
@@ -62,20 +65,26 @@ struct Folder : public ProjectItem
 class Project
 {
 public:
+	Project() { }
 	explicit Project(UTF8String folder);
 	~Project();
 
 	//! Populates the project with the files found in the project's folder
 	void populate();
+	void populate(const UTF8String& root);
+	void removeLooseFile(ProjectItemId fileId);
 
 	//! Gets the file object given the id
 	File* getFile(ProjectItemId id);
 
 	std::shared_ptr<const Folder> getRoot();
 
+	File* addLooseFile(const UTF8String& filename);
 private:
 
+	void setRoot(const UTF8String& root);
 	void populateFromDir(std::shared_ptr<Folder> root, const UTF8String& dir);
+	void add(const std::shared_ptr<Folder>& root, const std::shared_ptr<ProjectItem>& item);
 
 	cz::UTF8String m_folder;
 	std::shared_ptr<Folder> m_root;

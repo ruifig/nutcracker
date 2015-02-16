@@ -19,7 +19,7 @@ wxColour clDefault("#000000");
 wxColour clComment("#008000");
 wxColour clString("#B8860B");
 wxColour clPreprocessor("#9F1E1E");
-wxChar* fntDefault = L"Courier New";
+wxChar* fntDefault = L"PragmataPro";
 wxColour clKeyword("#4E2BFF");
 wxColour clType("#1E839F");
 wxColour clFunction("#880000");

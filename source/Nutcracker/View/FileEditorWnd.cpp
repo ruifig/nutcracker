@@ -61,6 +61,8 @@ FileEditorWnd::~FileEditorWnd()
 	{
 		file->dirty = false;
 	}
+
+	gProject->removeLooseFile(m_fileId);
 }
 
 ProjectItemId FileEditorWnd::getFileId()
