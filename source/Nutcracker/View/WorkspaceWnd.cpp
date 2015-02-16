@@ -204,7 +204,7 @@ void WorkspaceWnd::OnRunScriptFile(wxCommandEvent& /*event*/)
 	{
 		return UTF8String("\"") + file->fullname + "\"";
 	});
-	uiState->currentInterpreter->launch(vars, file->fullname);
+	uiState->currentInterpreter->launch(vars, file->fullname, false);
 }
 
 wxTreeItemId WorkspaceWnd::findFileTreeItem(document::ProjectItemId fileId)

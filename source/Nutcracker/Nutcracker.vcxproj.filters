@@ -49,9 +49,16 @@
     <ClCompile Include="AutoUI\FileEditorWnd_Auto.cpp">
       <Filter>AutoUI</Filter>
     </ClCompile>
-    <ClCompile Include="View\FileEditorWnd.cpp" />
-    <ClCompile Include="View\FileEditorStyles.cpp" />
-    <ClCompile Include="Document\Interpreter.cpp" />
+    <ClCompile Include="Document\Interpreter.cpp">
+      <Filter>Document</Filter>
+    </ClCompile>
+    <ClCompile Include="View\FileEditorWnd.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="View\FileEditorStyles.cpp">
+      <Filter>View</Filter>
+    </ClCompile>
+    <ClCompile Include="LaunchUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
@@ -89,8 +96,13 @@
     <ClInclude Include="AutoUI\FileEditorWnd_Auto.h">
       <Filter>AutoUI</Filter>
     </ClInclude>
-    <ClInclude Include="View\FileEditorWnd.h" />
-    <ClInclude Include="View\FileEditorStyles.h" />
+    <ClInclude Include="View\FileEditorWnd.h">
+      <Filter>View</Filter>
+    </ClInclude>
+    <ClInclude Include="View\FileEditorStyles.h">
+      <Filter>View</Filter>
+    </ClInclude>
+    <ClInclude Include="LaunchUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nutcracker.rc">
@@ -98,6 +110,8 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Document\Interpreter.h" />
+    <None Include="Document\Interpreter.h">
+      <Filter>Document</Filter>
+    </None>
   </ItemGroup>
 </Project>

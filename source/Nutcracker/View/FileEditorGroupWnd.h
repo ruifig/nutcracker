@@ -27,6 +27,7 @@ public:
 	wxString getWordUnderCursor();
 	FileEditorWnd* getEditorWithFocus();
 	void forceCloseAll();
+	document::File* getCurrentFile();
 private:
 	DECLARE_EVENT_TABLE()
 
@@ -42,7 +43,6 @@ private:
 
 	virtual void onAppEvent(const AppEvent& evt);
 	FileEditorWnd* getCurrentPage();
-	document::File* getCurrentFile();
 
 	void iterateFiles(std::function<void(FileEditorWnd*)> func);
 	class FileEditorWnd* findFileWnd(document::ProjectItemId id, int* index);

@@ -44,10 +44,16 @@ bool Interpreter::hasDebugger()
 	return m_hasDebugger;
 }
 
-std::unique_ptr<Session> Interpreter::launch(const Variables& variables, const UTF8String& file)
+std::unique_ptr<Session> Interpreter::launch(const Variables& variables, const UTF8String& file, bool debug)
 {
 	auto session = std::make_unique<Session>();
-	wxExecute(variables.replace(m_launch).c_str());
+
+	auto cwd = wxGetCwd();
+	auto cmd = variables.replace(debug ? m_launchDebug : m_launchNormal);
+	wxSetWorkingDirectory(Filename(file).getDirectory().c_str());
+	wxExecute(cmd.c_str());
+	wxSetWorkingDirectory(cwd);
+
 	return session;
 }
 
@@ -65,7 +71,8 @@ std::unique_ptr<Interpreter> Interpreter::init(const UTF8String& cfgFile)
 
 	inter->m_hasDebugger = file.getValue<bool>("General", "debugger", false);
 	inter->m_name = file.getValue<const char*>("General", "name", "Unknown");
-	inter->m_launch = file.getValue<const char*>("General", "launch", "");
+	inter->m_launchDebug = file.getValue<const char*>("General", "launch_normal", "");
+	inter->m_launchNormal = file.getValue<const char*>("General", "launch_debug", "");
 
 	return std::move(inter);
 }

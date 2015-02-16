@@ -34,7 +34,7 @@ public:
 	Interpreter();
 	virtual ~Interpreter();
 	bool hasDebugger();
-	std::unique_ptr<Session> launch(const Variables& variables, const UTF8String& file);
+	std::unique_ptr<Session> launch(const Variables& variables, const UTF8String& file, bool debug);
 	const UTF8String& getName();
 
 	static std::vector<std::unique_ptr<Interpreter>> initAll(const UTF8String& folder);
@@ -42,7 +42,8 @@ private:
 	static std::unique_ptr<Interpreter> init(const UTF8String& cfgFile);
 	UTF8String m_name;
 	bool m_hasDebugger = false;
-	UTF8String m_launch;
+	UTF8String m_launchNormal;
+	UTF8String m_launchDebug;
 };
 
 } // namespace document

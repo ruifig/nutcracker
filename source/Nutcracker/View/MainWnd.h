@@ -30,6 +30,9 @@ private:
 
 	virtual void OnIdle(wxIdleEvent& evt) override;
 	virtual void OnMenuClick(wxCommandEvent& event) override;
+
+	void OnCharHook(wxKeyEvent& event);
+	void OnQuit(wxCommandEvent& event);
 	void OnInterpreterClick(wxCommandEvent& event);
 
 	std::unique_ptr<MainWndLoggerOutput> m_logger;

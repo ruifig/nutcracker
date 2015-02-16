@@ -13,6 +13,7 @@
 #include "Document/Project.h"
 #include "AppEvents.h"
 #include "Document/Interpreter.h"
+#include "LaunchUtil.h"
 
 using namespace cz;
 using namespace document;
@@ -113,6 +114,9 @@ MainWnd::MainWnd()
 
 	document::Project prj(Filesystem::getSingleton().getCWD());
 	prj.populate();
+
+	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainWnd::OnCharHook));
+
 }
 
 MainWnd::~MainWnd()
@@ -156,6 +160,30 @@ void MainWnd::OnInterpreterClick(wxCommandEvent& event)
 {
 	uiState->currentInterpreter = uiState->interpreters[event.GetId() - ID_MENU_INTERPRETER_FIRST].get();
 }
+
+void MainWnd::OnCharHook(wxKeyEvent& event)
+{
+
+	if (!this->IsActive())
+	{
+		event.Skip();
+		return;
+	}
+
+	switch (event.GetKeyCode())
+	{
+	case WXK_F5: // Continue
+		if (event.ControlDown())
+			launch(true);
+		else
+			launch(false);
+		break;
+	default:
+		event.Skip();
+	}
+
+}
+
 
 } // namespace view
 } // namespace cz
