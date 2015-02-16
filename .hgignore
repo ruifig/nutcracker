@@ -28,6 +28,9 @@ dependencies/squirrel/squirrel/Template
 dependencies/squirrel/sqstdlib/Debug
 dependencies/squirrel/sqstdlib/Release
 dependencies/squirrel/sqstdlib/Template
+dependencies/squirrel/sqdbg/Debug
+dependencies/squirrel/sqdbg/Release
+
 
 #
 # wxWidgets
