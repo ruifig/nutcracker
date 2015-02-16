@@ -471,6 +471,21 @@
                 <string name="type">"dialog-control-document"</string>
               </document>
             </document>
+            <document>
+              <string name="proxy-type">"wbMenuProxy"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"menu"</string>
+              <long name="is-transient">0</long>
+              <long name="locked">0</long>
+              <long name="owns-file">1</long>
+              <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Label">"Interpreter"</string>
+              <string name="proxy-Member variable name">"m_menuInterpreters"</string>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <string name="title">"Interpreter"</string>
+              <long name="title-mode">0</long>
+              <string name="type">"dialog-control-document"</string>
+            </document>
           </document>
           <document>
             <string name="proxy-type">"wbAuiToolBarProxy"</string>

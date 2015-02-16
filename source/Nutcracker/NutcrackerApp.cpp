@@ -4,7 +4,9 @@
 #include "Document/Project.h"
 #include "AppEvents.h"
 #include "UIDefs.h"
+#include "Document/Interpreter.h"
 
+using namespace cz;
 using namespace cz::view;
 
 // Create a new application object: this macro will allow wxWidgets to create
@@ -30,6 +32,10 @@ void NutcrackerApp::Init()
 
 bool NutcrackerApp::OnInit()
 {
+	using namespace cz;
+	using namespace cz::document;
+	using namespace cz::view;
+
     // call the base class initialization method, currently it only parses a
     // few common command-line options but it could be do more in the future
     if ( !wxApp::OnInit() )
@@ -63,13 +69,12 @@ bool NutcrackerApp::OnInit()
 		gImageList32x32.Add(wxArtProvider::GetBitmap(wxART_MISSING_IMAGE, wxART_OTHER, wxSize(32, 32)));
 	gImageList32x32.Replace(BIGIMG_IDX_NUT, wxBITMAP_PNG(APP_IMG_32x32_NUT));
 
+
 	// create the main application window
     MainWnd *mainWnd = new MainWnd();
 
     mainWnd->Show(true);
 
-	using namespace cz::document;
-	using namespace cz::view;
 	gProject = std::make_shared<Project>(cz::Filesystem::getSingleton().getCWD().c_str());
 	gProject->populate();
 	mainWnd->addAsyncFunc([]()
@@ -91,5 +96,6 @@ bool NutcrackerApp::OnInit()
 int NutcrackerApp::OnExit()
 {
 	gProject.reset();
+	uiState.reset();
 	return wxApp::OnExit();
 }

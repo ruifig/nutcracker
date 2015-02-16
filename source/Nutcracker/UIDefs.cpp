@@ -1,8 +1,11 @@
 #include "NutcrackerPCH.h"
 #include "UIDefs.h"
+#include "Document/Interpreter.h"
+
 
 namespace cz
 {
+
 namespace view
 {
 
@@ -15,7 +18,7 @@ std::shared_ptr<document::Project> gProject;
 
 }
 
-UIState uiState;
+std::unique_ptr<UIState> uiState;
 
 cz::UTF8String wxStringToUtf8(const wxString& str)
 {
@@ -50,4 +53,3 @@ void showException(std::exception& e)
 }
 
 }
-

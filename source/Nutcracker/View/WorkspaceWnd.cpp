@@ -11,6 +11,10 @@
 #include "UIDefs.h"
 #include "WorkspaceWnd.h"
 #include "FileEditorGroupWnd.h"
+#include "Document/Interpreter.h"
+
+using namespace cz;
+using namespace document;
 
 namespace cz
 {
@@ -23,7 +27,7 @@ Control ids
 	enum
 	{
 		ID_TreeCtrl = wxID_HIGHEST + 1,
-		ID_CompileFile,
+		ID_RunScriptFile,
 		ID_OpenContainingFolder
 	};
 
@@ -31,7 +35,7 @@ BEGIN_EVENT_TABLE(WorkspaceWnd, wxPanel)
 	EVT_TREE_ITEM_ACTIVATED(wxID_ANY, WorkspaceWnd::OnItemActivated)
 	EVT_TREE_ITEM_MENU(ID_TreeCtrl, WorkspaceWnd::OnItemMenu)
 	EVT_MENU(ID_OpenContainingFolder, WorkspaceWnd::OnOpenContainingFolder)
-	EVT_MENU(ID_CompileFile, WorkspaceWnd::OnCompileFile)
+	EVT_MENU(ID_RunScriptFile, WorkspaceWnd::OnRunScriptFile)
 END_EVENT_TABLE()
 
 
@@ -163,10 +167,10 @@ void WorkspaceWnd::OnItemMenu(wxTreeEvent& event)
 			wxMenu* addmenu = new wxMenu;
 			ProjectItemId projectItemId(itemData->getItemId().id[0]);
 			auto file = gProject->getFile(projectItemId);
-			bool compilable = file->extension=="nut";
+			bool nutFile = file->extension=="nut";
 
-			if (compilable)
-				menu.Append(ID_CompileFile, wxT("Compile"));
+			if (nutFile)
+				menu.Append(ID_RunScriptFile, wxT("Run"));
 			menu.Append(ID_OpenContainingFolder, wxT("Open containing folder"));
 
 			m_selectedFileId = projectItemId;
@@ -189,9 +193,18 @@ void WorkspaceWnd::OnOpenContainingFolder(wxCommandEvent& event)
 	wxExecute(wxString("explorer \"") + res.widen() + "\"");
 }
 
-void WorkspaceWnd::OnCompileFile(wxCommandEvent& /*event*/)
+void WorkspaceWnd::OnRunScriptFile(wxCommandEvent& /*event*/)
 {
-	showMsg("TODO", "Not implemented yet.");
+	auto file = gProject->getFile(m_selectedFileId);
+	if (!file)
+		return;
+
+	Variables vars;
+	vars.set("%FILE%", [&]()
+	{
+		return UTF8String("\"") + file->fullname + "\"";
+	});
+	uiState->currentInterpreter->launch(vars, file->fullname);
 }
 
 wxTreeItemId WorkspaceWnd::findFileTreeItem(document::ProjectItemId fileId)

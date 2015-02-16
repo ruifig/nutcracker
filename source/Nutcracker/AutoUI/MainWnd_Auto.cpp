@@ -98,6 +98,7 @@ MainWnd_Auto::~MainWnd_Auto()
 void MainWnd_Auto::Init()
 {
 ////@begin MainWnd_Auto member initialisation
+	m_menuInterpreters = NULL;
 	m_workspaceWnd = NULL;
 	m_logTextCtrl = NULL;
 ////@end MainWnd_Auto member initialisation
@@ -125,33 +126,35 @@ void MainWnd_Auto::CreateControls()
 	itemMenu6->Append(ID_MENU_VIEW_WHITESPACE, _("Whitespaces"), wxEmptyString, wxITEM_CHECK);
 	itemMenu6->Append(ID_MENU_VIEW_EOL, _("End of line"), wxEmptyString, wxITEM_CHECK);
 	menuBar->Append(itemMenu6, _("View"));
+	m_menuInterpreters = new wxMenu;
+	menuBar->Append(m_menuInterpreters, _("Interpreter"));
 	itemFrame1->SetMenuBar(menuBar);
 
-	wxAuiToolBar* itemAuiToolBar10 = new wxAuiToolBar( itemFrame1, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_GRIPPER );
-	itemAuiToolBar10->Realize();
-	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar10, wxAuiPaneInfo()
+	wxAuiToolBar* itemAuiToolBar11 = new wxAuiToolBar( itemFrame1, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_GRIPPER );
+	itemAuiToolBar11->Realize();
+	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar11, wxAuiPaneInfo()
 		.ToolbarPane().Name(wxT("Pane1")).Top().Layer(10).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(false).Floatable(false).Gripper(true));
 
 	m_workspaceWnd = new cz::view::WorkspaceWnd( itemFrame1, ID_FOREIGN, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
 		.Name(wxT("Pane2")).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
 
-	cz::view::FileEditorGroupWnd* itemWindow12 = new cz::view::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
-	itemFrame1->GetAuiManager().AddPane(itemWindow12, wxAuiPaneInfo()
+	cz::view::FileEditorGroupWnd* itemWindow13 = new cz::view::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
+	itemFrame1->GetAuiManager().AddPane(itemWindow13, wxAuiPaneInfo()
 		.Name(wxT("Pane4")).Centre().CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
 
-	wxAuiNotebook* itemAuiNotebook13 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_DEFAULT_STYLE|wxAUI_NB_TOP );
+	wxAuiNotebook* itemAuiNotebook14 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_DEFAULT_STYLE|wxAUI_NB_TOP );
 
-	wxPanel* itemPanel14 = new wxPanel( itemAuiNotebook13, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
-	wxBoxSizer* itemBoxSizer15 = new wxBoxSizer(wxVERTICAL);
-	itemPanel14->SetSizer(itemBoxSizer15);
+	wxPanel* itemPanel15 = new wxPanel( itemAuiNotebook14, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+	wxBoxSizer* itemBoxSizer16 = new wxBoxSizer(wxVERTICAL);
+	itemPanel15->SetSizer(itemBoxSizer16);
 
-	m_logTextCtrl = new wxTextCtrl( itemPanel14, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
-	itemBoxSizer15->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
+	m_logTextCtrl = new wxTextCtrl( itemPanel15, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
+	itemBoxSizer16->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
 
-	itemAuiNotebook13->AddPage(itemPanel14, _("Log"), false);
+	itemAuiNotebook14->AddPage(itemPanel15, _("Log"), false);
 
-	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook13, wxAuiPaneInfo()
+	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook14, wxAuiPaneInfo()
 		.Name(wxT("Pane3")).Bottom().CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).Floatable(false));
 
 	GetAuiManager().Update();

@@ -51,6 +51,7 @@
     </ClCompile>
     <ClCompile Include="View\FileEditorWnd.cpp" />
     <ClCompile Include="View\FileEditorStyles.cpp" />
+    <ClCompile Include="Document\Interpreter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
@@ -95,5 +96,8 @@
     <ResourceCompile Include="Nutcracker.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Document\Interpreter.h" />
   </ItemGroup>
 </Project>

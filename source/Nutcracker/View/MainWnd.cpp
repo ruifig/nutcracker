@@ -12,13 +12,27 @@
 
 #include "Document/Project.h"
 #include "AppEvents.h"
+#include "Document/Interpreter.h"
+
+using namespace cz;
+using namespace document;
 
 namespace cz
 {
 namespace view
 {
 
+/*
+Control ids
+*/
+enum
+{
+	ID_MENU_INTERPRETER_FIRST = wxID_HIGHEST+1,
+	ID_MENU_INTERPRETER_LAST = ID_MENU_INTERPRETER_FIRST+100
+};
+
 BEGIN_EVENT_TABLE(MainWnd, MainWnd_Auto)
+	//EVT_MENU(ID_MENU_INTERPRETER_FIRST, MainWnd::OnMenuClick)
 END_EVENT_TABLE()
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,6 +70,7 @@ public:
 
 static wxIconBundle gAppIcons;
 
+
 MainWnd::MainWnd()
 	: MainWnd_Auto((wxFrame*)nullptr, wxID_ANY, "Nutcracker IDE", wxDefaultPosition, wxSize(1024,768))
 {
@@ -71,6 +86,30 @@ MainWnd::MainWnd()
 
 	m_logger = std::make_unique<MainWndLoggerOutput>(&m_asyncFuncs, m_logTextCtrl);
 	cz::Logger::getSingleton().addOutput(m_logger.get());
+	uiState = std::make_unique<UIState>();
+
+	//
+	// Initialize interpreters
+	//
+	{
+		uiState->interpreters = Interpreter::initAll(Filesystem::getSingleton().getCWD() + "interpreters\\");
+		int interpreterMenuId = ID_MENU_INTERPRETER_FIRST;
+
+		//bind(wxevt_command_menu_selected, &mainwnd::oninterpreterclick, this, interpretermenuid);
+		//m_menuinterpreters->append(interpretermenuid++, "test", wxemptystring, wxitem_check);
+
+		wxMenuItem* firstItem = nullptr;
+		for (auto& i : uiState->interpreters)
+		{
+			auto item = m_menuInterpreters->AppendRadioItem(interpreterMenuId, i->getName().c_str());
+			if (!firstItem)
+				firstItem = item;
+			Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWnd::OnInterpreterClick, this, interpreterMenuId);
+			interpreterMenuId++;
+		}
+		firstItem->Check();
+		uiState->currentInterpreter = uiState->interpreters[0].get();
+	}
 
 	document::Project prj(Filesystem::getSingleton().getCWD());
 	prj.populate();
@@ -98,19 +137,24 @@ void MainWnd::OnMenuClick(wxCommandEvent& event)
 	switch(event.GetId())
 	{
 		case ID_MENU_VIEW_INDENTATION:
-			uiState.view_ShowIndentationGuides = val;
+			uiState->view_ShowIndentationGuides = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
 			break;
 		case ID_MENU_VIEW_WHITESPACE:
-			uiState.view_Whitespace = val;
+			uiState->view_Whitespace = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
 		break;
 		case ID_MENU_VIEW_EOL:
-			uiState.view_EOL = val;
+			uiState->view_EOL = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
 		break;
 	}
 
+}
+
+void MainWnd::OnInterpreterClick(wxCommandEvent& event)
+{
+	uiState->currentInterpreter = uiState->interpreters[event.GetId() - ID_MENU_INTERPRETER_FIRST].get();
 }
 
 } // namespace view

@@ -24,11 +24,13 @@ public:
 
 	// Adds a function to be called on the next tick
 	void addAsyncFunc(std::function<void()> f);
+	int getInterpreterIndex();
 private:
 	DECLARE_EVENT_TABLE()
 
 	virtual void OnIdle(wxIdleEvent& evt) override;
 	virtual void OnMenuClick(wxCommandEvent& event) override;
+	void OnInterpreterClick(wxCommandEvent& event);
 
 	std::unique_ptr<MainWndLoggerOutput> m_logger;
 	cz::AsyncCommandQueueExplicit m_asyncFuncs;

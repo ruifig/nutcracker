@@ -30,6 +30,7 @@
 
 #if 0
 ////@begin forward declarations
+class wxMenu;
 namespace cz::view { class WorkspaceWnd; }
 ////@end forward declarations
 #else
@@ -104,6 +105,7 @@ public:
 
 ////@begin MainWnd_Auto member variables
 	wxAuiManager m_auiManager;
+	wxMenu* m_menuInterpreters;
 	cz::view::WorkspaceWnd* m_workspaceWnd;
 	wxTextCtrl* m_logTextCtrl;
 	/// Control identifiers

@@ -31,7 +31,7 @@ private:
 	DECLARE_EVENT_TABLE()
 	void OnItemActivated(wxTreeEvent& event);
 	void OnOpenContainingFolder(wxCommandEvent& event);
-	void OnCompileFile(wxCommandEvent& event);
+	void OnRunScriptFile(wxCommandEvent& event);
 	void OnItemMenu(wxTreeEvent& event);
 
 	std::shared_ptr<TreeCtrlUtil::TreeItemData> updateState(const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent,

@@ -8,6 +8,7 @@ namespace document
 {
 	class Project;
 	struct ProjectItem;
+	class Interpreter;
 }
 
 namespace view
@@ -47,9 +48,11 @@ struct UIState
 	bool view_ShowIndentationGuides = false;
 	bool view_Whitespace = false;
 	bool view_EOL = false;
+	std::vector<std::unique_ptr<document::Interpreter>> interpreters;
+	document::Interpreter* currentInterpreter=nullptr;
 };
 
-extern UIState uiState;
+extern std::unique_ptr<UIState> uiState;
 
 }
 

@@ -88,6 +88,7 @@
     <ClCompile Include="AutoUI\FileEditorWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\MainWnd_Auto.cpp" />
     <ClCompile Include="AppEvents.cpp" />
+    <ClCompile Include="Document\Interpreter.cpp" />
     <ClCompile Include="Document\Project.cpp" />
     <ClCompile Include="NutcrackerApp.cpp" />
     <ClCompile Include="NutcrackerPCH.cpp">
@@ -129,6 +130,9 @@
     <ProjectReference Include="..\..\dependencies\czPlatform\VisualStudio\czPlatform.vcxproj">
       <Project>{57fa36a4-c2b3-413f-a60c-4f9592f911d3}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Document\Interpreter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
