@@ -1,4 +1,4 @@
-# Nutcracker IDE #
+# Nutcracker IDE (Squirrel scripting Editor) #
 
 Nutracker is an IDE purely focused on the [Squirrel scripting language](http://squirrel-lang.org).
 I've used Squirrel on and off over the years, but despite being a nice little scripting language, I was always put off by the lack of tools.
