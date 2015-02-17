@@ -26,4 +26,5 @@ Planned features:
     * I intend to extend SQDBG protocol to have the IDE query the Squirrel VM's process and build a code database.
 
 # How it looks like a the moment (Work in progress) #
-![screenshot1.png](https://bitbucket.org/repo/jnoqe9/images/2250951370-screenshot1.png)
+
+![screenshot1.png](https://bitbucket.org/repo/jnoqe9/images/3766797570-screenshot1.png)
