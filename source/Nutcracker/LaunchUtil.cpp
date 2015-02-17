@@ -22,10 +22,10 @@ bool launch(bool debug)
 	Variables vars;
 	vars.set("%FILE%", [&]()
 	{
-		return UTF8String("\"") + file->fullname + "\"";
+		return UTF8String("\"") + file->fullpath + "\"";
 	});
 
-	uiState->currentInterpreter->launch(vars, file->fullname, debug);
+	uiState->currentInterpreter->launch(vars, file->fullpath, debug);
 	return true;
 }
 

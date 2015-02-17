@@ -24,20 +24,20 @@ typedef FNVHash32 ProjectItemId;
 
 struct ProjectItem
 {
-	explicit ProjectItem(ProjectItemType type_, UTF8String fullpath);
+	explicit ProjectItem(ProjectItemType type_, UTF8String fullpath_);
 	ProjectItem(const ProjectItem&) = delete;
 	virtual ~ProjectItem() {}
 	UTF8String fullpath;
 	UTF8String name;
 	ProjectItemType type;
-	ProjectItemId id = 0;
+	ProjectItemId id;
 	UTF8String getDirectory() const;
 };
 
 // Represents a file in the project
 struct File : public ProjectItem
 {
-	File(UTF8String fullname);
+	explicit File(UTF8String fullpath_);
 	virtual ~File() {}
 	UTF8String extension;
 	FileTime filetime;
@@ -49,14 +49,8 @@ struct File : public ProjectItem
 		bool isError;
 		cz::UTF8String desc;
 	};
+	bool looseFile = false;
 	std::vector<ErrorInfo> errorLines;
-};
-
-struct Folder : public ProjectItem
-{
-	Folder(UTF8String fullpath);
-	virtual ~Folder() {}
-	std::set<std::shared_ptr<ProjectItem>> items;
 };
 
 struct ProjectItemCompare
@@ -64,37 +58,41 @@ struct ProjectItemCompare
 	bool operator() (const std::shared_ptr<ProjectItem>& a, const std::shared_ptr<ProjectItem>& b)
 	{
 		if (a->type < b->type)
-			return -1;
+			return true;
 		else
-			a->name < b->name;
+			return a->name < b->name;
 	}
+};
+
+struct Folder : public ProjectItem
+{
+	explicit Folder(UTF8String fullpath_);
+	virtual ~Folder() {}
+	std::set<std::shared_ptr<ProjectItem>, ProjectItemCompare> items;
 };
 
 
 class Project
 {
 public:
-	Project() { }
+	Project();
 	~Project();
 
-	//! Populates the project with the files found in the project's folder
-	void populate();
-	void populate(const UTF8String& root);
-	void removeLooseFile(ProjectItemId fileId);
+	void addFolder(const UTF8String& path);
+	File* addLooseFile(const UTF8String& path);
+	void resyncFolders();
 
 	//! Gets the file object given the id
 	File* getFile(ProjectItemId id);
 
 	std::shared_ptr<const Folder> getRoot();
 
-	File* addLooseFile(const UTF8String& filename);
+	void removeLooseFile(ProjectItemId id);
 private:
 
-	void setRoot(const UTF8String& root);
-	void populateFromDir(std::shared_ptr<Folder> root, const UTF8String& dir);
-	void add(const std::shared_ptr<Folder>& root, const std::shared_ptr<ProjectItem>& item);
+	void populateFromDir(const std::shared_ptr<Folder>& folder);
+	void add(const std::shared_ptr<Folder>& parent, const std::shared_ptr<ProjectItem>& item);
 
-	cz::UTF8String m_folder;
 	std::shared_ptr<Folder> m_root;
 	std::unordered_map < u32, std::weak_ptr<ProjectItem>> m_rootMap;
 };

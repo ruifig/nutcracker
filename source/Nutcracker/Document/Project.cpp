@@ -11,9 +11,8 @@ namespace document
 // ProjectItem
 //////////////////////////////////////////////////////////////////////////
 ProjectItem::ProjectItem(ProjectItemType type_, UTF8String fullpath_)
-	: type(type_), fullpath(fullpath_)
+	: type(type_), fullpath(std::move(fullpath_))
 {
-	name = Filename(fullpath).getBaseFilename();
 	id.val = FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes());
 }
 
@@ -29,67 +28,94 @@ cz::UTF8String ProjectItem::getDirectory() const
 //////////////////////////////////////////////////////////////////////////
 // File
 //////////////////////////////////////////////////////////////////////////
-File::File(UTF8String fullpath) : ProjectItem(ProjectItemType::File, fullpath)
+File::File(UTF8String fullpath_) : ProjectItem(ProjectItemType::File, std::move(fullpath_))
 {
-	extension = ansiToLower(Filename(fullpath).getExtension());
+	auto fname = Filename(fullpath);
+	name = fname.getBaseFilename();
+	extension = ansiToLower(fname.getExtension());
+	filetime = cz::FileTime::get(fullpath, FileTime::kModified);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Folder
 //////////////////////////////////////////////////////////////////////////
-Folder::Folder(UTF8String fullpath) : ProjectItem(ProjectItemType::Folder, fullpath)
+Folder::Folder(UTF8String fullpath_) : ProjectItem(ProjectItemType::Folder, std::move(fullpath_))
 {
+	name = Filesystem::getSingleton().pathStrip(fullpath);
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Project
 //////////////////////////////////////////////////////////////////////////
 
-Project::Project(UTF8String folder)
+Project::Project()
 {
-	setRoot(folder);
+	m_root = std::make_shared < Folder >("");
 }
 
 Project::~Project()
 {
 }
 
-void Project::setRoot(const UTF8String& root)
+void Project::add(const std::shared_ptr<Folder>& parent, const std::shared_ptr<ProjectItem>& item)
 {
-	if (!Filesystem::getSingleton().fullPath(m_folder, root))
+	CZ_CHECK(m_rootMap.find(item->id.val) == m_rootMap.end());
+	parent->items.insert(item);
+	m_rootMap[item->id.val] = item;
+}
+
+void Project::addFolder(const UTF8String& path)
+{
+	UTF8String fullpath;
+	if (!Filesystem::getSingleton().fullPath(fullpath, path))
 	{
-		throw std::runtime_error(formatString("Error parsing folder '%s'", root.c_str()));
+		throw std::runtime_error(formatString("Error parsing folder '%s'", path.c_str()));
+	}
+
+	if (!Filesystem::getSingleton().isExistingDirectory(fullpath))
+	{
+		throw std::runtime_error(formatString("'%s' is not a folder", path.c_str()));
+	}
+
+	auto f = std::make_shared<Folder>(fullpath);
+	auto existing = getFile(f->id);
+	if (!existing)
+	{
+		add(m_root, f);
+		populateFromDir(f);
 	}
 }
 
-void Project::add(const std::shared_ptr<Folder>& root, const std::shared_ptr<ProjectItem>& item)
+File* Project::addLooseFile(const UTF8String& path)
 {
-	CZ_CHECK(m_rootMap.find(item->id.val) == m_rootMap.end());
-	root->items.push_back(item);
-	m_rootMap[item->id.val] = item;
-	item->absolutepath = item->fullname;
-}
+	UTF8String fullpath;
+	if (!Filesystem::getSingleton().fullPath(fullpath, path))
+	{
+		throw std::runtime_error(formatString("Error parsing path '%s'", path.c_str()));
+	}
 
-
-File* Project::addLooseFile(const UTF8String& filename)
-{
-	if (!Filesystem::getSingleton().isExistingFile(filename))
+	if (!Filesystem::getSingleton().isExistingFile(fullpath))
 		return nullptr;
 
-	auto file = std::make_shared<File>(filename, Filename(filename).getFilename());
+	auto f = std::make_shared<File>(fullpath);
+	f->looseFile = true;
 
 	// Check if there is a file with the same id. If so, it's the same file
-	if (auto existingFile = getFile(file->id))
-		return existingFile;
+	if (auto existing = getFile(f->id))
+		return existing;
 
-	file->looseFile = true;
-	add(m_root, file);
-	return file.get();
+	add(m_root, f);
+	return f.get();
 }
 
-void Project::populateFromDir(std::shared_ptr<Folder> root, const UTF8String& dir)
+void Project::resyncFolders()
 {
-	auto files = Filesystem::getFilesInDirectory(dir, "*", true);
+	CZ_UNEXPECTED();
+}
+
+void Project::populateFromDir(const std::shared_ptr<Folder>& folder)
+{
+	auto files = Filesystem::getFilesInDirectory(folder->fullpath, "*", true);
 
 	for (auto& f : files)
 	{
@@ -97,17 +123,17 @@ void Project::populateFromDir(std::shared_ptr<Folder> root, const UTF8String& di
 		{
 			case Filesystem::Type::Directory:
 			{
-				cz::UTF8String fullname = dir + f.name + "\\";
-				auto folder = std::make_shared<Folder>(fullname, f.name);
-				add(root, folder);
-				populateFromDir(folder, fullname);
+				cz::UTF8String path = folder->fullpath + f.name + "\\";
+				auto item = std::make_shared<Folder>(path);
+				add(folder, item);
+				populateFromDir(item);
 			}
 			break;
 			case Filesystem::Type::File:
 				if (ansiToLower(Filename(f.name).getExtension()) == "nut")
 				{
-					auto file = std::make_shared<File>(dir + f.name, f.name);
-					add(root, file);
+					auto item = std::make_shared<File>(folder->fullpath +f.name);
+					add(folder, item);
 				}
 			break;
 			default:
@@ -116,25 +142,6 @@ void Project::populateFromDir(std::shared_ptr<Folder> root, const UTF8String& di
 	}
 }
 
-void Project::populate()
-{
-	auto folder = std::make_shared<Folder>(m_folder, "Root");
-	m_root = folder;
-	if (m_folder == "")
-		return;
-	populateFromDir(folder, m_folder.c_str());
-}
-
-void Project::populate(const UTF8String& root)
-{
-
-	setRoot(root);
-	auto folder = std::make_shared<Folder>(m_folder, "Root");
-	m_root = folder;
-	if (m_folder == "")
-		return;
-	populateFromDir(folder, m_folder.c_str());
-}
 
 File* Project::getFile(ProjectItemId id)
 {
@@ -158,6 +165,8 @@ std::shared_ptr<const Folder> Project::getRoot()
 
 void Project::removeLooseFile(ProjectItemId fileId)
 {
+	CZ_UNEXPECTED();
+	/*
 	auto file = getFile(fileId);
 	if (!file || !file->looseFile)
 		return;
@@ -168,6 +177,7 @@ void Project::removeLooseFile(ProjectItemId fileId)
 	{
 		return item->id == fileId;
 	});
+	*/
 }
 
 

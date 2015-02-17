@@ -80,13 +80,10 @@ bool NutcrackerApp::OnInit()
 
     mainWnd->Show(true);
 
-
+	gProject = std::make_shared<Project>();
 	if (gParameters->has("workspace"))
-		gProject = std::make_shared<Project>(gParameters->get("workspace"));
-	else
-		gProject = std::make_shared<Project>();
+		gProject->addFolder(gParameters->get("workspace"));
 
-	gProject->populate();
 	mainWnd->addAsyncFunc([]()
 	{
 		fireAppEvent(AppEventID::OpenWorkspace);

@@ -183,9 +183,9 @@ void WorkspaceWnd::OnRunScriptFile(wxCommandEvent& /*event*/)
 	Variables vars;
 	vars.set("%FILE%", [&]()
 	{
-		return UTF8String("\"") + file->fullname + "\"";
+		return UTF8String("\"") + file->fullpath + "\"";
 	});
-	uiState->currentInterpreter->launch(vars, file->fullname, false);
+	uiState->currentInterpreter->launch(vars, file->fullpath, false);
 }
 
 wxTreeItemId WorkspaceWnd::findFileTreeItem(document::ProjectItemId fileId)
@@ -214,8 +214,8 @@ void WorkspaceWnd::locateFile(document::ProjectItemId fileId)
 
 void WorkspaceWnd::OnDirpickerctrlDirPickerChanged(wxFileDirPickerEvent& event)
 {
-	gProject->populate(wxStringToUtf8(m_workspaceRoot->GetTextCtrlValue()));
-
+	CZ_UNEXPECTED();
+	//gProject->populate(wxStringToUtf8(m_workspaceRoot->GetTextCtrlValue()));
 }
 
 } // namespace view

@@ -141,7 +141,7 @@ void FileEditorGroupWnd::gotoFile(document::File* file, int line, int col, bool 
 		w->setFile(file, line, col);
 		m_notebook->AddPage(w, file->name.c_str(), true, -1);
 		auto pageIndex = m_notebook->GetPageIndex(w);
-		m_notebook->SetPageToolTip(pageIndex, file->fullname.widen());
+		m_notebook->SetPageToolTip(pageIndex, file->fullpath.widen());
 		setPageTitle(file);
 		w->setFocusToEditor();
 		guard.dismiss();
@@ -256,7 +256,7 @@ void FileEditorGroupWnd::OnCloseAllButThis(wxCommandEvent& event)
 			if (f->getFile()->dirty)
 			{
 				int ret = wxMessageBox(
-					wxString(cz::formatString("Save file ""%s"" ?", f->getFile()->fullname.c_str())) ,
+					wxString(cz::formatString("Save file ""%s"" ?", f->getFile()->fullpath.c_str())) ,
 					wxMessageBoxCaptionStr, wxYES_NO | wxCANCEL | wxICON_QUESTION );
 
 				if (ret == wxYES)

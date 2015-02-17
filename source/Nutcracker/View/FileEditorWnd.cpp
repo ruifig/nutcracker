@@ -201,8 +201,7 @@ void FileEditorWnd::setFile(document::File* file, int line, int col, bool column
 		updateViewOptions();
 	
 		m_textCtrl->SetReadOnly(false);
-		m_textCtrl->LoadFile(file->fullname.c_str(), wxTEXT_TYPE_ANY);
-		file->filetime = cz::FileTime::get(file->fullname, FileTime::kModified);
+		m_textCtrl->LoadFile(file->fullpath.c_str(), wxTEXT_TYPE_ANY);
 		m_textCtrl->Connect(wxEVT_STC_MARGINCLICK, wxStyledTextEventHandler(FileEditorWnd::OnMarginClick), NULL, this);
 		m_textCtrl->Thaw();
 		m_textCtrl->SetSavePoint();
@@ -234,7 +233,7 @@ void FileEditorWnd::setFile(document::File* file, int line, int col, bool column
 void FileEditorWnd::checkReload()
 {
 	auto file = getFile();
-	cz::FileTime t = cz::FileTime::get(file->fullname, FileTime::kModified);
+	cz::FileTime t = cz::FileTime::get(file->fullpath, FileTime::kModified);
 	if (t<= file->filetime)
 		return;
 
@@ -492,9 +491,9 @@ void FileEditorWnd::save()
 		return;
 
 	try {
-		m_textCtrl->SaveFile(file->fullname.widen());
+		m_textCtrl->SaveFile(file->fullpath.widen());
 		file->dirty = false;
-		file->filetime = FileTime::get(file->fullname, FileTime::kModified);
+		file->filetime = FileTime::get(file->fullpath, FileTime::kModified);
 		fireAppEvent(AppEventFileSaved(this));
 	}
 	catch(std::exception& e)
