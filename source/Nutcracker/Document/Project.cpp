@@ -7,25 +7,43 @@ namespace cz
 namespace document
 {
 
-ProjectItem::ProjectItem(ProjectItemType type_, UTF8String fullname_, UTF8String name_)
-	: type(type_), fullname(fullname_), name(std::move(name_))
+//////////////////////////////////////////////////////////////////////////
+// ProjectItem
+//////////////////////////////////////////////////////////////////////////
+ProjectItem::ProjectItem(ProjectItemType type_, UTF8String fullpath_)
+	: type(type_), fullpath(fullpath_)
 {
-	id.val = FNVHash32::compute(fullname.c_str(), fullname.sizeBytes());
+	name = Filename(fullpath).getBaseFilename();
+	id.val = FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes());
 }
 
 cz::UTF8String ProjectItem::getDirectory() const
 {
 	if (type == ProjectItemType::Folder)
-		return fullname;
+		return fullpath;
 	else
-		return Filename(fullname).getDirectory();
+		return Filename(fullpath).getDirectory();
 }
 
 
-File::File(UTF8String fullname, UTF8String name) : ProjectItem(ProjectItemType::File, fullname, name)
+//////////////////////////////////////////////////////////////////////////
+// File
+//////////////////////////////////////////////////////////////////////////
+File::File(UTF8String fullpath) : ProjectItem(ProjectItemType::File, fullpath)
 {
-	extension = ansiToLower(Filename(fullname).getExtension());
+	extension = ansiToLower(Filename(fullpath).getExtension());
 }
+
+//////////////////////////////////////////////////////////////////////////
+// Folder
+//////////////////////////////////////////////////////////////////////////
+Folder::Folder(UTF8String fullpath) : ProjectItem(ProjectItemType::Folder, fullpath)
+{
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Project
+//////////////////////////////////////////////////////////////////////////
 
 Project::Project(UTF8String folder)
 {
@@ -151,6 +169,7 @@ void Project::removeLooseFile(ProjectItemId fileId)
 		return item->id == fileId;
 	});
 }
+
 
 
 } // namespace document

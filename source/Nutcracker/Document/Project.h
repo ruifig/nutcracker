@@ -21,13 +21,13 @@ enum class ProjectItemType
 
 typedef FNVHash32 ProjectItemId;
 
+
 struct ProjectItem
 {
-	explicit ProjectItem(ProjectItemType type_, UTF8String fullname_, UTF8String name_);
+	explicit ProjectItem(ProjectItemType type_, UTF8String fullpath);
 	ProjectItem(const ProjectItem&) = delete;
 	virtual ~ProjectItem() {}
-	UTF8String fullname;
-	UTF8String absolutepath;
+	UTF8String fullpath;
 	UTF8String name;
 	ProjectItemType type;
 	ProjectItemId id = 0;
@@ -37,7 +37,7 @@ struct ProjectItem
 // Represents a file in the project
 struct File : public ProjectItem
 {
-	File(UTF8String fullname, UTF8String name);
+	File(UTF8String fullname);
 	virtual ~File() {}
 	UTF8String extension;
 	FileTime filetime;
@@ -50,23 +50,31 @@ struct File : public ProjectItem
 		cz::UTF8String desc;
 	};
 	std::vector<ErrorInfo> errorLines;
-
-	// If the file was something we dragged or opened explicitly, and doesn't belong to the root folder
-	bool looseFile = false;
 };
 
 struct Folder : public ProjectItem
 {
-	Folder(UTF8String fullname, UTF8String name) : ProjectItem(ProjectItemType::Folder, fullname, name) {}
+	Folder(UTF8String fullpath);
 	virtual ~Folder() {}
-	std::vector<std::shared_ptr<ProjectItem>> items;
+	std::set<std::shared_ptr<ProjectItem>> items;
 };
+
+struct ProjectItemCompare
+{
+	bool operator() (const std::shared_ptr<ProjectItem>& a, const std::shared_ptr<ProjectItem>& b)
+	{
+		if (a->type < b->type)
+			return -1;
+		else
+			a->name < b->name;
+	}
+};
+
 
 class Project
 {
 public:
 	Project() { }
-	explicit Project(UTF8String folder);
 	~Project();
 
 	//! Populates the project with the files found in the project's folder
