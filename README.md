@@ -4,6 +4,7 @@ Nutracker is an IDE purely focused on the [Squirrel scripting language](http://s
 I've used Squirrel on and off over the years, but despite being a nice little scripting language, I was always put off by the lack of tools.
 
 The code is mostly a refactoring of the C/Assembly IDE I've been working on for my game toolkit:
+
 * [https://bitbucket.org/ruifig/g4devkit](https://bitbucket.org/ruifig/g4devkit)
 * [https://www.youtube.com/watch?v=cIyHgQvfETE](https://www.youtube.com/watch?v=cIyHgQvfETE)
 
