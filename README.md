@@ -20,7 +20,9 @@ Planned features:
 * Very simple workspace management, as to not enforce any particular kind of project organization
 * A good deal of keyboard shortcuts for code navigation, similar to Visual Studio and Visual Assist.
 * Support for user defined Squirrel interpreters
-** IDE can communicate with your game, or your customized standalone interpreter.
-** For the debugger to work, your game/interpreter must use the simple [SQDBG](http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBG.html) library. See also [http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBGProtocolReference.html]()
+    * The IDE can communicate with your game, or your customized standalone interpreter.
+    * For the debugger to work, your game/interpreter must use the simple [SQDBG](http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBG.html) library. See also [http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBGProtocolReference.html]()
+* Some degree of code completion, as far as it can be done with a dynamically typed language.
+    * I intend to extend SQDBG protocol to have the IDE query the Squirrel VM's process and build a code database.
 
 ![screenshot1.png](https://bitbucket.org/repo/jnoqe9/images/2250951370-screenshot1.png)
