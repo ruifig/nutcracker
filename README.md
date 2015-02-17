@@ -13,4 +13,14 @@ As such, it's pretty much unorganized while I refactor and bring things across a
 Also, this repository references code from another one of my repositories which is not public at the moment, so you won't be able to build.
 I'll get that sorted out as soon as I have a usable version.
 
+Planned features:
+
+* Purely focused on Squirrel
+* Debugger
+* Very simple workspace management, as to not enforce any particular kind of project organization
+* A good deal of keyboard shortcuts for code navigation, similar to Visual Studio and Visual Assist.
+* Support for user defined Squirrel interpreters
+** IDE can communicate with your game, or your customized standalone interpreter.
+** For the debugger to work, your game/interpreter must use the simple [SQDBG](http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBG.html) library. See also [http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBGProtocolReference.html]()
+
 ![screenshot1.png](https://bitbucket.org/repo/jnoqe9/images/2250951370-screenshot1.png)
