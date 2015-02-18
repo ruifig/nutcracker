@@ -57,8 +57,8 @@ struct ProjectItemCompare
 {
 	bool operator() (const std::shared_ptr<ProjectItem>& a, const std::shared_ptr<ProjectItem>& b)
 	{
-		if (a->type < b->type)
-			return true;
+		if (a->type != b->type)
+			return a->type < b->type;
 		else
 			return a->name < b->name;
 	}
@@ -87,7 +87,7 @@ public:
 
 	std::shared_ptr<const Folder> getRoot();
 
-	void removeLooseFile(ProjectItemId id);
+	void onEditorClosed(ProjectItemId id);
 private:
 
 	void populateFromDir(const std::shared_ptr<Folder>& folder);

@@ -62,7 +62,7 @@ FileEditorWnd::~FileEditorWnd()
 		file->dirty = false;
 	}
 
-	gProject->removeLooseFile(m_fileId);
+	gProject->onEditorClosed(m_fileId);
 }
 
 ProjectItemId FileEditorWnd::getFileId()

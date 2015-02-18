@@ -41,7 +41,7 @@ File::File(UTF8String fullpath_) : ProjectItem(ProjectItemType::File, std::move(
 //////////////////////////////////////////////////////////////////////////
 Folder::Folder(UTF8String fullpath_) : ProjectItem(ProjectItemType::Folder, std::move(fullpath_))
 {
-	name = Filesystem::getSingleton().pathStrip(fullpath);
+	name = Filesystem::getSingleton().pathStrip(Filename(fullpath).removeBackslash());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -163,23 +163,22 @@ std::shared_ptr<const Folder> Project::getRoot()
 	return m_root;
 }
 
-void Project::removeLooseFile(ProjectItemId fileId)
+void Project::onEditorClosed(ProjectItemId fileId)
 {
-	CZ_UNEXPECTED();
-	/*
 	auto file = getFile(fileId);
 	if (!file || !file->looseFile)
 		return;
 
 	m_rootMap.erase(fileId.val);
-	cz::erase_if(m_root->items,
-		[&](const std::shared_ptr<ProjectItem>& item)
+	for (auto it = m_root->items.begin(); it!=m_root->items.end(); ++it)
 	{
-		return item->id == fileId;
-	});
-	*/
+		if ((*it)->id == fileId)
+		{
+			m_root->items.erase(it);
+			break;
+		}
+	}
 }
-
 
 
 } // namespace document
