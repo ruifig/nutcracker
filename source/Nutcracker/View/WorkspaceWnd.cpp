@@ -46,6 +46,8 @@ WorkspaceWnd::WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	// other controls
 	m_treeCtrl->SetImageList(&gImageListSmall);
 
+	m_refreshBtn->SetBitmap(gImageListSmall.GetBitmap(SMALLIMG_IDX_REFRESH), wxLEFT);
+
 	gWorkspaceWnd = this;
 }
 
@@ -58,6 +60,7 @@ void WorkspaceWnd::onAppEvent(const AppEvent& evt)
 	switch (evt.id)
 	{
 		case AppEventID::OpenWorkspace:
+		case AppEventID::AddedFolder:
 			updateState();
 			break;
 	}
@@ -210,10 +213,10 @@ void WorkspaceWnd::locateFile(document::ProjectItemId fileId)
 	m_treeData.getCtrl()->SelectItem(itemId);
 }
 
-void WorkspaceWnd::OnDirpickerctrlDirPickerChanged(wxFileDirPickerEvent& event)
+void WorkspaceWnd::OnRefreshClick(wxCommandEvent& event)
 {
-	CZ_UNEXPECTED();
-	//gProject->populate(wxStringToUtf8(m_workspaceRoot->GetTextCtrlValue()));
+	gProject->resyncFolders();
+	updateState();
 }
 
 } // namespace view

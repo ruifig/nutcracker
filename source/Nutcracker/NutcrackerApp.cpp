@@ -68,6 +68,7 @@ bool NutcrackerApp::OnInit()
 	gImageListSmall.Replace(SMALLIMG_IDX_FOLDER, wxArtProvider::GetBitmap(wxART_FOLDER, wxART_OTHER, wxSize(16, 16)));
 	gImageListSmall.Replace(SMALLIMG_IDX_FILE_OTHER, wxArtProvider::GetBitmap(wxART_NORMAL_FILE, wxART_OTHER, wxSize(16, 16)));
 	gImageListSmall.Replace(SMALLIMG_IDX_FILE_NUT, wxBITMAP_PNG(APP_IMG_16x16_FILE_NUT));
+	gImageListSmall.Replace(SMALLIMG_IDX_REFRESH, wxBITMAP_PNG(APP_IMG_16x16_REFRESH));
 	gImageListSmall.Replace(SMALLIMG_IDX_NUT, wxBITMAP_PNG(APP_IMG_16x16_NUT));
 
 	for (int i = 0; i < BIGIMG_IDX_NUT; i++)

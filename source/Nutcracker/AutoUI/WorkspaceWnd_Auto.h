@@ -18,7 +18,6 @@
  */
 
 ////@begin includes
-#include "wx/filepicker.h"
 #include "wx/treectrl.h"
 ////@end includes
 
@@ -27,7 +26,6 @@
  */
 
 ////@begin forward declarations
-class wxDirPickerCtrl;
 class wxTreeCtrl;
 ////@end forward declarations
 
@@ -72,8 +70,8 @@ public:
 
 ////@begin WorkspaceWnd_Auto event handler declarations
 
-	/// wxEVT_DIRPICKER_CHANGED event handler for ID_DIRPICKERCTRL
-	virtual void OnDirpickerctrlDirPickerChanged( wxFileDirPickerEvent& event );
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON
+	virtual void OnRefreshClick( wxCommandEvent& event );
 
 	/// wxEVT_COMMAND_TREE_ITEM_ACTIVATED event handler for ID_TREECTRL
 	virtual void OnTreeItemActivated( wxTreeEvent& event );
@@ -96,12 +94,12 @@ public:
 	static bool ShowToolTips();
 
 ////@begin WorkspaceWnd_Auto member variables
-	wxDirPickerCtrl* m_workspaceRoot;
+	wxBitmapButton* m_refreshBtn;
 	wxTreeCtrl* m_treeCtrl;
 	/// Control identifiers
 	enum {
 		ID_WORKSPACEWND_AUTO = 10000,
-		ID_DIRPICKERCTRL = 10002,
+		ID_BITMAPBUTTON = 10002,
 		ID_TREECTRL = 10001
 	};
 ////@end WorkspaceWnd_Auto member variables

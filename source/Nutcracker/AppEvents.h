@@ -5,6 +5,7 @@
 enum class AppEventID
 {
 	OpenWorkspace,
+	AddedFolder,
 	NewWorkspace,
 	FileSaved,
 	ViewOptionsChanged

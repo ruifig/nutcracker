@@ -34,7 +34,7 @@ private:
 	virtual void OnTreeItemMenu(wxTreeEvent& event) override;
 	void OnOpenContainingFolder(wxCommandEvent& event);
 	void OnRunScriptFile(wxCommandEvent& event);
-	virtual void OnDirpickerctrlDirPickerChanged(wxFileDirPickerEvent& event) override;
+	virtual void OnRefreshClick(wxCommandEvent& event) override;
 
 	std::shared_ptr<TreeCtrlUtil::TreeItemData> updateState(const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent,
 															const std::shared_ptr<const document::ProjectItem>& item);

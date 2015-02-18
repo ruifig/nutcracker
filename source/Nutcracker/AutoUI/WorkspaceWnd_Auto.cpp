@@ -35,7 +35,7 @@ IMPLEMENT_DYNAMIC_CLASS( WorkspaceWnd_Auto, wxPanel )
 BEGIN_EVENT_TABLE( WorkspaceWnd_Auto, wxPanel )
 
 ////@begin WorkspaceWnd_Auto event table entries
-	EVT_DIRPICKER_CHANGED( ID_DIRPICKERCTRL, WorkspaceWnd_Auto::OnDirpickerctrlDirPickerChanged )
+	EVT_BUTTON( ID_BITMAPBUTTON, WorkspaceWnd_Auto::OnRefreshClick )
 	EVT_TREE_ITEM_ACTIVATED( ID_TREECTRL, WorkspaceWnd_Auto::OnTreeItemActivated )
 	EVT_TREE_ITEM_MENU( ID_TREECTRL, WorkspaceWnd_Auto::OnTreeItemMenu )
 ////@end WorkspaceWnd_Auto event table entries
@@ -97,7 +97,7 @@ WorkspaceWnd_Auto::~WorkspaceWnd_Auto()
 void WorkspaceWnd_Auto::Init()
 {
 ////@begin WorkspaceWnd_Auto member initialisation
-	m_workspaceRoot = NULL;
+	m_refreshBtn = NULL;
 	m_treeCtrl = NULL;
 ////@end WorkspaceWnd_Auto member initialisation
 }
@@ -118,8 +118,8 @@ void WorkspaceWnd_Auto::CreateControls()
 	wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer3, 0, wxGROW|wxALL, 1);
 
-	m_workspaceRoot = new wxDirPickerCtrl( itemPanel1, ID_DIRPICKERCTRL, wxEmptyString, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxDIRP_DEFAULT_STYLE|wxDIRP_DIR_MUST_EXIST );
-	itemBoxSizer3->Add(m_workspaceRoot, 1, wxGROW|wxALL, 0);
+	m_refreshBtn = new wxBitmapButton( itemPanel1, ID_BITMAPBUTTON, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	itemBoxSizer3->Add(m_refreshBtn, 1, wxGROW|wxALL, 0);
 
 	m_treeCtrl = new wxTreeCtrl( itemPanel1, ID_TREECTRL, wxDefaultPosition, wxSize(80, 200), wxTR_HAS_BUTTONS |wxTR_LINES_AT_ROOT|wxTR_HIDE_ROOT|wxTR_SINGLE|wxNO_BORDER );
 	itemBoxSizer2->Add(m_treeCtrl, 1, wxGROW|wxALL, 0);
@@ -191,14 +191,14 @@ void WorkspaceWnd_Auto::OnTreeItemMenu( wxTreeEvent& event )
 
 
 /*
- * wxEVT_DIRPICKER_CHANGED event handler for ID_DIRPICKERCTRL
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON
  */
 
-void WorkspaceWnd_Auto::OnDirpickerctrlDirPickerChanged( wxFileDirPickerEvent& event )
+void WorkspaceWnd_Auto::OnRefreshClick( wxCommandEvent& event )
 {
-////@begin wxEVT_DIRPICKER_CHANGED event handler for ID_DIRPICKERCTRL in WorkspaceWnd_Auto.
+////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON in WorkspaceWnd_Auto.
 	// Before editing this code, remove the block markers.
 	event.Skip();
-////@end wxEVT_DIRPICKER_CHANGED event handler for ID_DIRPICKERCTRL in WorkspaceWnd_Auto. 
+////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON in WorkspaceWnd_Auto. 
 }
 
