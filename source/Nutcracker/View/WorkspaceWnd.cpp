@@ -76,8 +76,6 @@ std::shared_ptr<TreeCtrlUtil::TreeItemData> WorkspaceWnd::updateState(
 	else if (item->type == ProjectItemType::File)
 	{
 		auto fileItem = static_cast<const document::File*>(item.get());
-		if (fileItem->looseFile)
-			return nullptr;
 		if (fileItem->extension=="nut")
 			imgIndex = SMALLIMG_IDX_FILE_NUT;
 		else

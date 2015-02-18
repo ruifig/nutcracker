@@ -7,6 +7,23 @@ namespace cz
 namespace document
 {
 
+static std::unordered_map<u32, std::weak_ptr<ProjectItem>> gAll;
+std::shared_ptr<struct File> createFile(UTF8String fullpath)
+{
+	auto f = std::shared_ptr<File>(new File(std::move(fullpath)));
+	CZ_ASSERT(gAll.find(f->id.val) == gAll.end());
+	gAll[f->id.val] = f;
+	return f;
+}
+
+std::shared_ptr<struct Folder> createFolder(UTF8String fullpath)
+{
+	auto f = std::shared_ptr<Folder>(new Folder(std::move(fullpath)));
+	CZ_ASSERT(gAll.find(f->id.val) == gAll.end());
+	gAll[f->id.val] = f;
+	return f;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // ProjectItem
 //////////////////////////////////////////////////////////////////////////
@@ -14,6 +31,11 @@ ProjectItem::ProjectItem(ProjectItemType type_, UTF8String fullpath_)
 	: type(type_), fullpath(std::move(fullpath_))
 {
 	id.val = FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes());
+}
+
+ProjectItem::~ProjectItem()
+{
+	gAll.erase(id.val);
 }
 
 cz::UTF8String ProjectItem::getDirectory() const
@@ -50,7 +72,7 @@ Folder::Folder(UTF8String fullpath_) : ProjectItem(ProjectItemType::Folder, std:
 
 Project::Project()
 {
-	m_root = std::make_shared < Folder >("");
+	m_root = createFolder("");
 }
 
 Project::~Project()
@@ -59,9 +81,7 @@ Project::~Project()
 
 void Project::add(const std::shared_ptr<Folder>& parent, const std::shared_ptr<ProjectItem>& item)
 {
-	CZ_CHECK(m_rootMap.find(item->id.val) == m_rootMap.end());
 	parent->items.insert(item);
-	m_rootMap[item->id.val] = item;
 }
 
 void Project::addFolder(const UTF8String& path)
@@ -77,7 +97,7 @@ void Project::addFolder(const UTF8String& path)
 		throw std::runtime_error(formatString("'%s' is not a folder", path.c_str()));
 	}
 
-	auto f = std::make_shared<Folder>(fullpath);
+	auto f = createFolder(fullpath);
 	auto existing = getFile(f->id);
 	if (!existing)
 	{
@@ -86,26 +106,37 @@ void Project::addFolder(const UTF8String& path)
 	}
 }
 
-File* Project::addLooseFile(const UTF8String& path)
+std::shared_ptr<File> Project::getFile(ProjectItemId fileId)
+{
+	auto it = gAll.find(fileId.val);
+	if (it == gAll.end())
+		return nullptr;
+
+	auto item = it->second.lock();
+	if (item->type != ProjectItemType::File)
+		return nullptr;
+
+	return std::static_pointer_cast<File>(item);
+}
+
+std::shared_ptr<File> Project::getFile(const UTF8String& path)
 {
 	UTF8String fullpath;
 	if (!Filesystem::getSingleton().fullPath(fullpath, path))
-	{
 		throw std::runtime_error(formatString("Error parsing path '%s'", path.c_str()));
-	}
 
 	if (!Filesystem::getSingleton().isExistingFile(fullpath))
 		return nullptr;
 
-	auto f = std::make_shared<File>(fullpath);
-	f->looseFile = true;
+	ProjectItemId id(FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes()));
+	// Check if this file is referenced somewhere already
+	auto f = getFile(id);
+	if (f)
+		return f;
 
-	// Check if there is a file with the same id. If so, it's the same file
-	if (auto existing = getFile(f->id))
-		return existing;
-
-	add(m_root, f);
-	return f.get();
+	// Not referenced, so it's a new file
+	f = createFile(fullpath);
+	return f;
 }
 
 void Project::resyncFolders()
@@ -124,7 +155,7 @@ void Project::populateFromDir(const std::shared_ptr<Folder>& folder)
 			case Filesystem::Type::Directory:
 			{
 				cz::UTF8String path = folder->fullpath + f.name + "\\";
-				auto item = std::make_shared<Folder>(path);
+				auto item = createFolder(path);
 				add(folder, item);
 				populateFromDir(item);
 			}
@@ -132,7 +163,7 @@ void Project::populateFromDir(const std::shared_ptr<Folder>& folder)
 			case Filesystem::Type::File:
 				if (ansiToLower(Filename(f.name).getExtension()) == "nut")
 				{
-					auto item = std::make_shared<File>(folder->fullpath +f.name);
+					auto item = createFile(folder->fullpath + f.name);
 					add(folder, item);
 				}
 			break;
@@ -142,44 +173,10 @@ void Project::populateFromDir(const std::shared_ptr<Folder>& folder)
 	}
 }
 
-
-File* Project::getFile(ProjectItemId id)
-{
-	auto it = m_rootMap.find(id.val);
-	if (it == m_rootMap.end())
-		return nullptr;
-
-	auto item = it->second.lock().get();
-	if (item->type != ProjectItemType::File)
-	{
-		return nullptr;
-	}
-
-	return static_cast<File*>(item);
-}
-
 std::shared_ptr<const Folder> Project::getRoot()
 {
 	return m_root;
 }
-
-void Project::onEditorClosed(ProjectItemId fileId)
-{
-	auto file = getFile(fileId);
-	if (!file || !file->looseFile)
-		return;
-
-	m_rootMap.erase(fileId.val);
-	for (auto it = m_root->items.begin(); it!=m_root->items.end(); ++it)
-	{
-		if ((*it)->id == fileId)
-		{
-			m_root->items.erase(it);
-			break;
-		}
-	}
-}
-
 
 } // namespace document
 } // namespace cz

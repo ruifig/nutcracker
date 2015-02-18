@@ -23,9 +23,8 @@ public:
 		const wxSize& size = wxDefaultSize, long style = 0);
 	virtual ~FileEditorWnd();
 
-	document::ProjectItemId getFileId();
-	document::File* getFile();
-	void setFile(document::File* file, int line=0, int col=0, bool columnIsOffset=false);
+	std::shared_ptr<document::File> getFile();
+	void setFile(const std::shared_ptr<document::File>& file, int line=0, int col=0, bool columnIsOffset=false);
 	void setFocusToEditor();
 	wxString getWordUnderCursor();
 	bool editorHasFocus();
@@ -55,7 +54,7 @@ private:
 	void getPositionForParser(int& line, int& column, bool adjustForSymbol);
 	void recolourise(bool reparse);
 
-	document::ProjectItemId m_fileId = 0;
+	std::shared_ptr<document::File> m_file;
 
 };
 

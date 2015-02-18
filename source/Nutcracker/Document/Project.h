@@ -21,12 +21,11 @@ enum class ProjectItemType
 
 typedef FNVHash32 ProjectItemId;
 
-
 struct ProjectItem
 {
 	explicit ProjectItem(ProjectItemType type_, UTF8String fullpath_);
 	ProjectItem(const ProjectItem&) = delete;
-	virtual ~ProjectItem() {}
+	virtual ~ProjectItem();
 	UTF8String fullpath;
 	UTF8String name;
 	ProjectItemType type;
@@ -34,10 +33,12 @@ struct ProjectItem
 	UTF8String getDirectory() const;
 };
 
+std::shared_ptr<struct File> createFile(UTF8String fullpath);
+std::shared_ptr<struct Folder> createFolder(UTF8String fullpath);
+
 // Represents a file in the project
 struct File : public ProjectItem
 {
-	explicit File(UTF8String fullpath_);
 	virtual ~File() {}
 	UTF8String extension;
 	FileTime filetime;
@@ -49,8 +50,10 @@ struct File : public ProjectItem
 		bool isError;
 		cz::UTF8String desc;
 	};
-	bool looseFile = false;
 	std::vector<ErrorInfo> errorLines;
+protected:
+	friend std::shared_ptr<struct File> cz::document::createFile(UTF8String);
+	explicit File(UTF8String fullpath_);
 };
 
 struct ProjectItemCompare
@@ -66,9 +69,11 @@ struct ProjectItemCompare
 
 struct Folder : public ProjectItem
 {
-	explicit Folder(UTF8String fullpath_);
 	virtual ~Folder() {}
 	std::set<std::shared_ptr<ProjectItem>, ProjectItemCompare> items;
+protected:
+	friend std::shared_ptr<struct Folder> createFolder(UTF8String);
+	explicit Folder(UTF8String fullpath_);
 };
 
 
@@ -79,22 +84,16 @@ public:
 	~Project();
 
 	void addFolder(const UTF8String& path);
-	File* addLooseFile(const UTF8String& path);
+	std::shared_ptr<File> getFile(ProjectItemId id);
+	std::shared_ptr<File> getFile(const UTF8String& path);
+
 	void resyncFolders();
-
-	//! Gets the file object given the id
-	File* getFile(ProjectItemId id);
-
 	std::shared_ptr<const Folder> getRoot();
-
-	void onEditorClosed(ProjectItemId id);
 private:
 
-	void populateFromDir(const std::shared_ptr<Folder>& folder);
 	void add(const std::shared_ptr<Folder>& parent, const std::shared_ptr<ProjectItem>& item);
-
+	void populateFromDir(const std::shared_ptr<Folder>& folder);
 	std::shared_ptr<Folder> m_root;
-	std::unordered_map < u32, std::weak_ptr<ProjectItem>> m_rootMap;
 };
 
 } // namespace document

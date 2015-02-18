@@ -88,7 +88,7 @@ void FileEditorGroupWnd::OnPageClosed(wxAuiNotebookEvent& event)
 
 }
 
-FileEditorWnd* FileEditorGroupWnd::findFileWnd(document::ProjectItemId id, int* index)
+FileEditorWnd* FileEditorGroupWnd::findFileWnd(const std::shared_ptr<document::File>& file, int* index)
 {
 	// Check if this file is already opened
 	for (size_t i = 0; i < m_notebook->GetPageCount(); i++)
@@ -96,7 +96,7 @@ FileEditorWnd* FileEditorGroupWnd::findFileWnd(document::ProjectItemId id, int* 
 		wxWindow* page = m_notebook->GetPage(i);
 		assert(page->IsKindOf(CLASSINFO(FileEditorWnd)));
 		FileEditorWnd* v = static_cast<FileEditorWnd*>(page);
-		if (v->getFileId() == id)
+		if (v->getFile() == file)
 		{
 			if (index)
 				*index = (int)i;
@@ -118,13 +118,13 @@ void FileEditorGroupWnd::iterateFiles(std::function<void(FileEditorWnd*)> func)
 	}
 }
 
-void FileEditorGroupWnd::gotoFile(document::File* file, int line, int col, bool columnIsOffset)
+void FileEditorGroupWnd::gotoFile(const std::shared_ptr<document::File>& file, int line /*= -1*/, int col /*= 0*/, bool columnIsOffset /*= false*/)
 {
 	try
 	{
 		// Check if the file is already open
 		int index;
-		FileEditorWnd* w = findFileWnd(file->id, &index);
+		FileEditorWnd* w = findFileWnd(file, &index);
 		if (w)
 		{
 			w->setFile(file, line, col);
@@ -152,12 +152,12 @@ void FileEditorGroupWnd::gotoFile(document::File* file, int line, int col, bool 
 	}
 }
 
-void FileEditorGroupWnd::setPageTitle(document::File* file)
+void FileEditorGroupWnd::setPageTitle(const std::shared_ptr<document::File>& file)
 {
 	try
 	{
 		int index;
-		auto fwnd = findFileWnd(file->id, &index);
+		auto fwnd = findFileWnd(file, &index);
 		if (fwnd)
 			m_notebook->SetPageText(index, wxString::Format(L"%s%s", file->name.widen(), file->dirty ? L"*" : L""));
 	}
@@ -194,7 +194,7 @@ FileEditorWnd* FileEditorGroupWnd::getCurrentPage()
 	return static_cast<FileEditorWnd*>(page);
 }
 
-document::File* FileEditorGroupWnd::getCurrentFile()
+std::shared_ptr<document::File> FileEditorGroupWnd::getCurrentFile()
 {
 	auto page = getCurrentPage();
 	if (!page)
@@ -230,7 +230,7 @@ void FileEditorGroupWnd::OnTabRightUp(wxAuiNotebookEvent& event)
 
 void FileEditorGroupWnd::OnLocateInWorkspace(wxCommandEvent& event)
 {
-	gWorkspaceWnd->locateFile(m_selectedFileTab->getFileId());
+	gWorkspaceWnd->locateFile(m_selectedFileTab->getFile()->id);
 }
 
 void FileEditorGroupWnd::OnOpenContainingFolder(wxCommandEvent& event)
