@@ -253,7 +253,7 @@ void MainWnd::OnDropFiles(wxDropFilesEvent& event)
 	wxString* dropped = event.GetFiles();
 	for (int i = 0; i < event.GetNumberOfFiles(); i++)
 	{
-		auto file = gProject->addLooseFile(wxStringToUtf8(*dropped));
+		auto file = gProject->getFile(wxStringToUtf8(*dropped));
 		if (file)
 			gFileEditorGroupWnd->gotoFile(file);
 		dropped++;

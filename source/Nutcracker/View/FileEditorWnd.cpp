@@ -61,18 +61,11 @@ FileEditorWnd::~FileEditorWnd()
 	{
 		file->dirty = false;
 	}
-
-	gProject->onEditorClosed(m_fileId);
 }
 
-ProjectItemId FileEditorWnd::getFileId()
+std::shared_ptr<document::File> FileEditorWnd::getFile()
 {
-	return m_fileId;
-}
-
-document::File* FileEditorWnd::getFile()
-{
-	return gProject->getFile(m_fileId);
+	return m_file;
 }
 
 void FileEditorWnd::setCommonStyle()
@@ -165,12 +158,12 @@ void FileEditorWnd::setCommonStyle()
 	m_textCtrl->SetCaretLineVisible(true);
 }
 
-void FileEditorWnd::setFile(document::File* file, int line, int col, bool columnIsOffset)
+void FileEditorWnd::setFile(const std::shared_ptr<document::File>& file, int line, int col, bool columnIsOffset)
 {
-	if (m_fileId.val == 0)
+	if (m_file != file)
 	{
-		file->dirty = false;
-		m_fileId = file->id;
+		m_file = file;
+		m_file->dirty = false;
 
 		// Find the language we want
 		cz::UTF8String ext = file->extension;
@@ -237,7 +230,7 @@ void FileEditorWnd::checkReload()
 	if (t<= file->filetime)
 		return;
 
-	m_fileId.val = 0;
+	m_file.reset();
 	setFile(file, -1, 0);
 }
 
@@ -336,15 +329,14 @@ void FileEditorWnd::OnTextChanged(wxStyledTextEvent& event)
 	{
 		auto file = getFile();
 		file->dirty = true;
-		gFileEditorGroupWnd->setPageTitle(file);
+		gFileEditorGroupWnd->setPageTitle(m_file);
 	}
 }
 
 void FileEditorWnd::OnTextSavePoint(wxStyledTextEvent& event)
 {
-	auto file = getFile();
-	file->dirty = false;
-	gFileEditorGroupWnd->setPageTitle(file);
+	m_file->dirty = false;
+	gFileEditorGroupWnd->setPageTitle(m_file);
 }
 
 void FileEditorWnd::OnUpdateUI(wxStyledTextEvent& event)
