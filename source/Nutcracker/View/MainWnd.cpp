@@ -89,20 +89,20 @@ MainWnd::MainWnd()
 
 	m_logger = std::make_unique<MainWndLoggerOutput>(&m_asyncFuncs, m_logTextCtrl);
 	cz::Logger::getSingleton().addOutput(m_logger.get());
-	uiState = std::make_unique<UIState>();
+	gUIState = std::make_unique<UIState>();
 
 	//
 	// Initialize interpreters
 	//
 	{
-		uiState->interpreters = Interpreter::initAll(Filesystem::getSingleton().getCWD() + "interpreters\\");
+		gUIState->interpreters = Interpreter::initAll(Filesystem::getSingleton().getCWD() + "interpreters\\");
 		int interpreterMenuId = ID_MENU_INTERPRETER_FIRST;
 
 		//bind(wxevt_command_menu_selected, &mainwnd::oninterpreterclick, this, interpretermenuid);
 		//m_menuinterpreters->append(interpretermenuid++, "test", wxemptystring, wxitem_check);
 
 		wxMenuItem* firstItem = nullptr;
-		for (auto& i : uiState->interpreters)
+		for (auto& i : gUIState->interpreters)
 		{
 			auto item = m_menuInterpreters->AppendRadioItem(interpreterMenuId, i->getName().c_str());
 			if (!firstItem)
@@ -111,7 +111,7 @@ MainWnd::MainWnd()
 			interpreterMenuId++;
 		}
 		firstItem->Check();
-		uiState->currentInterpreter = uiState->interpreters[0].get();
+		gUIState->currentInterpreter = gUIState->interpreters[0].get();
 	}
 
 	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainWnd::OnCharHook));
@@ -142,17 +142,17 @@ void MainWnd::OnMenuClick(wxCommandEvent& event)
 	switch(event.GetId())
 	{
 		case ID_MENU_VIEW_INDENTATION:
-			uiState->view_ShowIndentationGuides = val;
+			gUIState->view_ShowIndentationGuides = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
 		break;
 
 		case ID_MENU_VIEW_WHITESPACE:
-			uiState->view_Whitespace = val;
+			gUIState->view_Whitespace = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
 		break;
 
 		case ID_MENU_VIEW_EOL:
-			uiState->view_EOL = val;
+			gUIState->view_EOL = val;
 			fireAppEvent(AppEventID::ViewOptionsChanged);
 		break;
 
@@ -165,7 +165,7 @@ void MainWnd::OnMenuClick(wxCommandEvent& event)
 
 void MainWnd::OnInterpreterClick(wxCommandEvent& event)
 {
-	uiState->currentInterpreter = uiState->interpreters[event.GetId() - ID_MENU_INTERPRETER_FIRST].get();
+	gUIState->currentInterpreter = gUIState->interpreters[event.GetId() - ID_MENU_INTERPRETER_FIRST].get();
 }
 
 void MainWnd::OnCharHook(wxKeyEvent& event)
@@ -180,10 +180,7 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 	switch (event.GetKeyCode())
 	{
 	case WXK_F5: // Continue
-		if (event.ControlDown())
-			launch(true);
-		else
-			launch(false);
+		launch(event.ControlDown() ? false : true);
 		break;
 	default:
 		event.Skip();

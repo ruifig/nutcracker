@@ -50,6 +50,7 @@
 #include "wx/dir.h"
 #include "wx/regex.h"
 #include "wx/dcbuffer.h"
+#include "wx/socket.h"
 
 #include <wx/valnum.h>
 #include <wx/stc/private.h>

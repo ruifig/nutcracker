@@ -643,9 +643,9 @@ bool FileEditorWnd::editorHasFocus()
 
 void FileEditorWnd::updateViewOptions()
 {
-	m_textCtrl->SetIndentationGuides( uiState->view_ShowIndentationGuides ? wxSTC_IV_LOOKBOTH : wxSTC_IV_NONE);
-	m_textCtrl->SetViewWhiteSpace( uiState->view_Whitespace ? wxSTC_WS_VISIBLEALWAYS : wxSTC_WS_INVISIBLE);
-	m_textCtrl->SetViewEOL( uiState->view_EOL ? true : false);
+	m_textCtrl->SetIndentationGuides( gUIState->view_ShowIndentationGuides ? wxSTC_IV_LOOKBOTH : wxSTC_IV_NONE);
+	m_textCtrl->SetViewWhiteSpace( gUIState->view_Whitespace ? wxSTC_WS_VISIBLEALWAYS : wxSTC_WS_INVISIBLE);
+	m_textCtrl->SetViewEOL( gUIState->view_EOL ? true : false);
 	m_textCtrl->SetEdgeMode(wxSTC_EDGE_LINE);
 	m_textCtrl->SetEdgeColumn(80);
 	m_textCtrl->SetEdgeColour(wxColour(210,210,210));

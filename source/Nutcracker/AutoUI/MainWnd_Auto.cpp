@@ -142,9 +142,9 @@ void MainWnd_Auto::CreateControls()
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
 		.Name(wxT("Pane2")).Caption(_("Workspace")).MinSize(wxSize(80, 120)).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
-	cz::view::FileEditorGroupWnd* itemWindow14 = new cz::view::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
+	cz::view::FileEditorGroupWnd* itemWindow14 = new cz::view::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(itemWindow14, wxAuiPaneInfo()
-		.Name(wxT("Pane4")).Centre().CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true));
+		.Name(wxT("Pane4")).Centre().MinSize(wxSize(100, -1)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
 	wxAuiNotebook* itemAuiNotebook15 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_DEFAULT_STYLE|wxAUI_NB_TOP );
 

@@ -30,7 +30,34 @@ cz::UTF8String Variables::replace(const UTF8String& str) const
 
 
 
+//////////////////////////////////////////////////////////////////////////
+// Session
+//////////////////////////////////////////////////////////////////////////
+Session::Session()
+{
+}
 
+Session::~Session()
+{
+}
+
+bool Session::start(const std::string& ip, int port)
+{
+	if (port)
+	{
+		m_messenger = std::make_unique<Messenger>();
+		if (!m_messenger->connect(ip.c_str(), port, 5))
+			return false;
+
+		m_messenger->send("rd\n");
+	}
+
+	return true;
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Interpreter
+//////////////////////////////////////////////////////////////////////////
 Interpreter::Interpreter()
 {
 }
@@ -54,6 +81,9 @@ std::unique_ptr<Session> Interpreter::launch(const Variables& variables, const U
 	wxExecute(cmd.c_str());
 	wxSetWorkingDirectory(cwd);
 
+	if (!session->start(m_ip, m_port))
+		return nullptr;
+
 	return session;
 }
 
@@ -71,8 +101,10 @@ std::unique_ptr<Interpreter> Interpreter::init(const UTF8String& cfgFile)
 
 	inter->m_hasDebugger = file.getValue<bool>("General", "debugger", false);
 	inter->m_name = file.getValue<const char*>("General", "name", "Unknown");
-	inter->m_launchDebug = file.getValue<const char*>("General", "launch_normal", "");
-	inter->m_launchNormal = file.getValue<const char*>("General", "launch_debug", "");
+	inter->m_launchNormal = file.getValue<const char*>("General", "launch_normal", "");
+	inter->m_launchDebug = file.getValue<const char*>("General", "launch_debug", "");
+	inter->m_ip = file.getValue<const char*>("Debugger", "ip", "127.0.0.1");
+	inter->m_port = file.getValue<int>("Debugger", "port", 0);
 
 	return std::move(inter);
 }

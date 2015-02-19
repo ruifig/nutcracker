@@ -18,7 +18,7 @@ std::shared_ptr<document::Project> gProject;
 
 }
 
-std::unique_ptr<UIState> uiState;
+std::unique_ptr<UIState> gUIState;
 std::unique_ptr<cz::Parameters> gParameters;
 
 cz::UTF8String wxStringToUtf8(const wxString& str)

@@ -60,6 +60,7 @@
     </ClCompile>
     <ClCompile Include="LaunchUtil.cpp" />
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
+    <ClCompile Include="Messenger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
@@ -105,6 +106,7 @@
     </ClInclude>
     <ClInclude Include="LaunchUtil.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
+    <ClInclude Include="Messenger.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nutcracker.rc">
