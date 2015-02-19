@@ -17,6 +17,9 @@
     <Filter Include="Document">
       <UniqueIdentifier>{39ac7408-eb35-42c0-a08d-cb3dac9efd04}</UniqueIdentifier>
     </Filter>
+    <Filter Include="tinlyxml2">
+      <UniqueIdentifier>{d41edf21-463b-4ea2-be88-aeb4b83ba0f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutoUI\FileEditorGroupWnd_Auto.cpp">
@@ -61,6 +64,9 @@
     <ClCompile Include="LaunchUtil.cpp" />
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
     <ClCompile Include="Messenger.cpp" />
+    <ClCompile Include="..\..\dependencies\tinyxml2\tinyxml2.cpp">
+      <Filter>tinlyxml2</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
@@ -107,6 +113,9 @@
     <ClInclude Include="LaunchUtil.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
     <ClInclude Include="Messenger.h" />
+    <ClInclude Include="..\..\dependencies\tinyxml2\tinyxml2.h">
+      <Filter>tinlyxml2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nutcracker.rc">

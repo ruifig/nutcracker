@@ -111,4 +111,6 @@ typedef  unsigned char  byte;
 #include "czPlatform/czAsyncCommandQueue.h"
 #include "czPlatform/czFileTime.h"
 
+#include "tinyxml2.h"
+
 #define FORWARD_DECLARE_VIEWCLASS(CLASS) namespace cz { namespace view { class CLASS; } }
