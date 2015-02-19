@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Messenger.h"
+
 namespace cz
 {
 namespace document
@@ -25,7 +27,14 @@ class Launcher
 class Session
 {
 public:
+	Session();
+	~Session();
+	
+	// If port is 0, it will not use a debugger;
+	bool start(const std::string& ip, int port);
+
 private:
+	std::unique_ptr<Messenger> m_messenger;
 };
 
 class Interpreter
@@ -44,6 +53,8 @@ private:
 	bool m_hasDebugger = false;
 	UTF8String m_launchNormal;
 	UTF8String m_launchDebug;
+	std::string m_ip;
+	int m_port;
 };
 
 } // namespace document

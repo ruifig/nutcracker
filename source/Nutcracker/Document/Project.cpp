@@ -62,7 +62,7 @@ File::File(UTF8String fullpath_) : ProjectItem(ProjectItemType::File, std::move(
 	name = fname.getFilename();
 	extension = ansiToLower(fname.getExtension());
 	filetime = cz::FileTime::get(fullpath, FileTime::kModified);
-	czDebug(ID_Log, "%s (%s) : %u", fullpath.c_str(), name.c_str(), id.val);
+	//czDebug(ID_Log, "%s (%s) : %u", fullpath.c_str(), name.c_str(), id.val);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ File::File(UTF8String fullpath_) : ProjectItem(ProjectItemType::File, std::move(
 Folder::Folder(UTF8String fullpath_) : ProjectItem(ProjectItemType::Folder, std::move(fullpath_))
 {
 	name = Filesystem::getSingleton().pathStrip(fullpath);
-	czDebug(ID_Log, "%s (%s) : %u", fullpath.c_str(), name.c_str(), id.val);
+	//czDebug(ID_Log, "%s (%s) : %u", fullpath.c_str(), name.c_str(), id.val);
 }
 
 //////////////////////////////////////////////////////////////////////////

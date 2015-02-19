@@ -9,6 +9,7 @@ namespace document
 	class Project;
 	struct ProjectItem;
 	class Interpreter;
+	class Session;
 }
 
 namespace view
@@ -51,9 +52,10 @@ struct UIState
 	bool view_EOL = false;
 	std::vector<std::unique_ptr<document::Interpreter>> interpreters;
 	document::Interpreter* currentInterpreter=nullptr;
+	std::unique_ptr<document::Session> debugSession;
 };
 
-extern std::unique_ptr<UIState> uiState;
+extern std::unique_ptr<UIState> gUIState;
 extern std::unique_ptr<cz::Parameters> gParameters;
 
 }

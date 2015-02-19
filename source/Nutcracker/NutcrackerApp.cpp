@@ -104,7 +104,7 @@ bool NutcrackerApp::OnInit()
 int NutcrackerApp::OnExit()
 {
 	gProject.reset();
-	uiState.reset();
+	gUIState.reset();
 	gParameters.reset();
 	return wxApp::OnExit();
 }

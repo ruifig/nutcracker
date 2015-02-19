@@ -121,7 +121,7 @@ void WorkspaceWnd_Auto::CreateControls()
 	m_refreshBtn = new wxBitmapButton( itemPanel1, ID_BITMAPBUTTON, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
 	itemBoxSizer3->Add(m_refreshBtn, 1, wxGROW|wxALL, 0);
 
-	m_treeCtrl = new wxTreeCtrl( itemPanel1, ID_TREECTRL, wxDefaultPosition, wxSize(80, 200), wxTR_HAS_BUTTONS |wxTR_LINES_AT_ROOT|wxTR_HIDE_ROOT|wxTR_SINGLE|wxNO_BORDER );
+	m_treeCtrl = new wxTreeCtrl( itemPanel1, ID_TREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS |wxTR_LINES_AT_ROOT|wxTR_HIDE_ROOT|wxTR_SINGLE|wxNO_BORDER );
 	itemBoxSizer2->Add(m_treeCtrl, 1, wxGROW|wxALL, 0);
 
 ////@end WorkspaceWnd_Auto content construction

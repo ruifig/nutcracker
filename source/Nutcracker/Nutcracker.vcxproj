@@ -92,6 +92,7 @@
     <ClCompile Include="Document\Interpreter.cpp" />
     <ClCompile Include="Document\Project.cpp" />
     <ClCompile Include="LaunchUtil.cpp" />
+    <ClCompile Include="Messenger.cpp" />
     <ClCompile Include="NutcrackerApp.cpp" />
     <ClCompile Include="NutcrackerPCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -113,6 +114,7 @@
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
     <ClInclude Include="Document\Project.h" />
     <ClInclude Include="LaunchUtil.h" />
+    <ClInclude Include="Messenger.h" />
     <ClInclude Include="NutcrackerApp.h" />
     <ClInclude Include="NutcrackerPCH.h" />
     <ClInclude Include="targetver.h" />

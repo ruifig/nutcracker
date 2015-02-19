@@ -25,7 +25,7 @@ bool launch(bool debug)
 		return UTF8String("\"") + file->fullpath + "\"";
 	});
 
-	uiState->currentInterpreter->launch(vars, file->fullpath, debug);
+	gUIState->debugSession = gUIState->currentInterpreter->launch(vars, file->fullpath, debug);
 	return true;
 }
 
