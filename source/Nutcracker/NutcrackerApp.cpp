@@ -19,6 +19,7 @@ IMPLEMENT_APP(NutcrackerApp)
 IMPLEMENT_CLASS(NutcrackerApp, wxApp)
 
 BEGIN_EVENT_TABLE( NutcrackerApp, wxApp )
+	EVT_COMMAND(wxID_ANY, NUTCRACKER_LAMBDA_EVENT, NutcrackerApp::OnLambdaEvent)
 END_EVENT_TABLE()
 
 NutcrackerApp::NutcrackerApp() : m_platformRoot(&cz::PlatformRoot::Config{nullptr, 0, false})
@@ -90,6 +91,16 @@ bool NutcrackerApp::OnInit()
 		fireAppEvent(AppEventID::OpenWorkspace);
 	});
 
+	std::shared_ptr<std::function<void()>> func;
+
+	postAppLambdaEvent(
+		[]{
+		czDebug(ID_Log, "Hello World 1!");
+	});
+
+	wxPostEvent(this, NutcrackerLambdaEvent([]{
+		czDebug(ID_Log, "Hello World 2!"); }
+	));
 
 	//
 	// Test project handling
@@ -107,5 +118,10 @@ int NutcrackerApp::OnExit()
 	gUIState.reset();
 	gParameters.reset();
 	return wxApp::OnExit();
+}
+
+void NutcrackerApp::OnLambdaEvent(wxCommandEvent& evt)
+{
+	static_cast<NutcrackerLambdaEvent&>(evt).run();
 }
 
