@@ -20,6 +20,9 @@ public:
 
 
 private:
+
+	void OnLambdaEvent(wxCommandEvent& evt);
+
 	cz::PlatformRoot m_platformRoot;
 };
 

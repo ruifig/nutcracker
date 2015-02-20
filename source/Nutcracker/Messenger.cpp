@@ -57,10 +57,8 @@ void Messenger::run()
 
 	while (!m_shutdown)
 	{
-		/*
 		if (!m_sock.Wait(0, 10))
 			continue;
-			*/
 
 		if (m_sock.IsDisconnected())
 			break;
