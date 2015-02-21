@@ -6,8 +6,8 @@
 #include "UIDefs.h"
 #include "Document/Interpreter.h"
 
-using namespace cz;
-using namespace cz::view;
+namespace nutcracker
+{
 
 // Create a new application object: this macro will allow wxWidgets to create
 // the application object during program execution (it's better than using a
@@ -33,10 +33,6 @@ void NutcrackerApp::Init()
 
 bool NutcrackerApp::OnInit()
 {
-	using namespace cz;
-	using namespace cz::document;
-	using namespace cz::view;
-
 	gParameters = std::make_unique<cz::Parameters>();
 	gParameters->set(argc, argv);
 
@@ -125,3 +121,4 @@ void NutcrackerApp::OnLambdaEvent(wxCommandEvent& evt)
 	static_cast<NutcrackerLambdaEvent&>(evt).run();
 }
 
+} // namespace nutcracker

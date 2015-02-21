@@ -138,11 +138,11 @@ void MainWnd_Auto::CreateControls()
 	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar12, wxAuiPaneInfo()
 		.ToolbarPane().Name(wxT("Pane1")).Top().Layer(10).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(false).Floatable(false).Gripper(true));
 
-	m_workspaceWnd = new cz::view::WorkspaceWnd( itemFrame1, ID_FOREIGN, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
+	m_workspaceWnd = new nutcracker::WorkspaceWnd( itemFrame1, ID_FOREIGN, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
 		.Name(wxT("Pane2")).Caption(_("Workspace")).MinSize(wxSize(80, 120)).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
-	cz::view::FileEditorGroupWnd* itemWindow14 = new cz::view::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
+	nutcracker::FileEditorGroupWnd* itemWindow14 = new nutcracker::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(itemWindow14, wxAuiPaneInfo()
 		.Name(wxT("Pane4")).Centre().MinSize(wxSize(100, -1)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true));
 

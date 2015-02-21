@@ -13,10 +13,9 @@
 #include "FileEditorWnd.h"
 #include "WorkspaceWnd.h"
 
-namespace cz
+namespace nutcracker
 {
-namespace view
-{
+
 /*
 Control ids
 */
@@ -88,7 +87,7 @@ void FileEditorGroupWnd::OnPageClosed(wxAuiNotebookEvent& event)
 
 }
 
-FileEditorWnd* FileEditorGroupWnd::findFileWnd(const std::shared_ptr<document::File>& file, int* index)
+FileEditorWnd* FileEditorGroupWnd::findFileWnd(const std::shared_ptr<File>& file, int* index)
 {
 	// Check if this file is already opened
 	for (size_t i = 0; i < m_notebook->GetPageCount(); i++)
@@ -118,7 +117,7 @@ void FileEditorGroupWnd::iterateFiles(std::function<void(FileEditorWnd*)> func)
 	}
 }
 
-void FileEditorGroupWnd::gotoFile(const std::shared_ptr<document::File>& file, int line /*= -1*/, int col /*= 0*/, bool columnIsOffset /*= false*/)
+void FileEditorGroupWnd::gotoFile(const std::shared_ptr<File>& file, int line /*= -1*/, int col /*= 0*/, bool columnIsOffset /*= false*/)
 {
 	try
 	{
@@ -152,7 +151,7 @@ void FileEditorGroupWnd::gotoFile(const std::shared_ptr<document::File>& file, i
 	}
 }
 
-void FileEditorGroupWnd::setPageTitle(const std::shared_ptr<document::File>& file)
+void FileEditorGroupWnd::setPageTitle(const std::shared_ptr<File>& file)
 {
 	try
 	{
@@ -194,7 +193,7 @@ FileEditorWnd* FileEditorGroupWnd::getCurrentPage()
 	return static_cast<FileEditorWnd*>(page);
 }
 
-std::shared_ptr<document::File> FileEditorGroupWnd::getCurrentFile()
+std::shared_ptr<File> FileEditorGroupWnd::getCurrentFile()
 {
 	auto page = getCurrentPage();
 	if (!page)
@@ -235,8 +234,8 @@ void FileEditorGroupWnd::OnLocateInWorkspace(wxCommandEvent& event)
 
 void FileEditorGroupWnd::OnOpenContainingFolder(wxCommandEvent& event)
 {
-	cz::UTF8String res;
-	cz::Filesystem::getSingleton().fullPath(res, m_selectedFileTab->getFile()->getDirectory());
+	UTF8String res;
+	Filesystem::getSingleton().fullPath(res, m_selectedFileTab->getFile()->getDirectory());
 	wxExecute(wxString("explorer \"") + res.widen() + "\"");
 }
 
@@ -347,5 +346,4 @@ void FileEditorGroupWnd::saveAll()
 	});
 }
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker

@@ -13,13 +13,10 @@
 #include "FileEditorGroupWnd.h"
 #include "Document/Interpreter.h"
 
-using namespace cz;
-using namespace document;
+namespace nutcracker
+{
 
-namespace cz
-{
-namespace view
-{
+using namespace cz;
 
 /*
 Control ids
@@ -68,9 +65,8 @@ void WorkspaceWnd::onAppEvent(const AppEvent& evt)
 
 // Helper to update recursively
 std::shared_ptr<TreeCtrlUtil::TreeItemData> WorkspaceWnd::updateState(
-	const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent, const std::shared_ptr<const document::ProjectItem>& item)
+	const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent, const std::shared_ptr<const ProjectItem>& item)
 {
-	using namespace document;
 	int imgIndex = -1;
 	if (item->type == ProjectItemType::Folder)
 	{
@@ -78,7 +74,7 @@ std::shared_ptr<TreeCtrlUtil::TreeItemData> WorkspaceWnd::updateState(
 	}
 	else if (item->type == ProjectItemType::File)
 	{
-		auto fileItem = static_cast<const document::File*>(item.get());
+		auto fileItem = static_cast<const File*>(item.get());
 		if (fileItem->extension=="nut")
 			imgIndex = SMALLIMG_IDX_FILE_NUT;
 		else
@@ -97,7 +93,7 @@ std::shared_ptr<TreeCtrlUtil::TreeItemData> WorkspaceWnd::updateState(
 
 	if (item->type == ProjectItemType::Folder)
 	{
-		auto folder = static_cast<const document::Folder*>(item.get());
+		auto folder = static_cast<const Folder*>(item.get());
 		for (auto& f : folder->items)
 			updateState(data, f);
 	}
@@ -116,7 +112,6 @@ void WorkspaceWnd::updateState()
 
 void WorkspaceWnd::OnTreeItemActivated(wxTreeEvent& event)
 {
-	using namespace document;
 	wxTreeItemId itemId = event.GetItem();
 	auto itemData = m_treeData.findByWxTreeItemId(event.GetItem());
 	auto item = gProject->getFile(ProjectItemId(itemData->getItemId().id[0]));
@@ -134,8 +129,6 @@ void WorkspaceWnd::OnTreeItemMenu(wxTreeEvent& event)
     wxPoint clientpt = event.GetPoint();
     wxPoint screenpt = ClientToScreen(clientpt);
 	wxString title;
-
-	using namespace cz::document;
 
 	switch (ProjectItemType(itemData->getItemId().itemtype))
 	{
@@ -170,8 +163,8 @@ void WorkspaceWnd::OnOpenContainingFolder(wxCommandEvent& event)
 	if (!file)
 		return;
 
-	cz::UTF8String res;
-	cz::Filesystem::getSingleton().fullPath(res, file->getDirectory());
+	UTF8String res;
+	Filesystem::getSingleton().fullPath(res, file->getDirectory());
 	wxExecute(wxString("explorer \"") + res.widen() + "\"");
 }
 
@@ -189,7 +182,7 @@ void WorkspaceWnd::OnRunScriptFile(wxCommandEvent& /*event*/)
 	gUIState->currentInterpreter->launch(vars, file->fullpath, false);
 }
 
-wxTreeItemId WorkspaceWnd::findFileTreeItem(document::ProjectItemId fileId)
+wxTreeItemId WorkspaceWnd::findFileTreeItem(ProjectItemId fileId)
 {
 	wxTreeItemId res;
 	TreeCtrlUtil::iterateTreeItems<TreeCtrlUtil::TreeItemBase>(
@@ -203,7 +196,7 @@ wxTreeItemId WorkspaceWnd::findFileTreeItem(document::ProjectItemId fileId)
 	return res;
 }
 
-void WorkspaceWnd::locateFile(document::ProjectItemId fileId)
+void WorkspaceWnd::locateFile(ProjectItemId fileId)
 {
 	wxTreeItemId itemId = findFileTreeItem(fileId);
 	if (!itemId.IsOk())
@@ -219,5 +212,4 @@ void WorkspaceWnd::OnRefreshClick(wxCommandEvent& event)
 	updateState();
 }
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker

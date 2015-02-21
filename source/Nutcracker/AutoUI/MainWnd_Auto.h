@@ -31,7 +31,7 @@
 #if 0
 ////@begin forward declarations
 class wxMenu;
-namespace cz::view { class WorkspaceWnd; }
+namespace nutcracker { class WorkspaceWnd; }
 ////@end forward declarations
 #else
 	FORWARD_DECLARE_VIEWCLASS(WorkspaceWnd);
@@ -112,7 +112,7 @@ public:
 ////@begin MainWnd_Auto member variables
 	wxAuiManager m_auiManager;
 	wxMenu* m_menuInterpreters;
-	cz::view::WorkspaceWnd* m_workspaceWnd;
+	nutcracker::WorkspaceWnd* m_workspaceWnd;
 	wxTextCtrl* m_logTextCtrl;
 	/// Control identifiers
 	enum {

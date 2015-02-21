@@ -1,11 +1,10 @@
 #include "NutcrackerPCH.h"
 #include "Project.h"
 
+namespace nutcracker
+{
 
-namespace cz
-{
-namespace document
-{
+using namespace cz;
 
 static std::unordered_map<u32, std::weak_ptr<ProjectItem>> gAll;
 std::shared_ptr<struct File> createFile(UTF8String fullpath)
@@ -203,6 +202,6 @@ std::shared_ptr<const Folder> Project::getRoot()
 	return m_root;
 }
 
-} // namespace document
-} // namespace cz
+} // namespace nutcracker
+
 

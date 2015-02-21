@@ -9,9 +9,7 @@
 
 #include "AutoUI/MainWnd_Auto.h"
 
-namespace cz
-{
-namespace view
+namespace nutcracker
 {
 
 class MainWndLoggerOutput;
@@ -43,5 +41,4 @@ private:
 	cz::AsyncCommandQueueExplicit m_asyncFuncs;
 };
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker

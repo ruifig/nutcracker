@@ -1,10 +1,7 @@
 #pragma once
 
-namespace cz
+namespace nutcracker
 {
-namespace document
-{
-
 
 // Forward declarations
 struct File;
@@ -48,11 +45,11 @@ struct File : public ProjectItem
 	{
 		int line;
 		bool isError;
-		cz::UTF8String desc;
+		UTF8String desc;
 	};
 	std::vector<ErrorInfo> errorLines;
 protected:
-	friend std::shared_ptr<struct File> cz::document::createFile(UTF8String);
+	friend std::shared_ptr<struct File> nutcracker::createFile(UTF8String);
 	explicit File(UTF8String fullpath_);
 };
 
@@ -76,7 +73,6 @@ protected:
 	explicit Folder(UTF8String fullpath_);
 };
 
-
 class Project
 {
 public:
@@ -96,5 +92,4 @@ private:
 	std::shared_ptr<Folder> m_root;
 };
 
-} // namespace document
-} // namespace cz
+}

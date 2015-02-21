@@ -1,5 +1,7 @@
 #pragma once
 
+namespace nutcracker
+{
 
 class NutcrackerApp : public wxApp
 {
@@ -27,3 +29,6 @@ private:
 };
 
 DECLARE_APP(NutcrackerApp)
+
+} // namespace nutcracker
+

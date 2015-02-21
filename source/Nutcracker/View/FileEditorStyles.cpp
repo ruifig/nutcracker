@@ -1,9 +1,7 @@
 #include "NutcrackerPCH.h"
 #include "FileEditorStyles.h"
 
-namespace cz
-{
-namespace view
+namespace nutcracker
 {
 
 #define COLOUR_MULTIPLY(cl, mult) wxColour(int(cl.Red()*mult), int(cl.Green()*mult), int(cl.Blue()*mult))
@@ -150,5 +148,4 @@ void setStyles(wxStyledTextCtrl* ctrl, const std::vector<LanguageInfo::Style>& s
 		setStyle(ctrl, s, &keywordsNum);
 }
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker

@@ -11,9 +11,7 @@
 #include "Document/Project.h"
 #include "AppEvents.h"
 
-namespace cz
-{
-namespace view
+namespace nutcracker
 {
 
 class FileEditorGroupWnd : public FileEditorGroupWnd_Auto , public AppEventListener
@@ -22,12 +20,12 @@ public:
 	FileEditorGroupWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
 	virtual ~FileEditorGroupWnd();
 
-	void gotoFile(const std::shared_ptr<document::File>& file, int line = -1, int col = 0, bool columnIsOffset = false);
-	void setPageTitle(const std::shared_ptr<document::File>& file);
+	void gotoFile(const std::shared_ptr<File>& file, int line = -1, int col = 0, bool columnIsOffset = false);
+	void setPageTitle(const std::shared_ptr<File>& file);
 	wxString getWordUnderCursor();
 	FileEditorWnd* getEditorWithFocus();
 	void forceCloseAll();
-	std::shared_ptr<document::File> getCurrentFile();
+	std::shared_ptr<File> getCurrentFile();
 	bool hasDirtyFiles();
 	void saveAll();
 private:
@@ -47,13 +45,12 @@ private:
 	FileEditorWnd* getCurrentPage();
 
 	void iterateFiles(std::function<void(FileEditorWnd*)> func);
-	class FileEditorWnd* findFileWnd(const std::shared_ptr<document::File>& file, int* index);
+	class FileEditorWnd* findFileWnd(const std::shared_ptr<File>& file, int* index);
 
 	// Used to remember what file tab we right clicked (for the popup menu)
 	FileEditorWnd* m_selectedFileTab=nullptr;
 	wxTimer m_timer;
 };
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker
 

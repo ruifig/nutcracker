@@ -16,12 +16,7 @@
 #include "LaunchUtil.h"
 #include "FileEditorGroupWnd.h"
 
-using namespace cz;
-using namespace document;
-
-namespace cz
-{
-namespace view
+namespace nutcracker
 {
 
 /*
@@ -46,7 +41,6 @@ END_EVENT_TABLE()
 //
 //////////////////////////////////////////////////////////////////////////
 
-
 class MainWndLoggerOutput : public cz::LoggerOutput
 {
 public:
@@ -54,7 +48,7 @@ public:
 	{
 	}
 
-	virtual void outputLog(int cat, Logger::LogLevel level, const char* str) override
+	virtual void outputLog(int cat, cz::Logger::LogLevel level, const char* str) override
 	{
 		std::string s(str);
 		m_queue->send([=]()
@@ -269,5 +263,4 @@ void MainWnd::OnDropFiles(wxDropFilesEvent& event)
 }
 
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker
