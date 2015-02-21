@@ -3,8 +3,8 @@
 #include "MainWnd.h"
 #include "AppEvents.h"
 #include "UIDefs.h"
-#include "Project.h"
 #include "Interpreter.h"
+#include "Workspace.h"
 
 namespace nutcracker
 {
@@ -22,8 +22,10 @@ BEGIN_EVENT_TABLE( NutcrackerApp, wxApp )
 	EVT_COMMAND(wxID_ANY, NUTCRACKER_LAMBDA_EVENT, NutcrackerApp::OnLambdaEvent)
 END_EVENT_TABLE()
 
-NutcrackerApp::NutcrackerApp() : m_platformRoot(&cz::PlatformRoot::Config{nullptr, 0, false})
+NutcrackerApp::NutcrackerApp()
 {
+	auto cfg = cz::PlatformRoot::Config{ nullptr, 0, false };
+	m_platformRoot = std::make_unique<cz::PlatformRoot>(&cfg);
 	Init();
 }
 
@@ -78,9 +80,9 @@ bool NutcrackerApp::OnInit()
 
     mainWnd->Show(true);
 
-	gProject = std::make_shared<Project>();
+	gProject = std::make_shared<Workspace>();
 	if (gParameters->has("workspace"))
-		gProject->addFolder(gParameters->get("workspace"));
+		gProject->files.addFolder(gParameters->get("workspace"));
 
 	mainWnd->addAsyncFunc([]()
 	{

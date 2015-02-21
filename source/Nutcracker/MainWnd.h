@@ -7,6 +7,8 @@
 	
 *********************************************************************/
 
+#pragma once
+
 #include "AutoUI/MainWnd_Auto.h"
 
 namespace nutcracker

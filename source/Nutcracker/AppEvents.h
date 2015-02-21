@@ -5,70 +5,70 @@
 namespace nutcracker
 {
 
-	enum class AppEventID
+enum class AppEventID
+{
+	OpenWorkspace,
+	AddedFolder,
+	NewWorkspace,
+	FileSaved,
+	ViewOptionsChanged
+};
+
+struct AppEvent
+{
+	AppEventID id;
+	AppEvent(AppEventID id) : id(id) {}
+};
+
+struct AppEventFileSaved : public AppEvent
+{
+	AppEventFileSaved(FileEditorWnd* wnd) : AppEvent(AppEventID::FileSaved), wnd(wnd)
 	{
-		OpenWorkspace,
-		AddedFolder,
-		NewWorkspace,
-		FileSaved,
-		ViewOptionsChanged
-	};
+	}
+	FileEditorWnd* wnd;
+};
 
-	struct AppEvent
-	{
-		AppEventID id;
-		AppEvent(AppEventID id) : id(id) {}
-	};
+class AppEventListener
+{
+public:
+	AppEventListener();
+	virtual ~AppEventListener();
+	virtual void onAppEvent(const AppEvent& evt) = 0;
+private:
+};
 
-	struct AppEventFileSaved : public AppEvent
-	{
-		AppEventFileSaved(FileEditorWnd* wnd) : AppEvent(AppEventID::FileSaved), wnd(wnd)
-		{
-		}
-		FileEditorWnd* wnd;
-	};
+void fireAppEvent(const AppEvent& evt);
 
-	class AppEventListener
-	{
-	public:
-		AppEventListener();
-		virtual ~AppEventListener();
-		virtual void onAppEvent(const AppEvent& evt) = 0;
-	private:
-	};
+class NutcrackerLambdaEvent;
+wxDECLARE_EVENT(NUTCRACKER_LAMBDA_EVENT, NutcrackerLambdaEvent);
 
-	void fireAppEvent(const AppEvent& evt);
+template<typename T>
+void postAppLambdaEvent(T&& func)
+{
+	wxPostEvent(&wxGetApp(), NutcrackerLambdaEvent(std::forward<T>(func)));
+}
 
-	class NutcrackerLambdaEvent;
-	wxDECLARE_EVENT(NUTCRACKER_LAMBDA_EVENT, NutcrackerLambdaEvent);
+class NutcrackerLambdaEvent : public wxCommandEvent
+{
+public:
 
 	template<typename T>
-	void postAppLambdaEvent(T&& func)
+	NutcrackerLambdaEvent(T&& func) : wxCommandEvent(NUTCRACKER_LAMBDA_EVENT)
 	{
-		wxPostEvent(&wxGetApp(), NutcrackerLambdaEvent(std::forward<T>(func)));
+		//m_func = std::make_shared<std::function<void()>>([]{ czDebug(ID_Log, "HellO");  });
+		m_func = std::make_shared<std::function<void()>>(std::forward<T>(func));
 	}
 
-	class NutcrackerLambdaEvent : public wxCommandEvent
-	{
-	public:
+	virtual ~NutcrackerLambdaEvent();
+	NutcrackerLambdaEvent(const NutcrackerLambdaEvent& event);
+	wxEvent* Clone() const;
+	void run();
 
-		template<typename T>
-		NutcrackerLambdaEvent(T&& func) : wxCommandEvent(NUTCRACKER_LAMBDA_EVENT)
-		{
-			//m_func = std::make_shared<std::function<void()>>([]{ czDebug(ID_Log, "HellO");  });
-			m_func = std::make_shared<std::function<void()>>(std::forward<T>(func));
-		}
+private:
+	std::shared_ptr<std::function<void()>> m_func;
+	bool m_done = false;
+};
 
-		virtual ~NutcrackerLambdaEvent();
-		NutcrackerLambdaEvent(const NutcrackerLambdaEvent& event);
-		wxEvent* Clone() const;
-		void run();
-
-	private:
-		std::shared_ptr<std::function<void()>> m_func;
-		bool m_done = false;
-	};
-
-	typedef void (wxEvtHandler::*NutrackerLambdaEventFunction)(NutcrackerLambdaEvent &);
+typedef void (wxEvtHandler::*NutrackerLambdaEventFunction)(NutcrackerLambdaEvent &);
 
 } // namespace nutcracker

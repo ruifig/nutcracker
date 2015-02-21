@@ -2,10 +2,11 @@
 
 namespace nutcracker
 {
-	class Project;
-	struct ProjectItem;
+	class Files;
+	struct File;
 	class Interpreter;
 	class Session;
+	struct Workspace;
 
 	class FileEditorWnd;
 	extern class MainWnd* gMainWnd;
@@ -13,7 +14,7 @@ namespace nutcracker
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
 	extern wxImageList gImageListSmall;
 	extern wxImageList gImageList32x32;
-	extern std::shared_ptr<Project> gProject;
+	extern std::shared_ptr<Workspace> gProject;
 
 	enum
 	{
