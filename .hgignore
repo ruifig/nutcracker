@@ -32,7 +32,8 @@ dependencies/squirrel/sqdbg/Debug
 dependencies/squirrel/sqdbg/Release
 
 
-#
+# CppDepend
+CppDepend/CppDependOut
 # wxWidgets
 #
 dependencies/wxWidgets/*
