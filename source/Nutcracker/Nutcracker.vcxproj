@@ -93,22 +93,22 @@
     <ClCompile Include="AutoUI\MainWnd_Auto.cpp" />
     <ClCompile Include="AppEvents.cpp" />
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
-    <ClCompile Include="Document\Interpreter.cpp" />
-    <ClCompile Include="Document\Project.cpp" />
+    <ClCompile Include="FileEditorGroupWnd.cpp" />
+    <ClCompile Include="FileEditorStyles.cpp" />
+    <ClCompile Include="FileEditorWnd.cpp" />
+    <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="LaunchUtil.cpp" />
+    <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="Messenger.cpp" />
     <ClCompile Include="NutcrackerApp.cpp" />
     <ClCompile Include="NutcrackerPCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Project.cpp" />
+    <ClCompile Include="TreeCtrlUtilCode.cpp" />
     <ClCompile Include="UIDefs.cpp" />
-    <ClCompile Include="View\FileEditorGroupWnd.cpp" />
-    <ClCompile Include="View\FileEditorStyles.cpp" />
-    <ClCompile Include="View\FileEditorWnd.cpp" />
-    <ClCompile Include="View\MainWnd.cpp" />
-    <ClCompile Include="View\TreeCtrlUtilCode.cpp" />
-    <ClCompile Include="View\WorkspaceWnd.cpp" />
+    <ClCompile Include="WorkspaceWnd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dependencies\tinyxml2\tinyxml2.h" />
@@ -117,20 +117,21 @@
     <ClInclude Include="AutoUI\MainWnd_Auto.h" />
     <ClInclude Include="AppEvents.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
-    <ClInclude Include="Document\Project.h" />
+    <ClInclude Include="FileEditorGroupWnd.h" />
+    <ClInclude Include="FileEditorStyles.h" />
+    <ClInclude Include="FileEditorWnd.h" />
+    <ClInclude Include="Interpreter.h" />
     <ClInclude Include="LaunchUtil.h" />
+    <ClInclude Include="MainWnd.h" />
     <ClInclude Include="Messenger.h" />
     <ClInclude Include="NutcrackerApp.h" />
     <ClInclude Include="NutcrackerDefs.h" />
     <ClInclude Include="NutcrackerPCH.h" />
+    <ClInclude Include="Project.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TreeCtrlUtilCode.h" />
     <ClInclude Include="UIDefs.h" />
-    <ClInclude Include="View\FileEditorGroupWnd.h" />
-    <ClInclude Include="View\FileEditorStyles.h" />
-    <ClInclude Include="View\FileEditorWnd.h" />
-    <ClInclude Include="View\MainWnd.h" />
-    <ClInclude Include="View\TreeCtrlUtilCode.h" />
-    <ClInclude Include="View\WorkspaceWnd.h" />
+    <ClInclude Include="WorkspaceWnd.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nutcracker.rc">
@@ -142,9 +143,6 @@
     <ProjectReference Include="..\..\dependencies\czPlatform\VisualStudio\czPlatform.vcxproj">
       <Project>{57fa36a4-c2b3-413f-a60c-4f9592f911d3}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Document\Interpreter.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

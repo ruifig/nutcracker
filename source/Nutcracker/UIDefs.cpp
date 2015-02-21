@@ -1,6 +1,6 @@
 #include "NutcrackerPCH.h"
 #include "UIDefs.h"
-#include "Document/Interpreter.h"
+#include "Interpreter.h"
 
 namespace nutcracker
 {

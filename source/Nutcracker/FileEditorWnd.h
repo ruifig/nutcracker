@@ -8,7 +8,7 @@
 *********************************************************************/
 
 #include "AutoUI/FileEditorWnd_Auto.h"
-#include "Document/Project.h"
+#include "Project.h"
 #include "AppEvents.h"
 
 namespace nutcracker

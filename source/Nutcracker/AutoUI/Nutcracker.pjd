@@ -678,7 +678,7 @@
             <bool name="proxy-External implementation">1</bool>
             <string name="proxy-Font">""</string>
             <string name="proxy-Foreground colour">""</string>
-            <string name="proxy-Header filename">"../view/WorkspaceWnd.h"</string>
+            <string name="proxy-Header filename">"../WorkspaceWnd.h"</string>
             <long name="proxy-Height">100</long>
             <string name="proxy-Help text">""</string>
             <bool name="proxy-Hidden">0</bool>
@@ -783,7 +783,7 @@
             <bool name="proxy-External implementation">1</bool>
             <string name="proxy-Font">""</string>
             <string name="proxy-Foreground colour">""</string>
-            <string name="proxy-Header filename">"../view/FileEditorGroupWnd.h"</string>
+            <string name="proxy-Header filename">"../FileEditorGroupWnd.h"</string>
             <long name="proxy-Height">100</long>
             <string name="proxy-Help text">""</string>
             <bool name="proxy-Hidden">0</bool>

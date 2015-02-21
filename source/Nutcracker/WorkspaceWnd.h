@@ -11,7 +11,7 @@
 
 #include "TreeCtrlUtilCode.h"
 #include "AppEvents.h"
-#include "Document/Project.h"
+#include "Project.h"
 #include "AutoUI/WorkspaceWnd_Auto.h"
 
 namespace nutcracker
