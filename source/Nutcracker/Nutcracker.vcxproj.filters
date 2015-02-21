@@ -60,9 +60,6 @@
     <ClCompile Include="Messenger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Project.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="FileEditorGroupWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -79,6 +76,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WorkspaceWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Workspace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Files.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -116,17 +119,11 @@
     <ClInclude Include="Messenger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Project.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="UIDefs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NutcrackerDefs.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LaunchUtil.h">
-      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="FileEditorGroupWnd.h">
       <Filter>Header Files</Filter>
@@ -144,6 +141,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WorkspaceWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Workspace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Files.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Breakpoints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LaunchUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

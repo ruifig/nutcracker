@@ -10,11 +10,11 @@
 #include "NutcrackerPCH.h"
 #include "MainWnd.h"
 
-#include "Project.h"
 #include "AppEvents.h"
 #include "Interpreter.h"
 #include "LaunchUtil.h"
 #include "FileEditorGroupWnd.h"
+#include "Workspace.h"
 
 namespace nutcracker
 {
@@ -116,6 +116,7 @@ MainWnd::MainWnd()
 
 MainWnd::~MainWnd()
 {
+	cz::Logger::getSingleton().removeOutput(m_logger.get());
 }
 
 void MainWnd::OnIdle(wxIdleEvent& evt)
@@ -247,13 +248,13 @@ void MainWnd::OnDropFiles(wxDropFilesEvent& event)
 		auto fname = wxStringToUtf8(*dropped);
 		if (Filesystem::getSingleton().isExistingFile(fname))
 		{
-			auto file = gProject->getFile(fname);
+			auto file = gProject->files.createFile(fname);
 			if (file)
 				gFileEditorGroupWnd->gotoFile(file);
 		}
 		else if (Filesystem::getSingleton().isExistingDirectory(fname))
 		{
-			gProject->addFolder(fname);
+			gProject->files.addFolder(fname);
 			fireAppEvent(AppEventID::AddedFolder);
 		}
 

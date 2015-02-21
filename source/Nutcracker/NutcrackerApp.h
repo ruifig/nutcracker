@@ -25,7 +25,7 @@ private:
 
 	void OnLambdaEvent(wxCommandEvent& evt);
 
-	cz::PlatformRoot m_platformRoot;
+	std::unique_ptr<cz::PlatformRoot> m_platformRoot;
 };
 
 DECLARE_APP(NutcrackerApp)

@@ -1,10 +1,9 @@
 #include "NutcrackerPCH.h"
 #include "LaunchUtil.h"
-#include "Project.h"
 #include "Interpreter.h"
 #include "FileEditorGroupWnd.h"
 #include "UIDefs.h"
-
+#include "Workspace.h"
 
 namespace nutcracker
 {

@@ -12,6 +12,7 @@
 #include "FileEditorWnd.h"
 #include "FileEditorGroupWnd.h"
 #include "FileEditorStyles.h"
+#include "Workspace.h"
 
 namespace nutcracker
 {

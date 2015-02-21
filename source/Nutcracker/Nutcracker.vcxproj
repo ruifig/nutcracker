@@ -96,6 +96,7 @@
     <ClCompile Include="FileEditorGroupWnd.cpp" />
     <ClCompile Include="FileEditorStyles.cpp" />
     <ClCompile Include="FileEditorWnd.cpp" />
+    <ClCompile Include="Files.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="LaunchUtil.cpp" />
     <ClCompile Include="MainWnd.cpp" />
@@ -105,9 +106,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Project.cpp" />
     <ClCompile Include="TreeCtrlUtilCode.cpp" />
     <ClCompile Include="UIDefs.cpp" />
+    <ClCompile Include="Workspace.cpp" />
     <ClCompile Include="WorkspaceWnd.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -117,9 +118,11 @@
     <ClInclude Include="AutoUI\MainWnd_Auto.h" />
     <ClInclude Include="AppEvents.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
+    <ClInclude Include="Breakpoints.h" />
     <ClInclude Include="FileEditorGroupWnd.h" />
     <ClInclude Include="FileEditorStyles.h" />
     <ClInclude Include="FileEditorWnd.h" />
+    <ClInclude Include="Files.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="LaunchUtil.h" />
     <ClInclude Include="MainWnd.h" />
@@ -127,10 +130,10 @@
     <ClInclude Include="NutcrackerApp.h" />
     <ClInclude Include="NutcrackerDefs.h" />
     <ClInclude Include="NutcrackerPCH.h" />
-    <ClInclude Include="Project.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TreeCtrlUtilCode.h" />
     <ClInclude Include="UIDefs.h" />
+    <ClInclude Include="Workspace.h" />
     <ClInclude Include="WorkspaceWnd.h" />
   </ItemGroup>
   <ItemGroup>
