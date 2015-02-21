@@ -1,10 +1,11 @@
 #pragma once
 
-namespace cz
+namespace nutcracker
 {
 
 bool launch(bool debug);
 
 }
+
 
 

@@ -661,7 +661,7 @@
             <string name="proxy-Background colour">""</string>
             <string name="proxy-Base class">"wxPanel"</string>
             <long name="proxy-Border">5</long>
-            <string name="proxy-Class">"cz::view::WorkspaceWnd"</string>
+            <string name="proxy-Class">"nutcracker::WorkspaceWnd"</string>
             <bool name="proxy-Create in situ">1</bool>
             <string name="proxy-Custom arguments">""</string>
             <string name="proxy-Custom ctor arguments">""</string>
@@ -716,7 +716,7 @@
             <bool name="proxy-wxWS_EX_VALIDATE_RECURSIVELY">0</bool>
             <long name="proxy-X">-1</long>
             <long name="proxy-Y">-1</long>
-            <string name="title">"cz::view::WorkspaceWnd: ID_FOREIGN"</string>
+            <string name="title">"nutcracker::WorkspaceWnd: ID_FOREIGN"</string>
             <long name="title-mode">0</long>
             <string name="type">"dialog-control-document"</string>
           </document>
@@ -766,7 +766,7 @@
             <string name="proxy-Background colour">""</string>
             <string name="proxy-Base class">"wxWindow"</string>
             <long name="proxy-Border">5</long>
-            <string name="proxy-Class">"cz::view::FileEditorGroupWnd"</string>
+            <string name="proxy-Class">"nutcracker::FileEditorGroupWnd"</string>
             <bool name="proxy-Create in situ">1</bool>
             <string name="proxy-Custom arguments">""</string>
             <string name="proxy-Custom ctor arguments">""</string>
@@ -821,7 +821,7 @@
             <bool name="proxy-wxWS_EX_VALIDATE_RECURSIVELY">0</bool>
             <long name="proxy-X">-1</long>
             <long name="proxy-Y">-1</long>
-            <string name="title">"cz::view::FileEditorGroupWnd: ID_WINDOW"</string>
+            <string name="title">"nutcracker::FileEditorGroupWnd: ID_WINDOW"</string>
             <long name="title-mode">0</long>
             <string name="type">"dialog-control-document"</string>
           </document>
@@ -1654,13 +1654,21 @@
             <long name="is-transient">0</long>
             <long name="locked">0</long>
             <long name="owns-file">1</long>
+            <string name="proxy-AlignH">"Centre"</string>
+            <string name="proxy-AlignV">"Centre"</string>
+            <long name="proxy-Border">5</long>
             <string name="proxy-Member variable name">""</string>
             <string name="proxy-Orientation">"Vertical"</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+            <long name="proxy-Stretch factor">0</long>
             <bool name="proxy-wxADJUST_MINSIZE">0</bool>
+            <bool name="proxy-wxBOTTOM">1</bool>
             <bool name="proxy-wxFIXED_MINSIZE">0</bool>
+            <bool name="proxy-wxLEFT">1</bool>
             <bool name="proxy-wxRESERVE_SPACE_EVEN_IF_HIDDEN">0</bool>
+            <bool name="proxy-wxRIGHT">1</bool>
             <bool name="proxy-wxSHAPED">0</bool>
+            <bool name="proxy-wxTOP">1</bool>
             <string name="title">"wxBoxSizer V"</string>
             <long name="title-mode">0</long>
             <string name="type">"dialog-control-document"</string>

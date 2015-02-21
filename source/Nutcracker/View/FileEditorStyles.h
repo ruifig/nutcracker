@@ -1,8 +1,6 @@
 #pragma once
 
-namespace cz
-{
-namespace view
+namespace nutcracker
 {
 
 enum IndicatorNumber
@@ -58,8 +56,7 @@ extern wxColour clCurrentLineBkg;
 void setStyle(wxStyledTextCtrl* ctrl, const LanguageInfo::Style& style, int* keywordsNum=nullptr);
 void setStyles(wxStyledTextCtrl* ctrl, const std::vector<LanguageInfo::Style>& styles);
 
-} // namespace cz
-} // namesapce cz
+} // namespace nutcracker
 
 
 

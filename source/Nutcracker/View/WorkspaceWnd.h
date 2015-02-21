@@ -14,10 +14,7 @@
 #include "Document/Project.h"
 #include "AutoUI/WorkspaceWnd_Auto.h"
 
-namespace cz
-{
-
-namespace view
+namespace nutcracker
 {
 
 class WorkspaceWnd : public WorkspaceWnd_Auto, public AppEventListener
@@ -26,7 +23,7 @@ public:
 	WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
 	virtual ~WorkspaceWnd();
 
-	void locateFile(document::ProjectItemId fileId);
+	void locateFile(ProjectItemId fileId);
 
 private:
 	DECLARE_EVENT_TABLE()
@@ -37,14 +34,13 @@ private:
 	virtual void OnRefreshClick(wxCommandEvent& event) override;
 
 	std::shared_ptr<TreeCtrlUtil::TreeItemData> updateState(const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent,
-															const std::shared_ptr<const document::ProjectItem>& item);
+															const std::shared_ptr<const ProjectItem>& item);
 	void updateState();
-	wxTreeItemId findFileTreeItem(document::ProjectItemId fileId);
+	wxTreeItemId findFileTreeItem(ProjectItemId fileId);
 
 	virtual void onAppEvent(const AppEvent& evt) override;
 	TreeCtrlUtil::TreeCtrlData m_treeData;
-	document::ProjectItemId m_selectedFileId;
+	ProjectItemId m_selectedFileId;
 };
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker

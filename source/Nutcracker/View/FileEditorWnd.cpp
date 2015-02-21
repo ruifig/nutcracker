@@ -13,9 +13,7 @@
 #include "FileEditorGroupWnd.h"
 #include "FileEditorStyles.h"
 
-namespace cz
-{
-namespace view
+namespace nutcracker
 {
 
 enum
@@ -46,8 +44,6 @@ BEGIN_EVENT_TABLE(FileEditorWnd, FileEditorWnd_Auto)
 END_EVENT_TABLE()
 
 
-using namespace cz::document;
-
 FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 	: FileEditorWnd_Auto(parent,id,pos,size,style)
 {
@@ -63,7 +59,7 @@ FileEditorWnd::~FileEditorWnd()
 	}
 }
 
-std::shared_ptr<document::File> FileEditorWnd::getFile()
+std::shared_ptr<File> FileEditorWnd::getFile()
 {
 	return m_file;
 }
@@ -158,7 +154,7 @@ void FileEditorWnd::setCommonStyle()
 	m_textCtrl->SetCaretLineVisible(true);
 }
 
-void FileEditorWnd::setFile(const std::shared_ptr<document::File>& file, int line, int col, bool columnIsOffset)
+void FileEditorWnd::setFile(const std::shared_ptr<File>& file, int line, int col, bool columnIsOffset)
 {
 	if (m_file != file)
 	{
@@ -166,7 +162,7 @@ void FileEditorWnd::setFile(const std::shared_ptr<document::File>& file, int lin
 		m_file->dirty = false;
 
 		// Find the language we want
-		cz::UTF8String ext = file->extension;
+		UTF8String ext = file->extension;
 		LanguageInfo* lang = nullptr;
 		for (auto& l : gLanguages)
 		{
@@ -226,7 +222,7 @@ void FileEditorWnd::setFile(const std::shared_ptr<document::File>& file, int lin
 void FileEditorWnd::checkReload()
 {
 	auto file = getFile();
-	cz::FileTime t = cz::FileTime::get(file->fullpath, FileTime::kModified);
+	FileTime t = FileTime::get(file->fullpath, FileTime::kModified);
 	if (t<= file->filetime)
 		return;
 
@@ -236,8 +232,6 @@ void FileEditorWnd::checkReload()
 
 void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 {
-	using namespace cz::document;
-
 	switch(event.GetMargin())
 	{
 		case MARGIN_BREAKPOINTS:
@@ -263,8 +257,6 @@ void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 
 void FileEditorWnd::updateMarkers()
 {
-	using namespace cz::document;
-
 	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_ON);
 	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_OFF);
 	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_INVALID);
@@ -278,7 +270,7 @@ void FileEditorWnd::updateMarkers()
 	{
 		if (b->file == m_file)
 		{
-			if (gSession->getState()>=document::kSessionState_Running)
+			if (gSession->getState()>=kSessionState_Running)
 			{
 				if (b->enabled)
 					m_textCtrl->MarkerAdd(b->line - 1, b->isValid() ? MARK_BREAKPOINT_ON : MARK_BREAKPOINT_INVALID);
@@ -528,7 +520,7 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 	{
 		try
 		{
-			buildutil::compileFile(document::BuildVariables(), m_file, wxStringToUtf8(gMainFrame->getActiveConfigurationName()));
+			buildutil::compileFile(BuildVariables(), m_file, wxStringToUtf8(gMainFrame->getActiveConfigurationName()));
 			fireCustomAppEvent(CAE_BuildFinished);
 		}
 		catch (std::exception& e)
@@ -558,7 +550,7 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 	{
 		auto ext = m_file->getExtension();
 		auto basename = Filename(m_file->name).getBaseFilename();
-		cz::UTF8String othername;
+		UTF8String othername;
 		if (ext == "c")
 			othername = basename + ".h";
 		else if (ext == "h")
@@ -566,7 +558,7 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 
 		if (othername != "")
 		{
-			auto f = cz::apcpuide::document::gWorkspace->findFile(othername);
+			auto f = cz::apcpuide::gWorkspace->findFile(othername);
 			if (f)
 				gFileEditorGroupWnd->gotoFile(f, -1, -1);
 		}
@@ -588,7 +580,7 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 		if (column == 0)
 			column++;
 		auto filename =
-			document::gWorkspace->getCParser().findHeaderAtPos(m_file->getFullPath().c_str(), line, column);
+			gWorkspace->getCParser().findHeaderAtPos(m_file->getFullPath().c_str(), line, column);
 		if (filename != "")
 		{
 			gFileEditorGroupWnd->cursorHistory_AddHistory(gFileEditorGroupWnd->getCurrentLocation());
@@ -600,7 +592,7 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 		int line, column;
 		getPositionForParser(line, column);
 		cparser::Location2 loc =
-			document::gWorkspace->getCParser().findDeclaration(m_file->getFullPath().c_str(), line, column);
+			gWorkspace->getCParser().findDeclaration(m_file->getFullPath().c_str(), line, column);
 		if (loc.isValid())
 		{
 			gFileEditorGroupWnd->cursorHistory_AddHistory(gFileEditorGroupWnd->getCurrentLocation());
@@ -612,7 +604,7 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 		int line, column;
 		getPositionForParser(line, column);
 		cparser::Location2 loc =
-			document::gWorkspace->getCParser().findDefinition(m_file->getFullPath().c_str(), line, column);
+			gWorkspace->getCParser().findDefinition(m_file->getFullPath().c_str(), line, column);
 		if (loc.isValid())
 		{
 			gFileEditorGroupWnd->cursorHistory_AddHistory(gFileEditorGroupWnd->getCurrentLocation());
@@ -693,7 +685,6 @@ wxString FileEditorWnd::getWordUnderCursor()
 									m_textCtrl->WordEndPosition(m_textCtrl->GetCurrentPos(), true));
 }
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker
 
 

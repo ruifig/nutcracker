@@ -10,8 +10,8 @@
 #include "NutcrackerPCH.h"
 #include "TreeCtrlUtilCode.h"
 
-namespace cz {
-namespace view {
+namespace nutcracker
+{
 
 namespace TreeCtrlUtil
 {
@@ -289,6 +289,5 @@ std::shared_ptr<TreeItemData> TreeCtrlData::addItem(const std::shared_ptr<TreeIt
 
 } // namespace TreeCtrlUtil
 
+} // namespace nutcracker
 
-} // namespace view
-} // namespace cz

@@ -113,4 +113,6 @@ typedef  unsigned char  byte;
 
 #include "tinyxml2.h"
 
-#define FORWARD_DECLARE_VIEWCLASS(CLASS) namespace cz { namespace view { class CLASS; } }
+#define FORWARD_DECLARE_VIEWCLASS(CLASS) namespace nutcracker { class CLASS; }
+
+#include "NutcrackerDefs.h"

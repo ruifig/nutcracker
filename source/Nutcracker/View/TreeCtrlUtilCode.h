@@ -9,8 +9,8 @@
 
 #pragma once
 
-namespace cz {
-namespace view {
+namespace nutcracker
+{
 
 namespace TreeCtrlUtil
 {
@@ -165,7 +165,6 @@ protected:
 
 } // namespace TreeCtrlUtil
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker
 
 

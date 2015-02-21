@@ -62,10 +62,12 @@
       <Filter>View</Filter>
     </ClCompile>
     <ClCompile Include="LaunchUtil.cpp" />
-    <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
     <ClCompile Include="Messenger.cpp" />
     <ClCompile Include="..\..\dependencies\tinyxml2\tinyxml2.cpp">
       <Filter>tinlyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,10 +113,13 @@
       <Filter>View</Filter>
     </ClInclude>
     <ClInclude Include="LaunchUtil.h" />
-    <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
     <ClInclude Include="Messenger.h" />
     <ClInclude Include="..\..\dependencies\tinyxml2\tinyxml2.h">
       <Filter>tinlyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="NutcrackerDefs.h" />
+    <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h">
+      <Filter>AutoUI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

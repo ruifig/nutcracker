@@ -11,9 +11,7 @@
 #include "Document/Project.h"
 #include "AppEvents.h"
 
-namespace cz
-{
-namespace view
+namespace nutcracker
 {
 
 class FileEditorWnd : public FileEditorWnd_Auto, public AppEventListener
@@ -23,8 +21,8 @@ public:
 		const wxSize& size = wxDefaultSize, long style = 0);
 	virtual ~FileEditorWnd();
 
-	std::shared_ptr<document::File> getFile();
-	void setFile(const std::shared_ptr<document::File>& file, int line=0, int col=0, bool columnIsOffset=false);
+	std::shared_ptr<File> getFile();
+	void setFile(const std::shared_ptr<File>& file, int line=0, int col=0, bool columnIsOffset=false);
 	void setFocusToEditor();
 	wxString getWordUnderCursor();
 	bool editorHasFocus();
@@ -54,11 +52,10 @@ private:
 	void getPositionForParser(int& line, int& column, bool adjustForSymbol);
 	void recolourise(bool reparse);
 
-	std::shared_ptr<document::File> m_file;
+	std::shared_ptr<File> m_file;
 
 };
 
-} // namespace view
-} // namespace cz
+} // namespace nutcracker
 
 

@@ -121,6 +121,7 @@
     <ClInclude Include="LaunchUtil.h" />
     <ClInclude Include="Messenger.h" />
     <ClInclude Include="NutcrackerApp.h" />
+    <ClInclude Include="NutcrackerDefs.h" />
     <ClInclude Include="NutcrackerPCH.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="UIDefs.h" />

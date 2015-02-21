@@ -1,7 +1,7 @@
 #include "NutcrackerPCH.h"
 #include "Messenger.h"
 
-namespace cz
+namespace nutcracker
 {
 
 Messenger::Messenger()
@@ -142,5 +142,5 @@ void Messenger::send(std::string msg)
 	});
 }
 
+} // namespace nutcracker
 
-}

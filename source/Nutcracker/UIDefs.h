@@ -1,26 +1,19 @@
 #pragma once
 
-
-namespace cz
-{
-
-namespace document
+namespace nutcracker
 {
 	class Project;
 	struct ProjectItem;
 	class Interpreter;
 	class Session;
-}
 
-namespace view
-{
 	class FileEditorWnd;
 	extern class MainWnd* gMainWnd;
 	extern class WorkspaceWnd* gWorkspaceWnd;
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
 	extern wxImageList gImageListSmall;
 	extern wxImageList gImageList32x32;
-	extern std::shared_ptr<document::Project> gProject;
+	extern std::shared_ptr<Project> gProject;
 
 	enum
 	{
@@ -38,26 +31,25 @@ namespace view
 		BIGIMG_MAX
 	};
 
-}
+	cz::UTF8String wxStringToUtf8(const wxString& str);
+	void showError(const char* title, const char* fmt, ...);
+	void showMsg(const char* title, const char* fmt, ...);
+	void showException(std::exception& e);
 
-cz::UTF8String wxStringToUtf8(const wxString& str);
-void showError(const char* title, const char* fmt, ...);
-void showMsg(const char* title, const char* fmt, ...);
-void showException(std::exception& e);
+	struct UIState
+	{
+		bool view_ShowIndentationGuides = false;
+		bool view_Whitespace = false;
+		bool view_EOL = false;
+		std::vector<std::unique_ptr<Interpreter>> interpreters;
+		Interpreter* currentInterpreter=nullptr;
+		std::unique_ptr<Session> debugSession;
+	};
 
-struct UIState
-{
-	bool view_ShowIndentationGuides = false;
-	bool view_Whitespace = false;
-	bool view_EOL = false;
-	std::vector<std::unique_ptr<document::Interpreter>> interpreters;
-	document::Interpreter* currentInterpreter=nullptr;
-	std::unique_ptr<document::Session> debugSession;
-};
+	extern std::unique_ptr<UIState> gUIState;
+	extern std::unique_ptr<cz::Parameters> gParameters;
 
-extern std::unique_ptr<UIState> gUIState;
-extern std::unique_ptr<cz::Parameters> gParameters;
+	#define CZ_TODO CZ_UNEXPECTED
 
-}
+} // namespace nutcracker
 
-#define CZ_TODO CZ_UNEXPECTED

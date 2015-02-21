@@ -1,10 +1,9 @@
 #include "NutcrackerPCH.h"
 #include "Interpreter.h"
+#include "Messenger.h"
 
 
-namespace cz
-{
-namespace document
+namespace nutcracker
 {
 
 Variables::Variables(Variables* parent) : m_parent(parent)
@@ -129,7 +128,7 @@ const UTF8String& Interpreter::getName()
 	return m_name;
 }
 
-} // namespace document
-} // document cz
+} // nutcracker
+
 
 

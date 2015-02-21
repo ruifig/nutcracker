@@ -1,10 +1,6 @@
 #pragma once
 
-#include "Messenger.h"
-
-namespace cz
-{
-namespace document
+namespace nutcracker
 {
 
 class Variables
@@ -34,7 +30,7 @@ public:
 	bool start(const std::string& ip, int port);
 
 private:
-	std::unique_ptr<Messenger> m_messenger;
+	std::unique_ptr<class Messenger> m_messenger;
 };
 
 class Interpreter
@@ -57,5 +53,4 @@ private:
 	int m_port;
 };
 
-} // namespace document
-} // namespace cz
+} // namespace nutcracker

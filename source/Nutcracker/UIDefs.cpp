@@ -2,11 +2,7 @@
 #include "UIDefs.h"
 #include "Document/Interpreter.h"
 
-
-namespace cz
-{
-
-namespace view
+namespace nutcracker
 {
 
 wxImageList gImageListSmall(16, 16);
@@ -14,9 +10,7 @@ wxImageList gImageList32x32(32,32);
 class MainWnd* gMainWnd;
 class WorkspaceWnd* gWorkspaceWnd;
 class FileEditorGroupWnd* gFileEditorGroupWnd;
-std::shared_ptr<document::Project> gProject;
-
-}
+std::shared_ptr<Project> gProject;
 
 std::unique_ptr<UIState> gUIState;
 std::unique_ptr<cz::Parameters> gParameters;
@@ -53,4 +47,4 @@ void showException(std::exception& e)
 	showError("Exception", "%s", e.what());
 }
 
-}
+} // namespace nutcracker

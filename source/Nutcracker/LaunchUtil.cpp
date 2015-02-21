@@ -6,11 +6,7 @@
 #include "UIDefs.h"
 
 
-using namespace cz;
-using namespace cz::view;
-using namespace cz::document;
-
-namespace cz
+namespace nutcracker
 {
 
 bool launch(bool debug)
@@ -29,5 +25,5 @@ bool launch(bool debug)
 	return true;
 }
 
-}
+} // namespace nutcracker
 

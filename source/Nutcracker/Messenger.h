@@ -1,6 +1,6 @@
 #pragma once
 
-namespace cz
+namespace nutcracker
 {
 
 class Messenger
@@ -32,4 +32,4 @@ private:
 	void run_write();
 };
 
-}
+} // namespace nutcracker
