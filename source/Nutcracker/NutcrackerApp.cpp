@@ -80,9 +80,9 @@ bool NutcrackerApp::OnInit()
 
     mainWnd->Show(true);
 
-	gProject = std::make_shared<Workspace>();
+	gWorkspace = std::make_shared<Workspace>();
 	if (gParameters->has("workspace"))
-		gProject->files.addFolder(gParameters->get("workspace"));
+		gWorkspace->files.addFolder(gParameters->get("workspace"));
 
 	mainWnd->addAsyncFunc([]()
 	{
@@ -112,7 +112,7 @@ bool NutcrackerApp::OnInit()
 
 int NutcrackerApp::OnExit()
 {
-	gProject.reset();
+	gWorkspace.reset();
 	gUIState.reset();
 	gParameters.reset();
 	return wxApp::OnExit();

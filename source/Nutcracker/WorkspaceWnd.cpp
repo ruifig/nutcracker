@@ -104,8 +104,8 @@ std::shared_ptr<TreeCtrlUtil::TreeItemData> WorkspaceWnd::updateState(
 void WorkspaceWnd::updateState()
 {
 	m_treeData.startRefresh();
-	auto root = gProject->files.getRoot();
-	auto data = updateState(nullptr, gProject->files.getRoot());
+	auto root = gWorkspace->files.getRoot();
+	auto data = updateState(nullptr, gWorkspace->files.getRoot());
 	m_treeData.endRefresh();
 	//data->expand();
 }
@@ -114,7 +114,7 @@ void WorkspaceWnd::OnTreeItemActivated(wxTreeEvent& event)
 {
 	wxTreeItemId itemId = event.GetItem();
 	auto itemData = m_treeData.findByWxTreeItemId(event.GetItem());
-	auto item = gProject->files.getFile(FileId(itemData->getItemId().id[0]));
+	auto item = gWorkspace->files.getFile(FileId(itemData->getItemId().id[0]));
 	if (item == nullptr)
 		return;
 
@@ -141,7 +141,7 @@ void WorkspaceWnd::OnTreeItemMenu(wxTreeEvent& event)
 			wxMenu menu;
 			wxMenu* addmenu = new wxMenu;
 			FileId projectItemId(itemData->getItemId().id[0]);
-			auto file = gProject->files.getFile(projectItemId);
+			auto file = gWorkspace->files.getFile(projectItemId);
 			bool nutFile = file->extension=="nut";
 
 			if (nutFile)
@@ -159,7 +159,7 @@ void WorkspaceWnd::OnTreeItemMenu(wxTreeEvent& event)
 
 void WorkspaceWnd::OnOpenContainingFolder(wxCommandEvent& event)
 {
-	auto file = gProject->files.getFile(m_selectedFileId);
+	auto file = gWorkspace->files.getFile(m_selectedFileId);
 	if (!file)
 		return;
 
@@ -170,7 +170,7 @@ void WorkspaceWnd::OnOpenContainingFolder(wxCommandEvent& event)
 
 void WorkspaceWnd::OnRunScriptFile(wxCommandEvent& /*event*/)
 {
-	auto file = gProject->files.getFile(m_selectedFileId);
+	auto file = gWorkspace->files.getFile(m_selectedFileId);
 	if (!file)
 		return;
 
@@ -208,7 +208,7 @@ void WorkspaceWnd::locateFile(FileId fileId)
 
 void WorkspaceWnd::OnRefreshClick(wxCommandEvent& event)
 {
-	gProject->files.resyncFolders();
+	gWorkspace->files.resyncFolders();
 	updateState();
 }
 
