@@ -13,9 +13,21 @@ Messenger::~Messenger()
 	if (m_isRunning)
 	{
 		m_shutdown = true;
-		m_thread.join();
 		m_sock.Shutdown();
+		m_out.push([](){}); // Push an empty command, just to wake up the thread and detect that m_shutdown is true
+		m_readThread.join();
+		m_writeThread.join();
 	}
+}
+
+void Messenger::setOnIncoming(std::function<void()> callback)
+{
+	m_onIncomingCallback = std::move(callback);
+}
+
+void Messenger::setOnDisconnected(std::function<void()> callback)
+{
+	m_onDisconnectedCallback = std::move(callback);
 }
 
 bool Messenger::connect(const char* ip, unsigned int port, unsigned timeoutMs)
@@ -43,52 +55,68 @@ bool Messenger::connect(const char* ip, unsigned int port, unsigned timeoutMs)
 	}
 
 	m_isRunning = true;
-	m_thread = std::thread(&Messenger::run, this);
+	m_readThread = std::thread(&Messenger::run_read, this);
+	m_writeThread = std::thread(&Messenger::run_write, this);
 	czDebug(ID_Log, "Messenger: Connected");
 
 	return true;
 }
 
-void Messenger::run()
+void Messenger::run_read()
 {
-	char part[1024];
-	//std::queue<char> incoming;
+	char part[4096];
 	std::string incoming;
-
 	while (!m_shutdown)
 	{
-		if (!m_sock.Wait(0, 10))
+		if (!m_sock.WaitForRead(1))
 			continue;
-
 		if (m_sock.IsDisconnected())
-			break;
+		{
+			// If this was not an explicit shutdown, we need to let the write thread know we have a disconnect.
+			// This is necessary because the writer thread blocks waiting for commands, instead of blocking on the socket,
+			// so it can't detect a disconnect when blocking.
+			if (!m_shutdown)
+			{
+				m_shutdown = true;
+				czDebug(ID_Log, "Messenger: Disconnect detected.");
+				m_out.push([](){});
+				if (m_onDisconnectedCallback)
+					m_onDisconnectedCallback();
+			}
 
-		// Read any available data
+			break;
+		}
+
 		m_sock.Read(part, sizeof(part));
-		for (size_t i = 0; i < m_sock.LastReadCount(); i++)
+		auto count = m_sock.LastReadCount();
+		for (size_t i = 0; i<count; i++)
 		{
 			if (part[i] == '\n')
 			{
 				czDebug(ID_Log, "Messenger: Receive: %s", incoming.c_str());
 				m_in.push(std::move(incoming));
+				if (m_onIncomingCallback)
+					m_onIncomingCallback();
 			}
 			else
-				incoming.push_back(part[i]);
-		}
-
-		std::string outgoing;
-		if (m_out.try_and_pop(outgoing))
-		{
-			auto p = outgoing.begin();
-			while (p != outgoing.end() && m_sock.IsConnected())
 			{
-				m_sock.Write(&(*p), outgoing.end() - p);
-				p += m_sock.LastWriteCount();
+				incoming.push_back(part[i]);
 			}
 		}
 	}
 
-	czDebug(ID_Log, "Messenger: Disconnected");
+	czDebug(ID_Log, "Messenger: Read thread finishing");
+}
+
+void Messenger::run_write()
+{
+	while (!m_shutdown)
+	{
+		std::function<void()> f;
+		m_out.wait_and_pop(f);
+		f();
+	}
+	czDebug(ID_Log, "Messenger: Write thread finishing");
 }
 
 bool Messenger::read(std::string& msg)
@@ -99,7 +127,20 @@ bool Messenger::read(std::string& msg)
 void Messenger::send(std::string msg)
 {
 	czDebug(ID_Log, "Messenger: Send: %s", msg.c_str());
-	m_out.push(std::move(msg));
+	m_out.push([msg,this]()
+	{
+		auto p = msg.begin();
+		while (p != msg.end() && m_sock.IsConnected())
+		{
+			m_sock.WaitForWrite();
+			if (m_sock.IsDisconnected())
+				break;
+
+			m_sock.Write(&(*p), msg.end() - p);
+			p += m_sock.LastWriteCount();
+		}
+	});
 }
+
 
 }
