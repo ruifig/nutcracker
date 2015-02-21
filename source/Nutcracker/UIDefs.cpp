@@ -10,7 +10,7 @@ wxImageList gImageList32x32(32,32);
 class MainWnd* gMainWnd;
 class WorkspaceWnd* gWorkspaceWnd;
 class FileEditorGroupWnd* gFileEditorGroupWnd;
-std::shared_ptr<Workspace> gProject;
+std::shared_ptr<Workspace> gWorkspace;
 
 std::unique_ptr<UIState> gUIState;
 std::unique_ptr<cz::Parameters> gParameters;

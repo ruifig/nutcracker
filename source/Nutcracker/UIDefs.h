@@ -14,7 +14,7 @@ namespace nutcracker
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
 	extern wxImageList gImageListSmall;
 	extern wxImageList gImageList32x32;
-	extern std::shared_ptr<Workspace> gProject;
+	extern std::shared_ptr<Workspace> gWorkspace;
 
 	enum
 	{
