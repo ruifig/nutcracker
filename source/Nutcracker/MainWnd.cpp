@@ -10,9 +10,9 @@
 #include "NutcrackerPCH.h"
 #include "MainWnd.h"
 
-#include "Document/Project.h"
+#include "Project.h"
 #include "AppEvents.h"
-#include "Document/Interpreter.h"
+#include "Interpreter.h"
 #include "LaunchUtil.h"
 #include "FileEditorGroupWnd.h"
 

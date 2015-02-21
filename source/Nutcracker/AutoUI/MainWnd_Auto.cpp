@@ -12,8 +12,8 @@
 #include "NutcrackerPCH.h"
 
 ////@begin includes
-#include "../View/WorkspaceWnd.h"
-#include "../View/FileEditorGroupWnd.h"
+#include "../WorkspaceWnd.h"
+#include "../FileEditorGroupWnd.h"
 #include "wx/imaglist.h"
 ////@end includes
 

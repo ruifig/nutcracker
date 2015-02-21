@@ -11,7 +11,7 @@
 #include "UIDefs.h"
 #include "WorkspaceWnd.h"
 #include "FileEditorGroupWnd.h"
-#include "Document/Interpreter.h"
+#include "Interpreter.h"
 
 namespace nutcracker
 {

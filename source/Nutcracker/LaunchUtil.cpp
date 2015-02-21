@@ -1,8 +1,8 @@
 #include "NutcrackerPCH.h"
 #include "LaunchUtil.h"
-#include "Document/Project.h"
-#include "Document/Interpreter.h"
-#include "View/FileEditorGroupWnd.h"
+#include "Project.h"
+#include "Interpreter.h"
+#include "FileEditorGroupWnd.h"
 #include "UIDefs.h"
 
 

@@ -1,10 +1,10 @@
 #include "NutcrackerPCH.h"
 #include "NutcrackerApp.h"
-#include "View/MainWnd.h"
-#include "Document/Project.h"
+#include "MainWnd.h"
 #include "AppEvents.h"
 #include "UIDefs.h"
-#include "Document/Interpreter.h"
+#include "Project.h"
+#include "Interpreter.h"
 
 namespace nutcracker
 {

@@ -11,14 +11,16 @@
     <Filter Include="App">
       <UniqueIdentifier>{1e3bf449-ab4f-44ce-9125-1dd664d12855}</UniqueIdentifier>
     </Filter>
-    <Filter Include="View">
-      <UniqueIdentifier>{b38625d9-281a-40f6-b0b1-72b0ad07eebe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Document">
-      <UniqueIdentifier>{39ac7408-eb35-42c0-a08d-cb3dac9efd04}</UniqueIdentifier>
-    </Filter>
     <Filter Include="tinlyxml2">
       <UniqueIdentifier>{d41edf21-463b-4ea2-be88-aeb4b83ba0f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{7b1f7d0d-b822-4041-8b6f-87d3a62ac456}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b7a66587-e7b1-45c5-bb2f-70c80794ff23}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -34,40 +36,50 @@
     <ClCompile Include="NutcrackerApp.cpp">
       <Filter>App</Filter>
     </ClCompile>
-    <ClCompile Include="View\WorkspaceWnd.cpp">
-      <Filter>View</Filter>
-    </ClCompile>
-    <ClCompile Include="View\MainWnd.cpp">
-      <Filter>View</Filter>
-    </ClCompile>
-    <ClCompile Include="View\FileEditorGroupWnd.cpp">
-      <Filter>View</Filter>
-    </ClCompile>
-    <ClCompile Include="Document\Project.cpp" />
-    <ClCompile Include="View\TreeCtrlUtilCode.cpp">
-      <Filter>View</Filter>
-    </ClCompile>
-    <ClCompile Include="UIDefs.cpp" />
-    <ClCompile Include="AppEvents.cpp" />
     <ClCompile Include="AutoUI\FileEditorWnd_Auto.cpp">
       <Filter>AutoUI</Filter>
     </ClCompile>
-    <ClCompile Include="Document\Interpreter.cpp">
-      <Filter>Document</Filter>
-    </ClCompile>
-    <ClCompile Include="View\FileEditorWnd.cpp">
-      <Filter>View</Filter>
-    </ClCompile>
-    <ClCompile Include="View\FileEditorStyles.cpp">
-      <Filter>View</Filter>
-    </ClCompile>
-    <ClCompile Include="LaunchUtil.cpp" />
-    <ClCompile Include="Messenger.cpp" />
     <ClCompile Include="..\..\dependencies\tinyxml2\tinyxml2.cpp">
       <Filter>tinlyxml2</Filter>
     </ClCompile>
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp">
       <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIDefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AppEvents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interpreter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LaunchUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Messenger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Project.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileEditorGroupWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileEditorStyles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileEditorWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeCtrlUtilCode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkspaceWnd.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -80,56 +92,64 @@
     <ClInclude Include="NutcrackerApp.h">
       <Filter>App</Filter>
     </ClInclude>
-    <ClInclude Include="View\MainWnd.h">
-      <Filter>View</Filter>
-    </ClInclude>
-    <ClInclude Include="View\FileEditorGroupWnd.h">
-      <Filter>View</Filter>
-    </ClInclude>
     <ClInclude Include="NutcrackerPCH.h">
       <Filter>App</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
       <Filter>App</Filter>
     </ClInclude>
-    <ClInclude Include="View\WorkspaceWnd.h">
-      <Filter>View</Filter>
-    </ClInclude>
-    <ClInclude Include="Document\Project.h">
-      <Filter>Document</Filter>
-    </ClInclude>
-    <ClInclude Include="View\TreeCtrlUtilCode.h">
-      <Filter>View</Filter>
-    </ClInclude>
-    <ClInclude Include="UIDefs.h" />
-    <ClInclude Include="AppEvents.h" />
     <ClInclude Include="AutoUI\FileEditorWnd_Auto.h">
       <Filter>AutoUI</Filter>
     </ClInclude>
-    <ClInclude Include="View\FileEditorWnd.h">
-      <Filter>View</Filter>
-    </ClInclude>
-    <ClInclude Include="View\FileEditorStyles.h">
-      <Filter>View</Filter>
-    </ClInclude>
-    <ClInclude Include="LaunchUtil.h" />
-    <ClInclude Include="Messenger.h" />
     <ClInclude Include="..\..\dependencies\tinyxml2\tinyxml2.h">
       <Filter>tinlyxml2</Filter>
     </ClInclude>
-    <ClInclude Include="NutcrackerDefs.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h">
       <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="AppEvents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interpreter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Messenger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Project.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NutcrackerDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LaunchUtil.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileEditorGroupWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileEditorStyles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileEditorWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeCtrlUtilCode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkspaceWnd.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Nutcracker.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Document\Interpreter.h">
-      <Filter>Document</Filter>
-    </None>
   </ItemGroup>
 </Project>
