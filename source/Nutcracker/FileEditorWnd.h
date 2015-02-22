@@ -31,6 +31,9 @@ public:
 	void save();
 	void onPageChanged();
 	std::pair<int, int> getCursorLocation();
+	bool markerToLine(int markerHandle, int& line);
+	void syncBreakpoint(Breakpoint& brk);
+
 private:
 	DECLARE_EVENT_TABLE()
 	void OnCharacterAdded(wxStyledTextEvent& evt);

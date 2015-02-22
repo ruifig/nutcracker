@@ -88,11 +88,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="AutoUI\BreakpointsWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\FileEditorGroupWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\FileEditorWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\MainWnd_Auto.cpp" />
     <ClCompile Include="AppEvents.cpp" />
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
+    <ClCompile Include="Breakpoints.cpp" />
+    <ClCompile Include="BreakpointsWnd.cpp" />
     <ClCompile Include="FileEditorGroupWnd.cpp" />
     <ClCompile Include="FileEditorStyles.cpp" />
     <ClCompile Include="FileEditorWnd.cpp" />
@@ -113,12 +116,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dependencies\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="AutoUI\BreakpointsWnd_Auto.h" />
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h" />
     <ClInclude Include="AutoUI\FileEditorWnd_Auto.h" />
     <ClInclude Include="AutoUI\MainWnd_Auto.h" />
     <ClInclude Include="AppEvents.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
     <ClInclude Include="Breakpoints.h" />
+    <ClInclude Include="BreakpointsWnd.h" />
     <ClInclude Include="FileEditorGroupWnd.h" />
     <ClInclude Include="FileEditorStyles.h" />
     <ClInclude Include="FileEditorWnd.h" />

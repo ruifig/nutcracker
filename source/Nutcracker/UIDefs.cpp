@@ -10,6 +10,7 @@ wxImageList gImageList32x32(32,32);
 class MainWnd* gMainWnd;
 class WorkspaceWnd* gWorkspaceWnd;
 class FileEditorGroupWnd* gFileEditorGroupWnd;
+class BreakpointsWnd* gBreakpointsWnd;
 std::shared_ptr<Workspace> gWorkspace;
 
 std::unique_ptr<UIState> gUIState;

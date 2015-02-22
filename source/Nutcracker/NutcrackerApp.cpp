@@ -74,15 +74,15 @@ bool NutcrackerApp::OnInit()
 		gImageList32x32.Add(wxArtProvider::GetBitmap(wxART_MISSING_IMAGE, wxART_OTHER, wxSize(32, 32)));
 	gImageList32x32.Replace(BIGIMG_IDX_NUT, wxBITMAP_PNG(APP_IMG_32x32_NUT));
 
+	gWorkspace = std::make_shared<Workspace>();
+	if (gParameters->has("workspace"))
+		gWorkspace->files.addFolder(gParameters->get("workspace"));
+
 
 	// create the main application window
     MainWnd *mainWnd = new MainWnd();
 
     mainWnd->Show(true);
-
-	gWorkspace = std::make_shared<Workspace>();
-	if (gParameters->has("workspace"))
-		gWorkspace->files.addFolder(gParameters->get("workspace"));
 
 	mainWnd->addAsyncFunc([]()
 	{

@@ -9,6 +9,7 @@
 #pragma once
 
 #include "Files.h"
+#include "Breakpoints.h"
 
 namespace nutcracker
 {
@@ -24,6 +25,7 @@ struct Workspace
 	}
 
 	Files files;
+	Breakpoints breakpoints;
 };
 
 } // namespace nutcracker

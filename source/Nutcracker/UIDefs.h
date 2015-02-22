@@ -1,3 +1,4 @@
+
 #pragma once
 
 namespace nutcracker
@@ -7,11 +8,13 @@ namespace nutcracker
 	class Interpreter;
 	class Session;
 	struct Workspace;
+	struct Breakpoint;
 
 	class FileEditorWnd;
 	extern class MainWnd* gMainWnd;
 	extern class WorkspaceWnd* gWorkspaceWnd;
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
+	extern class BreakpointsWnd* gBreakpointsWnd;
 	extern wxImageList gImageListSmall;
 	extern wxImageList gImageList32x32;
 	extern std::shared_ptr<Workspace> gWorkspace;
