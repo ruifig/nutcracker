@@ -22,12 +22,6 @@ typedef FNVHash32 FileId;
 class Files;
 struct File;
 
-struct Location
-{
-	std::shared_ptr<File> file;
-	int line=0;
-};
-
 // Base object for workspace items
 struct BaseItem : std::enable_shared_from_this<BaseItem>
 {

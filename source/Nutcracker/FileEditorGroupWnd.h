@@ -27,6 +27,7 @@ public:
 	std::shared_ptr<File> getCurrentFile();
 	bool hasDirtyFiles();
 	void saveAll();
+	class FileEditorWnd* findFileWnd(const std::shared_ptr<File>& file, int* index);
 private:
 	DECLARE_EVENT_TABLE()
 
@@ -44,7 +45,6 @@ private:
 	FileEditorWnd* getCurrentPage();
 
 	void iterateFiles(std::function<void(FileEditorWnd*)> func);
-	class FileEditorWnd* findFileWnd(const std::shared_ptr<File>& file, int* index);
 
 	// Used to remember what file tab we right clicked (for the popup menu)
 	FileEditorWnd* m_selectedFileTab=nullptr;

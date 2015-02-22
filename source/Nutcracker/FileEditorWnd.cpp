@@ -13,6 +13,12 @@
 #include "FileEditorGroupWnd.h"
 #include "FileEditorStyles.h"
 #include "Workspace.h"
+#include "BreakpointsWnd.h"
+
+#include "art/xpm/breakpoint_on.xpm"
+#include "art/xpm/breakpoint_off.xpm"
+#include "art/xpm/breakpoint_invalid.xpm"
+#include "art/xpm/debugcursor.xpm"
 
 namespace nutcracker
 {
@@ -58,6 +64,15 @@ FileEditorWnd::~FileEditorWnd()
 	{
 		file->dirty = false;
 	}
+
+	gWorkspace->breakpoints.iterate(m_file, [&](Breakpoint& brk)
+	{
+		brk.markerHandle = -1;
+		brk.line = brk.savedline;
+	});
+
+	if (gBreakpointsWnd->IsShownOnScreen())
+		gBreakpointsWnd->updateState();
 }
 
 std::shared_ptr<File> FileEditorWnd::getFile()
@@ -76,12 +91,10 @@ void FileEditorWnd::setCommonStyle()
 
 	m_textCtrl->SetWrapMode(wxSTC_WRAP_NONE);
 
-	/*
 	m_textCtrl->MarkerDefineBitmap(MARK_BREAKPOINT_ON, wxImage(breakpoint_on_xpm));
 	m_textCtrl->MarkerDefineBitmap(MARK_BREAKPOINT_OFF, wxImage(breakpoint_off_xpm));
 	m_textCtrl->MarkerDefineBitmap(MARK_BREAKPOINT_INVALID, wxImage(breakpoint_invalid_xpm));
 	m_textCtrl->MarkerDefineBitmap(MARK_DEBUGCURSOR, wxImage(debugcursor_xpm));
-	*/
 
 	// ---- Enable code folding
 	m_textCtrl->SetMarginWidth(MARGIN_FOLD, 15);
@@ -197,6 +210,11 @@ void FileEditorWnd::setFile(const std::shared_ptr<File>& file, int line, int col
 		m_textCtrl->SetSavePoint();
 		m_textCtrl->EmptyUndoBuffer();
 
+		gWorkspace->breakpoints.iterate(m_file, [&](Breakpoint& brk)
+		{
+			syncBreakpoint(brk);
+		});
+
 		updateErrorMarkers();
 		updateMarkers();
 
@@ -209,11 +227,11 @@ void FileEditorWnd::setFile(const std::shared_ptr<File>& file, int line, int col
 		if (columnIsOffset)
 		{
 			// Column is a real offset into the text (doesn't take into account tab width)
-			int pos = m_textCtrl->PositionFromLine(line - 1);
+			int pos = m_textCtrl->PositionFromLine(line);
 			m_textCtrl->GotoPos(pos + col);
 		} else{
 			// Column is a visual offset into the text (takes into account tab width)
-			m_textCtrl->GotoPos(m_textCtrl->FindColumn(line - 1, col));
+			m_textCtrl->GotoPos(m_textCtrl->FindColumn(line, col));
 		}
 	}
 
@@ -231,15 +249,69 @@ void FileEditorWnd::checkReload()
 	setFile(file, -1, 0);
 }
 
+void FileEditorWnd::syncBreakpoint(Breakpoint& brk)
+{
+	auto deleteAll = [&]()
+	{
+		m_textCtrl->MarkerDelete(brk.line, MARK_BREAKPOINT_INVALID);
+		m_textCtrl->MarkerDelete(brk.line, MARK_BREAKPOINT_ON);
+		m_textCtrl->MarkerDelete(brk.line, MARK_BREAKPOINT_OFF);
+	};
+
+	if (brk.markerHandle == -1)
+	{
+		CZ_ASSERT(brk.line != -1);
+		deleteAll();
+		brk.markerHandle = m_textCtrl->MarkerAdd(brk.line, brk.enabled ? MARK_BREAKPOINT_ON : MARK_BREAKPOINT_OFF);
+	}
+	else
+	{
+		int line = m_textCtrl->MarkerLineFromHandle(brk.markerHandle);
+		brk.line = line;
+		int markers = m_textCtrl->MarkerGet(line);
+		if (brk.enabled && (markers&(1 << MARK_BREAKPOINT_OFF)))
+		{
+			deleteAll();
+			brk.markerHandle = m_textCtrl->MarkerAdd(brk.line, MARK_BREAKPOINT_ON);
+		}
+		else if (!brk.enabled && (markers&(1 << MARK_BREAKPOINT_ON)))
+		{
+			deleteAll();
+			brk.markerHandle = m_textCtrl->MarkerAdd(brk.line, MARK_BREAKPOINT_OFF);
+		}
+	}
+}
+
 void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 {
 	switch(event.GetMargin())
 	{
 		case MARGIN_BREAKPOINTS:
 		{
-			int lineclick = m_textCtrl->LineFromPosition(event.GetPosition()) + 1;
-			// TODO
-			//gSession->toggleBreakpoint(m_file, lineclick);
+			int linenumber = m_textCtrl->LineFromPosition(event.GetPosition());
+			int markers = m_textCtrl->MarkerGet(linenumber);
+
+			if (markers&((1<<MARK_BREAKPOINT_ON)|(1<<MARK_BREAKPOINT_INVALID)))
+			{
+				gWorkspace->breakpoints.remove(m_file, linenumber);
+				m_textCtrl->MarkerDelete(linenumber, MARK_BREAKPOINT_ON);
+			}
+			else if (markers&(1 << MARK_BREAKPOINT_OFF))
+			{
+				auto b = gWorkspace->breakpoints.get(m_file, linenumber);
+				CZ_ASSERT(b && b->enabled==false);
+				b->enabled = true;
+				b->markerHandle = -1;
+				syncBreakpoint(*b);
+			}
+			else
+			{
+				auto handle =m_textCtrl->MarkerAdd(linenumber, MARK_BREAKPOINT_ON);
+				gWorkspace->breakpoints.add(m_file, linenumber, handle);
+			}
+			
+			gBreakpointsWnd->updateState();
+			//updateMarkers();
 		}
 		break;
 		case MARGIN_FOLD:
@@ -258,6 +330,7 @@ void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 
 void FileEditorWnd::updateMarkers()
 {
+	/*
 	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_ON);
 	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_OFF);
 	m_textCtrl->MarkerDeleteAll(MARK_BREAKPOINT_INVALID);
@@ -265,30 +338,10 @@ void FileEditorWnd::updateMarkers()
 
 	// TODO
 
-	/*
-	auto& breakpoints = gSession->getBreakpoints();
-	for(auto& b: breakpoints)
-	{
-		if (b->file == m_file)
-		{
-			if (gSession->getState()>=kSessionState_Running)
-			{
-				if (b->enabled)
-					m_textCtrl->MarkerAdd(b->line - 1, b->isValid() ? MARK_BREAKPOINT_ON : MARK_BREAKPOINT_INVALID);
-				else
-					m_textCtrl->MarkerAdd(b->line - 1, MARK_BREAKPOINT_OFF);
-			}
-			else
-			{
-				m_textCtrl->MarkerAdd(b->line - 1, b->enabled ? MARK_BREAKPOINT_ON : MARK_BREAKPOINT_OFF);
-			}
-		}
-	}
-
 	auto& debugpos = gSession->getLastSourcePos(m_file->isCSource());
 	if (debugpos.first == m_file)
 		m_textCtrl->MarkerAdd(debugpos.second-1, MARK_DEBUGCURSOR);
-		*/
+	*/
 }
 
 void FileEditorWnd::updateErrorMarkers()
@@ -302,7 +355,7 @@ void FileEditorWnd::updateErrorMarkers()
 
 	for (auto& e : file->errorLines)
 	{
-		int line = e.line-1; // scintilla lines start at 0
+		int line = e.line;
 		m_textCtrl->SetIndicatorCurrent( e.isError ? kINDIC_Error : kINDIC_Warning);
 		/*
 		int length = m_textCtrl->GetLineLength(line);
@@ -323,6 +376,15 @@ void FileEditorWnd::OnTextChanged(wxStyledTextEvent& event)
 		auto file = getFile();
 		file->dirty = true;
 		gFileEditorGroupWnd->setPageTitle(m_file);
+
+		gWorkspace->breakpoints.iterate(m_file, [&](Breakpoint& brk)
+		{
+			if (brk.markerHandle != -1)
+				brk.line = m_textCtrl->MarkerLineFromHandle(brk.markerHandle);
+		});
+
+		if (gBreakpointsWnd->IsShownOnScreen())
+			gBreakpointsWnd->updateState();
 	}
 }
 
@@ -480,6 +542,11 @@ void FileEditorWnd::save()
 		file->dirty = false;
 		file->filetime = FileTime::get(file->fullpath, FileTime::kModified);
 		fireAppEvent(AppEventFileSaved(this));
+
+		gWorkspace->breakpoints.iterate(m_file, [&](Breakpoint& brk)
+		{
+			brk.savedline = brk.line;
+		});
 	}
 	catch(std::exception& e)
 	{
@@ -515,6 +582,11 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 	if (modifiers == wxMOD_CONTROL && keycode == 'S') // Save
 	{
 		save();
+	}
+	else if (modifiers == wxMOD_CONTROL && keycode == 'R')
+	{
+		m_textCtrl->DiscardEdits();
+		m_textCtrl->LoadFile(m_file->fullpath.widen());
 	}
 	/*
 	else if (modifiers == wxMOD_CONTROL && keycode == WXK_F7) // Compile current file
@@ -684,6 +756,15 @@ wxString FileEditorWnd::getWordUnderCursor()
 {
 	return m_textCtrl->GetTextRange(m_textCtrl->WordStartPosition(m_textCtrl->GetCurrentPos(), true),
 									m_textCtrl->WordEndPosition(m_textCtrl->GetCurrentPos(), true));
+}
+
+bool FileEditorWnd::markerToLine(int markerHandle, int& line)
+{
+	int l = m_textCtrl->MarkerLineFromHandle(markerHandle);
+	if (l == 1)
+		return false;
+	line = l;
+	return true;
 }
 
 } // namespace nutcracker
