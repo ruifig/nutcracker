@@ -30,11 +30,14 @@ public:
 	void add(const std::shared_ptr<File>& file, int line, int markerHandle, bool enabled=true);
 	void remove(const std::shared_ptr<File>& file, int line);
 
+	int getCount() const;
 	void iterate(const std::shared_ptr<File>& file, std::function<void(Breakpoint& brk)>&& func);
-	std::vector<Breakpoint>& getAll();
+	void iterate(std::function<void(Breakpoint& brk)>&& func);
+	Breakpoint& getAt(int index);
 
 	Breakpoint* get(const std::shared_ptr<File>& file, int line);
 private:
+	//std::vector<Breakpoint>& getAll();
 	std::vector<Breakpoint> m_all;
 };
 

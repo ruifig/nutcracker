@@ -62,6 +62,14 @@ void Breakpoints::iterate(const std::shared_ptr<File>& file, std::function<void(
 	}
 }
 
+void Breakpoints::iterate(std::function<void(Breakpoint& brk)>&& func)
+{
+	for (auto& b : m_all)
+	{
+		func(b);
+	}
+}
+
 Breakpoint* Breakpoints::get(const std::shared_ptr<File>& file, int line)
 {
 	for (auto& b : m_all)
@@ -72,10 +80,22 @@ Breakpoint* Breakpoints::get(const std::shared_ptr<File>& file, int line)
 	return nullptr;
 }
 
+int Breakpoints::getCount() const
+{
+	return static_cast<int>(m_all.size());
+}
+
+Breakpoint& Breakpoints::getAt(int index)
+{
+	return m_all[index];
+}
+
+/*
 std::vector<Breakpoint>& Breakpoints::getAll()
 {
 	return m_all;
 }
+*/
 
 
 

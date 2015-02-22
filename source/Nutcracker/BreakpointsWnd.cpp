@@ -49,18 +49,16 @@ void BreakpointsWnd::OnToggleBreakpointsClick(wxCommandEvent& event)
 
 void BreakpointsWnd::updateState()
 {
-	auto& breakpoints = gWorkspace->breakpoints.getAll();
-
 	m_grid->Freeze();
 
 	if (m_grid->GetNumberRows())
 		m_grid->DeleteRows(0, m_grid->GetNumberRows());
-	m_grid->AppendRows(breakpoints.size());
+	m_grid->AppendRows(gWorkspace->breakpoints.getCount());
 
-	for (int i=0; i< static_cast<int>(breakpoints.size()); i++)
+
+	int r = 0;
+	gWorkspace->breakpoints.iterate([&](Breakpoint& b)
 	{
-		auto& b = breakpoints[i];
-		int r = i;
 		m_grid->SetCellRenderer(r, 0, new wxGridCellBoolRenderer);
 		m_grid->SetCellEditor(r, 0, new wxGridCellBoolEditor);
 		m_grid->SetReadOnly(r,0,true);
@@ -69,7 +67,8 @@ void BreakpointsWnd::updateState()
 		m_grid->SetCellValue(
 			r, 1, wxString::Format(wxT("%s, line %d"), b.file->name.c_str(), b.line+1));
 		m_grid->SetReadOnly(r,1,true);
-	}
+		r++;
+	});
 
 	m_grid->AutoSizeColumns(true);
 	m_grid->Thaw();
@@ -84,11 +83,10 @@ void BreakpointsWnd::OnCellClick(wxGridEvent& evt)
 {
 	int r = evt.GetRow();
 	int c = evt.GetCol();
-	auto& breakpoints = gWorkspace->breakpoints.getAll();
 
-	if (c==0 && r<=static_cast<int>(breakpoints.size()))
+	if (c==0 && r<=gWorkspace->breakpoints.getCount())
 	{
-		auto& b = breakpoints[r];
+		auto& b = gWorkspace->breakpoints.getAt(r);
 		b.enabled = !b.enabled;
 		auto wnd = gFileEditorGroupWnd->findFileWnd(b.file, nullptr);
 		if (wnd)
@@ -103,14 +101,11 @@ void BreakpointsWnd::OnCellDClick(wxGridEvent& evt)
 {
 	int r = evt.GetRow();
 	int c = evt.GetCol();
-	const auto& breakpoints = gWorkspace->breakpoints.getAll();
-
-	if (c!=0 && r<=(int)breakpoints.size())
+	if (c!=0 && r<=gWorkspace->breakpoints.getCount())
 	{
-		const auto& b = breakpoints[r];
+		const auto& b = gWorkspace->breakpoints.getAt(r);
 		gFileEditorGroupWnd->gotoFile(b.file, b.line);
 	}
-
 	evt.Skip();
 }
 
