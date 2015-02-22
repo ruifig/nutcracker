@@ -1,0 +1,42 @@
+syntax: glob
+*.swp
+*.suo
+*.sdf
+*.opensdf
+*.ncb
+*.user
+*.pdb
+*.idb
+*.aps
+*.ilk
+
+#
+#
+tmp/*
+bin/*
+source/ipch/*
+
+#
+# Squirrel
+#
+dependencies/squirrel/bin
+dependencies/squirrel/sq/Debug
+dependencies/squirrel/sq/Release
+dependencies/squirrel/squirrel/Debug
+dependencies/squirrel/squirrel/Release
+dependencies/squirrel/squirrel/Template
+dependencies/squirrel/sqstdlib/Debug
+dependencies/squirrel/sqstdlib/Release
+dependencies/squirrel/sqstdlib/Template
+dependencies/squirrel/sqdbg/Debug
+dependencies/squirrel/sqdbg/Release
+
+# CppDepend
+CppDepend/CppDependOut
+
+# wxWidgets
+dependencies/wxWidgets/*
+
+# Visual Paradigm
+VisualParadigm/*
+
