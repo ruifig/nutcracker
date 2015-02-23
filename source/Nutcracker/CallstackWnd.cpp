@@ -37,9 +37,10 @@ void CallstackWnd::onAppEvent(const AppEvent& evt)
 	switch (evt.id)
 	{
 		case AppEventID::DebugStarted:
-			gUIState->debugSession->breakListeners.add(this, [&](const BreakInfo& info)
+			gUIState->debugSession->breakListeners.add(
+				this, [&](const std::shared_ptr<const BreakInfo>& info)
 			{
-				m_callstack = info.callstack;
+				m_info = info;
 				if (IsShownOnScreen())
 					updateState();
 			});
@@ -52,10 +53,17 @@ void CallstackWnd::updateState()
 
 	if (m_grid->GetNumberRows())
 		m_grid->DeleteRows(0, m_grid->GetNumberRows());
-	m_grid->AppendRows(m_callstack.size());
+
+	if (!m_info)
+	{
+		m_grid->Thaw();
+		return;
+	}
+
+	m_grid->AppendRows(m_info->callstack.size());
 
 	int r = 0;
-	for (auto& c : m_callstack)
+	for (auto& c : m_info->callstack)
 	{
 		m_grid->SetReadOnly(r, 0, true);
 		m_grid->SetReadOnly(r, 1, true);
@@ -98,7 +106,7 @@ void CallstackWnd::OnCellDClick(wxGridEvent& evt)
 	int r = evt.GetRow();
 	int c = evt.GetCol();
 
-	auto& entry = m_callstack[r];
+	auto& entry = m_info->callstack[r];
 	gFileEditorGroupWnd->gotoFile(entry.file, entry.line-1);
 	evt.Skip();
 }

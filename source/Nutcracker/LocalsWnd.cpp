@@ -9,6 +9,7 @@
 
 #include "NutcrackerPCH.h"
 #include "LocalsWnd.h"
+#include "UIDefs.h"
 
 namespace nutcracker
 {
@@ -28,11 +29,27 @@ LocalsWnd::~LocalsWnd()
 
 void LocalsWnd::onAppEvent(const AppEvent& evt)
 {
+	switch (evt.id)
+	{
+		case AppEventID::DebugStarted:
+			gUIState->debugSession->breakListeners.add(this,
+				[&](const std::shared_ptr<const BreakInfo>& info)
+			{
+				m_info = info;
+			});
+	}
 }
 
 void LocalsWnd::updateState()
 {
 	m_tree->Freeze();
+
+	if (!m_info)
+	{
+		m_tree->DeleteAllItems();
+		m_tree->Thaw();
+		return;
+	}
 
 	adjustSize(this->GetSize().GetX());
 

@@ -10,6 +10,7 @@
 
 #include "BaseWatchesWnd.h"
 #include "AppEvents.h"
+#include "Interpreter.h"
 
 namespace nutcracker
 {
@@ -32,6 +33,9 @@ private:
 
 	void updateState();
 	void adjustSize(int width);
+
+	std::shared_ptr<const BreakInfo> m_info;
+	
 };
 
 } // namespace nutcracker

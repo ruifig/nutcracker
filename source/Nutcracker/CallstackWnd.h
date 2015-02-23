@@ -37,7 +37,7 @@ private:
 	void updateState();
 	void adjustSize(int width);
 
-	std::vector<CallstackEntry> m_callstack;
+	std::shared_ptr<const BreakInfo> m_info;
 	int m_infoColMinSize = 0;
 };
 

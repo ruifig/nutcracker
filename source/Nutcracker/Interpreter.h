@@ -257,8 +257,6 @@ struct BreakInfo
 	int line=-1;
 	std::string error;
 
-	// Keys >=0  - Objects provided by sqdbg in the xml "objs" element
-	// Keys <0   - Custom objects for all other variables I need to create
 	std::map<int, std::shared_ptr<ValueBase>> objs;
 	std::vector<CallstackEntry> callstack;
 	int customObjKeyCounter = -1;
@@ -273,7 +271,7 @@ public:
 	// If port is 0, it will not use a debugger;
 	bool start(const std::string& ip, int port);
 
-	Listeners < std::function<void(const BreakInfo&)>> breakListeners;
+	Listeners < std::function<void(const std::shared_ptr<const BreakInfo>&)>> breakListeners;
 
 	void removeListener(void* listener)
 	{

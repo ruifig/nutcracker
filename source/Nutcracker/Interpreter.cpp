@@ -147,7 +147,7 @@ void DebugSession::processIncoming()
 	auto this_ = shared_from_this();
 	postAppLambdaEvent([info, this_]
 	{
-		this_->breakListeners.fire(*info);
+		this_->breakListeners.fire(info);
 	});
 
 }
