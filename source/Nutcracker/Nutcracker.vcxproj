@@ -102,6 +102,7 @@
     <ClCompile Include="Files.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="LaunchUtil.cpp" />
+    <ClCompile Include="Locator.cpp" />
     <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="Messenger.cpp" />
     <ClCompile Include="NutcrackerApp.cpp" />
@@ -135,6 +136,7 @@
     <ClInclude Include="NutcrackerApp.h" />
     <ClInclude Include="NutcrackerDefs.h" />
     <ClInclude Include="NutcrackerPCH.h" />
+    <ClInclude Include="Locator.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TreeCtrlUtilCode.h" />
     <ClInclude Include="UIDefs.h" />
