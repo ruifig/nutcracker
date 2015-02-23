@@ -1,0 +1,209 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="AutoUI">
+      <UniqueIdentifier>{3e937ffd-6914-4a96-a997-8396b1e1bee3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{1e3bf449-ab4f-44ce-9125-1dd664d12855}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tinlyxml2">
+      <UniqueIdentifier>{d41edf21-463b-4ea2-be88-aeb4b83ba0f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{7b1f7d0d-b822-4041-8b6f-87d3a62ac456}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b7a66587-e7b1-45c5-bb2f-70c80794ff23}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AutoUI\FileEditorGroupWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoUI\MainWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="NutcrackerPCH.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="NutcrackerApp.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoUI\FileEditorWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\dependencies\tinyxml2\tinyxml2.cpp">
+      <Filter>tinlyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="UIDefs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AppEvents.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Interpreter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LaunchUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Messenger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileEditorGroupWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileEditorStyles.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileEditorWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TreeCtrlUtilCode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WorkspaceWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Workspace.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Files.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Breakpoints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoUI\BreakpointsWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="BreakpointsWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AutoUI\CallstackWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="CallstackWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseWatchesWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalsWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WatchesWnd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoUI\MainWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="NutcrackerApp.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="NutcrackerPCH.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoUI\FileEditorWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\dependencies\tinyxml2\tinyxml2.h">
+      <Filter>tinlyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="AppEvents.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interpreter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Messenger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UIDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NutcrackerDefs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileEditorGroupWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileEditorStyles.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileEditorWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeCtrlUtilCode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorkspaceWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Workspace.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Files.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Breakpoints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LaunchUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoUI\BreakpointsWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="BreakpointsWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoUI\CallstackWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="CallstackWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseWatchesWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LocalsWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WatchesWnd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Nutcracker.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>

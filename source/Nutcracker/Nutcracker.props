@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <wxWidgetsRoot>$(SolutionDir)..\dependencies\wxWidgets</wxWidgetsRoot>
+  </PropertyGroup>
+  <PropertyGroup>
+    <OutDir>$(SolutionDir)..\bin\</OutDir>
+    <IntDir>$(SolutionDir)..\tmp\$(ProjectName)\$(PlatformName)\$(Configuration)\</IntDir>
+    <TargetName>$(ProjectName)_$(PlatformName)_$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level4</WarningLevel>
+      <AdditionalOptions>/wd4996 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(SolutionDir)Nutcracker;$(SolutionDir)..\dependencies\czPlatform\source;$(SolutionDir)..\dependencies\tinyxml2</AdditionalIncludeDirectories>
+      <MinimalRebuild>No</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <BuildMacro Include="wxWidgetsRoot">
+      <Value>$(wxWidgetsRoot)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>
