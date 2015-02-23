@@ -128,7 +128,9 @@ public:
 		ID_PANEL = 10006,
 		ID_TEXTCTRL = 10007,
 		ID_PANEL1 = 10001,
-		ID_PANEL2 = 10012
+		ID_PANEL2 = 10012,
+		ID_PANEL3 = 10013,
+		ID_PANEL4 = 10014
 	};
 ////@end MainWnd_Auto member variables
 };

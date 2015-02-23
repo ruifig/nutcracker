@@ -95,6 +95,7 @@
     <ClCompile Include="AutoUI\MainWnd_Auto.cpp" />
     <ClCompile Include="AppEvents.cpp" />
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
+    <ClCompile Include="BaseWatchesWnd.cpp" />
     <ClCompile Include="Breakpoints.cpp" />
     <ClCompile Include="BreakpointsWnd.cpp" />
     <ClCompile Include="CallstackWnd.cpp" />
@@ -104,6 +105,7 @@
     <ClCompile Include="Files.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="LaunchUtil.cpp" />
+    <ClCompile Include="LocalsWnd.cpp" />
     <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="Messenger.cpp" />
     <ClCompile Include="NutcrackerApp.cpp" />
@@ -113,6 +115,7 @@
     </ClCompile>
     <ClCompile Include="TreeCtrlUtilCode.cpp" />
     <ClCompile Include="UIDefs.cpp" />
+    <ClCompile Include="WatchesWnd.cpp" />
     <ClCompile Include="Workspace.cpp" />
     <ClCompile Include="WorkspaceWnd.cpp" />
   </ItemGroup>
@@ -125,6 +128,7 @@
     <ClInclude Include="AutoUI\MainWnd_Auto.h" />
     <ClInclude Include="AppEvents.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
+    <ClInclude Include="BaseWatchesWnd.h" />
     <ClInclude Include="Breakpoints.h" />
     <ClInclude Include="BreakpointsWnd.h" />
     <ClInclude Include="CallstackWnd.h" />
@@ -134,6 +138,7 @@
     <ClInclude Include="Files.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="LaunchUtil.h" />
+    <ClInclude Include="LocalsWnd.h" />
     <ClInclude Include="MainWnd.h" />
     <ClInclude Include="Messenger.h" />
     <ClInclude Include="NutcrackerApp.h" />
@@ -142,6 +147,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TreeCtrlUtilCode.h" />
     <ClInclude Include="UIDefs.h" />
+    <ClInclude Include="WatchesWnd.h" />
     <ClInclude Include="Workspace.h" />
     <ClInclude Include="WorkspaceWnd.h" />
   </ItemGroup>
