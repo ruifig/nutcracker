@@ -17,6 +17,8 @@
 #include "wx/imaglist.h"
 #include "../BreakpointsWnd.h"
 #include "../CallstackWnd.h"
+#include "../LocalsWnd.h"
+#include "../WatchesWnd.h"
 ////@end includes
 
 #include "MainWnd_Auto.h"
@@ -166,6 +168,14 @@ void MainWnd_Auto::CreateControls()
 	nutcracker::CallstackWnd* itemPanel20 = new nutcracker::CallstackWnd( itemAuiNotebook15, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
 
 	itemAuiNotebook15->AddPage(itemPanel20, _("Callstack"), false);
+
+	nutcracker::LocalsWnd* itemPanel21 = new nutcracker::LocalsWnd( itemAuiNotebook15, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+
+	itemAuiNotebook15->AddPage(itemPanel21, _("Locals"), false);
+
+	nutcracker::WatchesWnd* itemPanel22 = new nutcracker::WatchesWnd( itemAuiNotebook15, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+
+	itemAuiNotebook15->AddPage(itemPanel22, _("Watches"), false);
 
 	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook15, wxAuiPaneInfo()
 		.Name(wxT("Pane3")).Caption(_("Output")).Bottom().MinSize(wxSize(80, 80)).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));
