@@ -6,7 +6,7 @@ namespace nutcracker
 	class Files;
 	struct File;
 	class Interpreter;
-	class Session;
+	class DebugSession;
 	struct Workspace;
 	struct Breakpoint;
 
@@ -47,7 +47,7 @@ namespace nutcracker
 		bool view_EOL = false;
 		std::vector<std::unique_ptr<Interpreter>> interpreters;
 		Interpreter* currentInterpreter=nullptr;
-		std::unique_ptr<Session> debugSession;
+		std::unique_ptr<DebugSession> debugSession;
 	};
 
 	extern std::unique_ptr<UIState> gUIState;
