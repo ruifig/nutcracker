@@ -19,7 +19,7 @@ namespace nutcracker
 {
 
 BEGIN_EVENT_TABLE(BreakpointsWnd, BreakpointsWnd_Auto)
-		EVT_SHOW(BreakpointsWnd::OnShow)
+	EVT_SHOW(BreakpointsWnd::OnShow)
 END_EVENT_TABLE()
 
 BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
@@ -40,11 +40,6 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 BreakpointsWnd::~BreakpointsWnd()
 {
 	gBreakpointsWnd = nullptr;
-}
-
-void BreakpointsWnd::OnToggleBreakpointsClick(wxCommandEvent& event)
-{
-	CZ_ASSERT(0); // TODO
 }
 
 void BreakpointsWnd::updateState()
@@ -71,8 +66,20 @@ void BreakpointsWnd::updateState()
 	});
 
 	m_grid->AutoSizeColumns(true);
+	m_infoColMinSize = m_grid->GetColSize(1);
+	adjustSize(this->GetSize().GetX());
 	m_grid->Thaw();
+}
 
+// Tips on how to adjust grid size taken from
+// http://stackoverflow.com/questions/7946778/wxgrid-shows-large-empty-border-on-right
+//
+void BreakpointsWnd::adjustSize(int width)
+{
+	int col1Size = m_grid->GetColSize(0);
+	int remaining = width - col1Size;
+	m_grid->SetColSize(1,std::max(m_infoColMinSize, remaining));
+	m_grid->SetMargins(0 - wxSYS_VSCROLL_X, 0);
 }
 
 void BreakpointsWnd::OnCellChanged(wxGridEvent& evt)
@@ -123,6 +130,15 @@ void BreakpointsWnd::onAppEvent(const AppEvent& evt)
 		break;
 	}
 }
+
+void BreakpointsWnd::OnSize(wxSizeEvent& evt)
+{
+	auto size = evt.GetSize();
+	adjustSize(size.GetX());
+	evt.Skip();
+}
+
+
 } // namespace nutcracker
 
 

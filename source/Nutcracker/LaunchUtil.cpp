@@ -21,6 +21,7 @@ bool launch(bool debug)
 	});
 
 	gUIState->debugSession = gUIState->currentInterpreter->launch(vars, file->fullpath, debug);
+	fireAppEvent(AppEventID::DebugStarted);
 	return true;
 }
 

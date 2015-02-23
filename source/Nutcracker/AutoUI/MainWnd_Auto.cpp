@@ -16,6 +16,7 @@
 #include "../FileEditorGroupWnd.h"
 #include "wx/imaglist.h"
 #include "../BreakpointsWnd.h"
+#include "../CallstackWnd.h"
 ////@end includes
 
 #include "MainWnd_Auto.h"
@@ -161,6 +162,10 @@ void MainWnd_Auto::CreateControls()
 	nutcracker::BreakpointsWnd* itemPanel19 = new nutcracker::BreakpointsWnd( itemAuiNotebook15, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
 
 	itemAuiNotebook15->AddPage(itemPanel19, _("Breakpoints"), false);
+
+	nutcracker::CallstackWnd* itemPanel20 = new nutcracker::CallstackWnd( itemAuiNotebook15, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+
+	itemAuiNotebook15->AddPage(itemPanel20, _("Callstack"), false);
 
 	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook15, wxAuiPaneInfo()
 		.Name(wxT("Pane3")).Caption(_("Output")).Bottom().MinSize(wxSize(80, 80)).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));

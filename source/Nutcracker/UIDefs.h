@@ -47,7 +47,7 @@ namespace nutcracker
 		bool view_EOL = false;
 		std::vector<std::unique_ptr<Interpreter>> interpreters;
 		Interpreter* currentInterpreter=nullptr;
-		std::unique_ptr<DebugSession> debugSession;
+		std::shared_ptr<DebugSession> debugSession;
 	};
 
 	extern std::unique_ptr<UIState> gUIState;

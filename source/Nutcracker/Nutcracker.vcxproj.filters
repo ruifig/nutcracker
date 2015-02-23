@@ -93,7 +93,10 @@
     <ClCompile Include="BreakpointsWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Locator.cpp">
+    <ClCompile Include="AutoUI\CallstackWnd_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="CallstackWnd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -173,7 +176,10 @@
     <ClInclude Include="BreakpointsWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Locator.h">
+    <ClInclude Include="AutoUI\CallstackWnd_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="CallstackWnd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,7 +2,8 @@
 #include "Interpreter.h"
 #include "Messenger.h"
 #include "Workspace.h"
-
+#include "AppEvents.h" 
+#include "NutcrackerApp.h"
 
 namespace nutcracker
 {
@@ -87,7 +88,6 @@ void DebugSession::processIncoming()
 		return;
 	}
 
-
 	/*
 	{
 		FILE* fp = fopen("doc.txt", "w+");
@@ -97,7 +97,6 @@ void DebugSession::processIncoming()
 	}
 	*/
 
-
 	auto brk = doc.FirstChildElement("break");
 	if (!brk)
 	{
@@ -105,22 +104,22 @@ void DebugSession::processIncoming()
 		return;
 	}
 
-	BreakInfo info;
-	CZ_CHECK(brk->QueryAttribute("line", &info.line)==tinyxml2::XML_SUCCESS);
-	info.file = gWorkspace->files.createFile( getString(brk, "src"));
+	auto info = std::make_shared<BreakInfo>();
+	CZ_CHECK(brk->QueryAttribute("line", &info->line)==tinyxml2::XML_SUCCESS);
+	info->file = gWorkspace->files.createFile( getString(brk, "src"));
 	auto type = brk->Attribute("type");
 	CZ_CHECK(type);
 	if (strcmp(type, "step") == 0)
-		info.type = BreakType::Step;
+		info->type = BreakType::Step;
 	else if (strcmp(type, "breakpoint") == 0)
-		info.type = BreakType::Breakpoint;
+		info->type = BreakType::Breakpoint;
 	else if (strcmp(type, "error") == 0)
-		info.type = BreakType::Error;
+		info->type = BreakType::Error;
 	else
 	{
 		CZ_UNEXPECTED();
 	}
-	info.error = getString(brk, "error", "");
+	info->error = getString(brk, "error", "");
 
 	// objs node
 	if (auto objs = brk->FirstChildElement("objs"))
@@ -128,7 +127,7 @@ void DebugSession::processIncoming()
 		auto entry = objs->FirstChildElement("o");
 		while (entry)
 		{
-			processObjElement(entry, info);
+			processObjElement(entry, *info);
 			entry = entry->NextSiblingElement("o");
 		}
 	}
@@ -139,12 +138,18 @@ void DebugSession::processIncoming()
 		auto entry = calls->FirstChildElement("call");
 		while (entry)
 		{
-			processCallElement(entry, info);
+			processCallElement(entry, *info);
 			entry = entry->NextSiblingElement("call");
 		}
 	}
 	
-	breakListeners.fire(info);
+	// Keep a pointer to this session
+	auto this_ = shared_from_this();
+	postAppLambdaEvent([info, this_]
+	{
+		this_->breakListeners.fire(*info);
+	});
+
 }
 
 std::shared_ptr<ValueBase> DebugSession::processValue(tinyxml2::XMLElement* ele, BreakInfo& info, const char* attrType, const char* attrVal)
@@ -294,9 +299,9 @@ bool Interpreter::hasDebugger()
 	return m_hasDebugger;
 }
 
-std::unique_ptr<DebugSession> Interpreter::launch(const Variables& variables, const UTF8String& file, bool debug)
+std::shared_ptr<DebugSession> Interpreter::launch(const Variables& variables, const UTF8String& file, bool debug)
 {
-	auto session = std::make_unique<DebugSession>();
+	auto session = std::make_shared<DebugSession>();
 
 	auto cwd = wxGetCwd();
 	auto cmd = variables.replace(debug ? m_launchDebug : m_launchNormal);

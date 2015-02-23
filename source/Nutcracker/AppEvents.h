@@ -11,7 +11,8 @@ enum class AppEventID
 	AddedFolder,
 	NewWorkspace,
 	FileSaved,
-	ViewOptionsChanged
+	ViewOptionsChanged,
+	DebugStarted,
 };
 
 struct AppEvent
