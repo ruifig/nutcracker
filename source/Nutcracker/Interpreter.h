@@ -264,7 +264,7 @@ struct BreakInfo
 	int customObjKeyCounter = -1;
 };
 
-class DebugSession
+class DebugSession : public std::enable_shared_from_this<DebugSession>
 {
 public:
 	DebugSession();
@@ -294,7 +294,7 @@ public:
 	Interpreter();
 	virtual ~Interpreter();
 	bool hasDebugger();
-	std::unique_ptr<DebugSession> launch(const Variables& variables, const UTF8String& file, bool debug);
+	std::shared_ptr<DebugSession> launch(const Variables& variables, const UTF8String& file, bool debug);
 	const UTF8String& getName();
 
 	static std::vector<std::unique_ptr<Interpreter>> initAll(const UTF8String& folder);

@@ -34,7 +34,7 @@ IMPLEMENT_DYNAMIC_CLASS( BreakpointsWnd_Auto, wxPanel )
 BEGIN_EVENT_TABLE( BreakpointsWnd_Auto, wxPanel )
 
 ////@begin BreakpointsWnd_Auto event table entries
-	EVT_BUTTON( ID_BUTTON, BreakpointsWnd_Auto::OnToggleBreakpointsClick )
+	EVT_SIZE( BreakpointsWnd_Auto::OnSize )
 	EVT_GRID_CELL_LEFT_CLICK( BreakpointsWnd_Auto::OnCellClick )
 	EVT_GRID_CELL_LEFT_DCLICK( BreakpointsWnd_Auto::OnCellDClick )
 	EVT_GRID_CELL_CHANGED( BreakpointsWnd_Auto::OnCellChanged )
@@ -109,12 +109,6 @@ void BreakpointsWnd_Auto::CreateControls()
 
 	wxBoxSizer* itemBoxSizer2 = new wxBoxSizer(wxVERTICAL);
 	itemPanel1->SetSizer(itemBoxSizer2);
-
-	wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-	itemBoxSizer2->Add(itemBoxSizer3, 0, wxALIGN_LEFT|wxALL, 0);
-
-	wxButton* itemButton4 = new wxButton( itemPanel1, ID_BUTTON, _("Button"), wxDefaultPosition, wxDefaultSize, 0 );
-	itemBoxSizer3->Add(itemButton4, 0, wxALIGN_CENTER_VERTICAL|wxALL, 0);
 
 	m_grid = new wxGrid( itemPanel1, ID_GRID, wxDefaultPosition, wxSize(200, 150), wxHSCROLL|wxVSCROLL );
 	m_grid->SetDefaultColSize(50);
@@ -204,14 +198,14 @@ void BreakpointsWnd_Auto::OnCellChanged( wxGridEvent& event )
 
 
 /*
- * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BUTTON
+ * wxEVT_SIZE event handler for ID_BREAKPOINTSWND_AUTO
  */
 
-void BreakpointsWnd_Auto::OnToggleBreakpointsClick( wxCommandEvent& event )
+void BreakpointsWnd_Auto::OnSize( wxSizeEvent& event )
 {
-////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BUTTON in BreakpointsWnd_Auto.
+////@begin wxEVT_SIZE event handler for ID_BREAKPOINTSWND_AUTO in BreakpointsWnd_Auto.
 	// Before editing this code, remove the block markers.
 	event.Skip();
-////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BUTTON in BreakpointsWnd_Auto. 
+////@end wxEVT_SIZE event handler for ID_BREAKPOINTSWND_AUTO in BreakpointsWnd_Auto. 
 }
 

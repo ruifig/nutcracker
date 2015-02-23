@@ -70,8 +70,8 @@ public:
 
 ////@begin BreakpointsWnd_Auto event handler declarations
 
-	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BUTTON
-	virtual void OnToggleBreakpointsClick( wxCommandEvent& event );
+	/// wxEVT_SIZE event handler for ID_BREAKPOINTSWND_AUTO
+	virtual void OnSize( wxSizeEvent& event );
 
 	/// wxEVT_GRID_CELL_LEFT_CLICK event handler for ID_GRID
 	virtual void OnCellClick( wxGridEvent& event );
@@ -101,7 +101,6 @@ public:
 	/// Control identifiers
 	enum {
 		ID_BREAKPOINTSWND_AUTO = 10000,
-		ID_BUTTON = 10001,
 		ID_GRID = 10002
 	};
 ////@end BreakpointsWnd_Auto member variables

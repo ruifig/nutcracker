@@ -127,7 +127,8 @@ public:
 		ID_AUINOTEBOOK = 10005,
 		ID_PANEL = 10006,
 		ID_TEXTCTRL = 10007,
-		ID_PANEL1 = 10001
+		ID_PANEL1 = 10001,
+		ID_PANEL2 = 10012
 	};
 ////@end MainWnd_Auto member variables
 };

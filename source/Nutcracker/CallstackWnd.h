@@ -8,30 +8,36 @@
 *********************************************************************/
 #pragma once
 
-#include "AutoUI/BreakpointsWnd_Auto.h"
+#include "AutoUI/CallstackWnd_Auto.h"
+#include "Interpreter.h"
+#include "AppEvents.h"
 
 namespace nutcracker
 {
 
-class BreakpointsWnd : public BreakpointsWnd_Auto, public AppEventListener
+class CallstackWnd : public CallstackWnd_Auto, public AppEventListener
 {
 public:
-	BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
-	virtual ~BreakpointsWnd();
-
-	void updateState();
+	CallstackWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
+	virtual ~CallstackWnd();
+	
 private:
-
 	DECLARE_EVENT_TABLE()
+
+	// CallstackWnd_Auto
 	virtual void OnCellChanged( wxGridEvent& evt ) override;
 	virtual void OnCellClick( wxGridEvent& evt ) override;
 	virtual void OnCellDClick( wxGridEvent& evt ) override;
-	virtual void OnSize(wxSizeEvent& event) override;
+	virtual void OnSize(wxSizeEvent& evt) override;
 	void OnShow(wxShowEvent& evt);
 
+	// AppEventListener
 	virtual void onAppEvent(const AppEvent& evt) override;
 
+	void updateState();
 	void adjustSize(int width);
+
+	std::vector<CallstackEntry> m_callstack;
 	int m_infoColMinSize = 0;
 };
 
