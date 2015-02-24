@@ -225,13 +225,13 @@ void DebugSession::processObjElement(tinyxml2::XMLElement* ele, BreakInfo& info)
 	CZ_ASSERT_F(obj->isTable(), "'obj' element needs to some kind of table.");
 	auto tbl = std::static_pointer_cast<ValueBaseTable>(obj);
 
-
 	auto x = ele->FirstChildElement("e");
 	while (x)
 	{
 		TableEntry e;
 		e.key = processValue(x, info, "kt", "kv");
 		e.val = processValue(x, info, "vt", "v");
+		e.outer = tbl.get();
 		tbl->entries.push_back(std::move(e));
 		x = x->NextSiblingElement("e");
 	}
@@ -248,8 +248,8 @@ void DebugSession::processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info
 	auto l = ele->FirstChildElement("l");
 	while (l)
 	{
-		Variable v;
-		v.name = getString(l, "name");
+		TableEntry v;
+		v.key = std::make_shared<ValueString>(getString(l, "name"));
 		v.val = processValue(l, info, "type", "val");
 		e.vars.push_back(std::move(v));
 		l = l->NextSiblingElement("l");
@@ -258,30 +258,86 @@ void DebugSession::processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info
 	info.callstack.push_back(std::move(e));
 }
 
+struct TypeInfo 
+{
+	const char* dbg;
+	VarType type;
+	const char* name;
+};
+
+static TypeInfo typeInfo[(unsigned int)VarType::MAX] = {
+	{ "n", VarType::Null, "null" },
+	{ "r", VarType::Root, "root" },
+	{ "s", VarType::String, "string" },
+	{ "i", VarType::Integer, "integer" },
+	{ "f", VarType::Float, "float" },
+	{ "u", VarType::UserData, "userdata" },
+	{ "fn", VarType::Function, "function" },
+	{ "t", VarType::Table, "table" },
+	{ "a", VarType::Array, "array" },
+	{ "g", VarType::Generator, "generator" },
+	{ "h", VarType::Thread, "thread" },
+	{ "x", VarType::Instance, "instance" },
+	{ "y", VarType::Class, "class" },
+	{ "b", VarType::Bool, "bool" },
+	{ "w", VarType::WeakRef, "weakref" } };
+
 VarType stringToObjectType(const char* str)
 {
-	static std::pair<const char*, VarType> data[(unsigned int)VarType::MAX] = {
-		{ "n", VarType::Null },
-		{ "s", VarType::String },
-		{ "i", VarType::Integer },
-		{ "f", VarType::Float },
-		{ "u", VarType::UserData },
-		{ "fn",VarType::Function},
-		{ "t", VarType::Table },
-		{ "a", VarType::Array },
-		{ "g", VarType::Generator },
-		{ "h", VarType::Thread },
-		{ "x", VarType::Instance },
-		{ "y", VarType::Class },
-		{ "b", VarType::Bool },
-		{ "w", VarType::WeakRef } };
-
-	for (const auto& i : data)
-		if (strcmp(str, i.first) == 0)
-			return i.second;
+	for (const auto& i : typeInfo)
+		if (strcmp(str, i.dbg) == 0)
+			return i.type;
 	CZ_ASSERT_F(0, "Unknown object type '%s'", str);
 	return VarType::Null;
 };
+
+const char* typeToString(VarType type)
+{
+	for (const auto& i : typeInfo)
+	{
+		if (i.type == type)
+			return i.name;
+	}
+
+	CZ_ASSERT_F(0, "Unknown name for type '%d'", (int)type);
+	return "null";
+}
+
+std::string TableEntry::getName() const
+{
+	if (outer == nullptr || outer->type == VarType::Root || outer->type == VarType::Instance ||
+		outer->type == VarType::Class)
+		return key->txt;
+
+
+	if (key->type == VarType::String)
+		return cz::formatString("[\"%s\"]", key->txt.c_str());
+	else
+		return cz::formatString("[%s]", key->txt.c_str());
+}
+
+std::string TableEntry::getValue() const
+{
+	if (val->type == VarType::String)
+		return cz::formatString("\"%s\"", val->txt.c_str());
+	else if (val->type == VarType::Integer || val->type == VarType::Float)
+		return val->txt;
+	else
+		return "";
+}
+
+std::string TableEntry::getType() const
+{
+	if (val->type == VarType::Array || val->type == VarType::Table)
+	{
+		return cz::formatString("%s[%d]", typeToString(val->type),
+			(int)std::static_pointer_cast<ValueBaseTable>(val)->entries.size());
+	}
+	else
+	{
+		return typeToString(val->type);
+	}
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Interpreter

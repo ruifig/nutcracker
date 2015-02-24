@@ -71,6 +71,8 @@ static wxIconBundle gAppIcons;
 MainWnd::MainWnd()
 	: MainWnd_Auto((wxFrame*)nullptr, wxID_ANY, "Nutcracker IDE", wxDefaultPosition, wxSize(1024,768))
 {
+	gMainWnd = this;
+
 	{
 		wxIcon iconSmall;
 		iconSmall.CopyFromBitmap(gImageListSmall.GetBitmap(SMALLIMG_IDX_NUT));

@@ -107,7 +107,7 @@ struct ValueString : public ValueBase
 {
 	ValueString(const char* str) : ValueBase(VarType::String)
 	{
-		txt = std::string("\"") + str + "\"";
+		txt = str;
 	}
 };
 
@@ -147,6 +147,11 @@ struct TableEntry
 {
 	std::shared_ptr<ValueBase> key;
 	std::shared_ptr<ValueBase> val;
+	struct ValueBaseTable* outer=nullptr;
+
+	std::string getName() const;
+	std::string getValue() const;
+	std::string getType() const;
 };
 
 struct ValueBaseTable : public ValueBase
@@ -234,7 +239,6 @@ struct ValueWeakRef : public ValueBase
 	}
 };
 
-
 struct Variable
 {
 	std::string name;
@@ -246,9 +250,8 @@ struct CallstackEntry
 	std::string func;
 	std::shared_ptr<File> file;
 	int line;
-	std::vector<Variable> vars;
+	std::vector<TableEntry> vars;
 };
-
 
 struct BreakInfo
 {
@@ -258,6 +261,8 @@ struct BreakInfo
 	std::string error;
 
 	std::map<int, std::shared_ptr<ValueBase>> objs;
+
+	int currentCallstackFrame = 0;
 	std::vector<CallstackEntry> callstack;
 	int customObjKeyCounter = -1;
 };
@@ -271,7 +276,7 @@ public:
 	// If port is 0, it will not use a debugger;
 	bool start(const std::string& ip, int port);
 
-	Listeners < std::function<void(const std::shared_ptr<const BreakInfo>&)>> breakListeners;
+	Listeners < std::function<void(const std::shared_ptr<BreakInfo>&)>> breakListeners;
 
 	void removeListener(void* listener)
 	{
