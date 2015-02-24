@@ -11,6 +11,7 @@
 #include "BaseWatchesWnd.h"
 #include "AppEvents.h"
 #include "Interpreter.h"
+#include "TreeListCtrlUtilCode.h"
 
 namespace nutcracker
 {
@@ -33,9 +34,10 @@ private:
 
 	void updateState();
 	void adjustSize(int width);
+	void LocalsWnd::addVar(const std::shared_ptr<TreeCtrlUtil::TreeListCtrlItemData>& parentItem, const TableEntry& entry, int& idcounter);
 
 	std::shared_ptr<const BreakInfo> m_info;
-	
+	TreeCtrlUtil::TreeListCtrlData m_treeData;
 };
 
 } // namespace nutcracker

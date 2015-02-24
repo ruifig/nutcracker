@@ -38,7 +38,7 @@ void CallstackWnd::onAppEvent(const AppEvent& evt)
 	{
 		case AppEventID::DebugStarted:
 			gUIState->debugSession->breakListeners.add(
-				this, [&](const std::shared_ptr<const BreakInfo>& info)
+				this, [&](const std::shared_ptr<BreakInfo>& info)
 			{
 				m_info = info;
 				if (IsShownOnScreen())
@@ -106,14 +106,18 @@ void CallstackWnd::OnCellDClick(wxGridEvent& evt)
 	int r = evt.GetRow();
 	int c = evt.GetCol();
 
-	auto& entry = m_info->callstack[r];
+	m_info->currentCallstackFrame = r;
+	auto& entry = m_info->callstack[m_info->currentCallstackFrame];
 	gFileEditorGroupWnd->gotoFile(entry.file, entry.line-1);
+	fireAppEvent(AppEventID::CallstackFrameChanged);
 	evt.Skip();
 }
 
 void CallstackWnd::OnShow(wxShowEvent& evt)
 {
-	updateState();
+	if (evt.IsShown())
+		updateState();
+	evt.Skip();
 }
 
 void CallstackWnd::OnSize(wxSizeEvent& evt)

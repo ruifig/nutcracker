@@ -17,79 +17,32 @@ namespace TreeCtrlUtil
 {
 
 //////////////////////////////////////////////////////////////////////////
-//		TreeItemID
+//		TreeCtrlItemData
 //////////////////////////////////////////////////////////////////////////
 
-
-TreeItemID::TreeItemID(cz::u32 type_, cz::u32 id0, cz::u32 id1, cz::u32 id2, cz::u32 id3)
-		: itemtype(type_)
+class TreeCtrlItemData  : public TreeItemData
 {
-	id[0] = id0;
-	id[1] = id1;
-	id[2] = id2;
-	id[3] = id3;
-}
+public:
+	explicit TreeCtrlItemData(wxTreeCtrl* parent, const TreeItemID id_ = TreeItemID());
+	virtual ~TreeCtrlItemData();
 
-bool TreeItemID::operator<(const TreeItemID& other) const
-{
-	if (itemtype<other.itemtype)
-		return true;
-	if (other.itemtype<itemtype)
-		return false;
+protected:
+	friend class TreeCtrlData;
+	virtual void _retrieveLayout() override;
+	wxTreeItemId m_wxTreeItemId;
+	wxTreeCtrl* m_ctrl;
+};
 
-	for(int i=0; i<3; i++)
-	{
-		if (id[i]<other.id[i])
-			return true;
-		if (other.id[i]<id[i])
-			return false;
-	}
 
-	if (id[3]<other.id[3])
-		return true;
-	return false;
-}
-
-bool TreeItemID::isValid() const
-{
-	if (itemtype!=0)
-		return true;
-
-	for(auto &i : id)
-		if (i!=0)
-			return true;
-
-	return false;
-}
-
-bool TreeItemID::operator==(const TreeItemID& other) const
-{
-	return memcmp(this, &other, sizeof(*this))==0;
-}
-
-//////////////////////////////////////////////////////////////////////////
-//		TreeItemData
-//////////////////////////////////////////////////////////////////////////
-
-TreeItemData::TreeItemData(wxTreeCtrl* parent, const TreeItemID id_) : m_ctrl(parent), m_id(id_)
+TreeCtrlItemData::TreeCtrlItemData(wxTreeCtrl* parent, const TreeItemID id_) : TreeItemData(id_), m_ctrl(parent)
 {
 }
 
-TreeItemData::~TreeItemData()
+TreeCtrlItemData::~TreeCtrlItemData()
 {
 }
 
-const wxTreeItemId& TreeItemData::getWxTreeItemId()
-{
-	return m_wxTreeItemId;
-}
-
-const TreeItemID& TreeItemData::getItemId() const
-{
-	return m_id;
-}
-
-void TreeItemData::retrieveLayout()
+void TreeCtrlItemData::_retrieveLayout()
 {
 	if ( m_ctrl->GetWindowStyleFlag()&wxTR_HIDE_ROOT &&
 		 m_ctrl->GetRootItem()==m_wxTreeItemId)
@@ -109,33 +62,6 @@ void TreeItemData::retrieveLayout()
 	}
 }
 
-const std::shared_ptr<TreeItemCustomData>& TreeItemData::getCustomData()
-{
-	return m_customdata;
-}
-
-void TreeItemData::setCustomData(const std::shared_ptr<TreeItemCustomData>& customdata)
-{
-	m_customdata = customdata;
-}
-
-void TreeItemData::setImage(int image, wxTreeItemIcon which)
-{
-	m_ctrl->SetItemImage(m_wxTreeItemId, image, which);
-}
-
-void TreeItemData::expand()
-{
-	m_ctrl->Expand(m_wxTreeItemId);
-}
-
-void TreeItemData::setName(const wxString& name)
-{
-	m_ctrl->SetItemText(m_wxTreeItemId, name);
-}
-
-
-
 //////////////////////////////////////////////////////////////////////////
 //		TreeCtrlData
 //////////////////////////////////////////////////////////////////////////
@@ -153,7 +79,7 @@ const std::shared_ptr<TreeItemData>& TreeCtrlData::get(const TreeItemID& id)
 {
 	auto& data = m_layout[id];
 	if (!data)
-		data = std::make_shared<TreeItemData>(m_ctrl, id);
+		data = std::make_shared<TreeCtrlItemData>(m_ctrl, id);
 
 	//
 	// This little bit, allows us to keep a record of what items we touched
@@ -198,7 +124,7 @@ void TreeCtrlData::clear()
 void TreeCtrlData::retrieveLayout()
 {
 	for(auto& i : m_layout)
-		i.second->retrieveLayout();
+		i.second->_retrieveLayout();
 
 	m_firstVisibleId = TreeItemID();
 	m_firstWxVisibleId = wxTreeItemId();
@@ -217,25 +143,6 @@ void TreeCtrlData::startRefresh()
 	m_ctrl->AddRoot("Root");
 	m_layoutprune = true;
 	m_selectedId = wxTreeItemId();
-
-
-
-	/*
-	m_ctrl->GetScrollHelper()->GetScrollPixelsPerUnit(&m_scrollpos.xpixunit, &m_scrollpos.ypixunit);
-	m_ctrl->GetScrollHelper()->GetViewStart(&m_scrollpos.xview, &m_scrollpos.yview);
-	m_ctrl->GetSize(&m_scrollpos.xsize, &m_scrollpos.ysize);
-	m_ctrl->GetVirtualSize(&m_scrollpos.vxsize, &m_scrollpos.vysize);
-
-	m_scrollpos.thumbsize = (int)(m_scrollpos.ysize / m_scrollpos.ypixunit);
-	m_scrollpos.totalsize = (int)(m_scrollpos.vysize / m_scrollpos.ypixunit);
-	m_scrollpos.maxy = m_scrollpos.totalsize - m_scrollpos.thumbsize;
-
-	m_scrollpos.newy = m_scrollpos.yview;
-
-	if (m_scrollpos.newy<0) m_scrollpos.newy = 0;
-	else if (m_scrollpos.newy>m_scrollpos.maxy) m_scrollpos.newy = m_scrollpos.maxy;
-	*/
-
 }
 
 void TreeCtrlData::endRefresh()
@@ -255,7 +162,6 @@ void TreeCtrlData::endRefresh()
 	m_layout = m_templayout;
 	m_layoutprune = false;
 
-	//m_ctrl->GetScrollHelper()->SetScrollbars(m_scrollpos.xpixunit, m_scrollpos.ypixunit, (m_scrollpos.vxsize / m_scrollpos.xpixunit), (m_scrollpos.vysize / m_scrollpos.ypixunit), m_scrollpos.xview, m_scrollpos.newy);
 	if (m_firstWxVisibleId.IsOk())
 		m_ctrl->EnsureVisible(m_firstWxVisibleId);
 
@@ -265,7 +171,7 @@ void TreeCtrlData::endRefresh()
 std::shared_ptr<TreeItemData> TreeCtrlData::setupRoot(const TreeItemID& id, int image)
 {
 	auto rootid = m_ctrl->GetRootItem();
-	auto data = get(id);
+	auto data = std::static_pointer_cast<TreeCtrlItemData>(get(id));
 	data->m_wxTreeItemId = rootid;
 	m_ctrl->SetItemData(rootid, new TreeItemBase(data));
 	m_ctrl->SetItemImage(rootid, image);
@@ -274,8 +180,8 @@ std::shared_ptr<TreeItemData> TreeCtrlData::setupRoot(const TreeItemID& id, int 
 
 std::shared_ptr<TreeItemData> TreeCtrlData::addItem(const std::shared_ptr<TreeItemData>& parentItem, const TreeItemID& id, const cz::UTF8String& text, int image)
 {
-	auto wxid = m_ctrl->AppendItem(parentItem->m_wxTreeItemId, text.widen(), image);
-	auto data = get(id);
+	auto wxid = m_ctrl->AppendItem(std::static_pointer_cast<TreeCtrlItemData>(parentItem)->m_wxTreeItemId, text.widen(), image);
+	auto data = std::static_pointer_cast<TreeCtrlItemData>(get(id));
 	data->m_wxTreeItemId = wxid;
 	m_ctrl->SetItemData(wxid, new TreeItemBase(data));
 	if (data->m_expanded)

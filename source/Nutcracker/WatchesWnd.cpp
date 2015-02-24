@@ -52,7 +52,9 @@ void WatchesWnd::adjustSize(int width)
 
 void WatchesWnd::OnShow(wxShowEvent& evt)
 {
-	updateState();
+	if (evt.IsShown())
+		updateState();
+	evt.Skip();
 }
 
 void WatchesWnd::OnSize(wxSizeEvent& evt)

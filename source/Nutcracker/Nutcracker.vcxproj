@@ -95,6 +95,7 @@
     <ClCompile Include="AutoUI\MainWnd_Auto.cpp" />
     <ClCompile Include="AppEvents.cpp" />
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
+    <ClCompile Include="BaseTreeUtilCode.cpp" />
     <ClCompile Include="BaseWatchesWnd.cpp" />
     <ClCompile Include="Breakpoints.cpp" />
     <ClCompile Include="BreakpointsWnd.cpp" />
@@ -114,6 +115,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TreeCtrlUtilCode.cpp" />
+    <ClCompile Include="TreeListCtrlUtilCode.cpp" />
     <ClCompile Include="UIDefs.cpp" />
     <ClCompile Include="WatchesWnd.cpp" />
     <ClCompile Include="Workspace.cpp" />
@@ -128,6 +130,7 @@
     <ClInclude Include="AutoUI\MainWnd_Auto.h" />
     <ClInclude Include="AppEvents.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
+    <ClInclude Include="BaseTreeUtilCode.h" />
     <ClInclude Include="BaseWatchesWnd.h" />
     <ClInclude Include="Breakpoints.h" />
     <ClInclude Include="BreakpointsWnd.h" />
@@ -146,6 +149,7 @@
     <ClInclude Include="NutcrackerPCH.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TreeCtrlUtilCode.h" />
+    <ClInclude Include="TreeListCtrlUtilCode.h" />
     <ClInclude Include="UIDefs.h" />
     <ClInclude Include="WatchesWnd.h" />
     <ClInclude Include="Workspace.h" />
