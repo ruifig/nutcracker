@@ -55,6 +55,14 @@ bool DebugSession::start(const std::string& ip, int port)
 		m_messenger->send("aw:1:unusedFunctionVariable\n");
 		m_messenger->send("aw:2:someArray\n");
 		m_messenger->send("aw:3:someClass\n");
+
+		// Setup breakpoints
+		gWorkspace->breakpoints.iterate([&](Breakpoint& brk)
+		{
+			//m_messenger->send(cz::formatString("ab:%d:%s\n", brk.line+1, cz::ansiToLower(brk.file->fullpath).c_str()));
+			m_messenger->send(cz::formatString("ab:%d:%s\n", brk.line+1, brk.file->fullpath.c_str()));
+		});
+
 		m_messenger->send("rd\n");
 	}
 
@@ -73,6 +81,63 @@ const char* getString(tinyxml2::XMLElement* ele, const char* name, const char* d
 		CZ_UNEXPECTED();
 		return "";
 	}
+}
+
+void DebugSession::processMsgResumed(tinyxml2::XMLElement* xml)
+{
+}
+
+void DebugSession::processMsgAddBreakpoint(tinyxml2::XMLElement* xml)
+{
+}
+
+void DebugSession::processMsgBreak(tinyxml2::XMLElement* xml)
+{
+	auto info = std::make_shared<BreakInfo>();
+	CZ_CHECK(xml->QueryAttribute("line", &info->line)==tinyxml2::XML_SUCCESS);
+	info->file = gWorkspace->files.createFile( getString(xml, "src"));
+	auto type = xml->Attribute("type");
+	CZ_CHECK(type);
+	if (strcmp(type, "step") == 0)
+		info->type = BreakType::Step;
+	else if (strcmp(type, "breakpoint") == 0)
+		info->type = BreakType::Breakpoint;
+	else if (strcmp(type, "error") == 0)
+		info->type = BreakType::Error;
+	else
+	{
+		CZ_UNEXPECTED();
+	}
+	info->error = getString(xml, "error", "");
+
+	// objs node
+	if (auto objs = xml->FirstChildElement("objs"))
+	{
+		auto entry = objs->FirstChildElement("o");
+		while (entry)
+		{
+			processObjElement(entry, *info);
+			entry = entry->NextSiblingElement("o");
+		}
+	}
+
+	// calls node
+	if (auto calls = xml->FirstChildElement("calls"))
+	{
+		auto entry = calls->FirstChildElement("call");
+		while (entry)
+		{
+			processCallElement(entry, *info);
+			entry = entry->NextSiblingElement("call");
+		}
+	}
+	
+	// Keep a pointer to this session
+	auto this_ = shared_from_this();
+	postAppLambdaEvent([info, this_]
+	{
+		this_->breakListeners.fire(info);
+	});
 }
 
 void DebugSession::processIncoming()
@@ -97,59 +162,17 @@ void DebugSession::processIncoming()
 	}
 	*/
 
-	auto brk = doc.FirstChildElement("break");
-	if (!brk)
-	{
-		czDebug(ID_Log, "Received xml message does not have the 'break' node");
-		return;
-	}
-
-	auto info = std::make_shared<BreakInfo>();
-	CZ_CHECK(brk->QueryAttribute("line", &info->line)==tinyxml2::XML_SUCCESS);
-	info->file = gWorkspace->files.createFile( getString(brk, "src"));
-	auto type = brk->Attribute("type");
-	CZ_CHECK(type);
-	if (strcmp(type, "step") == 0)
-		info->type = BreakType::Step;
-	else if (strcmp(type, "breakpoint") == 0)
-		info->type = BreakType::Breakpoint;
-	else if (strcmp(type, "error") == 0)
-		info->type = BreakType::Error;
+	auto xml = doc.FirstChildElement();
+	if (strcmp(xml->Name(), "resumed") == 0)
+		processMsgResumed(xml);
+	else if (strcmp(xml->Name(), "addbreakpoint") == 0)
+		processMsgAddBreakpoint(xml);
+	else if (strcmp(xml->Name(), "break") == 0)
+		processMsgBreak(xml);
 	else
 	{
-		CZ_UNEXPECTED();
+		czDebug(ID_Log, "Unknown received xml message '%s'", xml->Name());
 	}
-	info->error = getString(brk, "error", "");
-
-	// objs node
-	if (auto objs = brk->FirstChildElement("objs"))
-	{
-		auto entry = objs->FirstChildElement("o");
-		while (entry)
-		{
-			processObjElement(entry, *info);
-			entry = entry->NextSiblingElement("o");
-		}
-	}
-
-	// calls node
-	if (auto calls = brk->FirstChildElement("calls"))
-	{
-		auto entry = calls->FirstChildElement("call");
-		while (entry)
-		{
-			processCallElement(entry, *info);
-			entry = entry->NextSiblingElement("call");
-		}
-	}
-	
-	// Keep a pointer to this session
-	auto this_ = shared_from_this();
-	postAppLambdaEvent([info, this_]
-	{
-		this_->breakListeners.fire(info);
-	});
-
 }
 
 std::shared_ptr<ValueBase> DebugSession::processValue(tinyxml2::XMLElement* ele, BreakInfo& info, const char* attrType, const char* attrVal)

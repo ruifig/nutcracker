@@ -285,6 +285,9 @@ public:
 
 private:
 	void processIncoming();
+	void processMsgResumed(tinyxml2::XMLElement* xml);
+	void processMsgAddBreakpoint(tinyxml2::XMLElement* xml);
+	void processMsgBreak(tinyxml2::XMLElement* xml);
 	void processObjElement(tinyxml2::XMLElement* ele, BreakInfo& info);
 	void processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info);
 	std::shared_ptr<ValueBase> processValue(tinyxml2::XMLElement* ele, BreakInfo& info, const char* attrType, const char* attrVal=nullptr);
