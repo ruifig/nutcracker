@@ -27,4 +27,4 @@ Planned features:
 
 # How it looks like at the moment (Work in progress) #
 
-![screenshot2.png](https://bitbucket.org/repo/jnoqe9/images/2044533431-screenshot2.png)
+![Screenshot3.png](https://bitbucket.org/repo/jnoqe9/images/3573107134-Screenshot3.png)
