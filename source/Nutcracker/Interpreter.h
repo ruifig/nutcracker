@@ -277,11 +277,20 @@ public:
 	bool start(const std::string& ip, int port);
 
 	Listeners < std::function<void(const std::shared_ptr<BreakInfo>&)>> breakListeners;
+	Listeners < std::function<void()> > disconnectListeners;
 
 	void removeListener(void* listener)
 	{
 		breakListeners.remove(listener);
+		disconnectListeners.remove(listener);
 	}
+
+	void stepInto();
+	void stepReturn();
+	void stepOver();
+	void resume();
+	void suspend();
+	void terminate();
 
 private:
 	void processIncoming();
@@ -292,6 +301,7 @@ private:
 	void processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info);
 	std::shared_ptr<ValueBase> processValue(tinyxml2::XMLElement* ele, BreakInfo& info, const char* attrType, const char* attrVal=nullptr);
 	std::unique_ptr<class Messenger> m_messenger;
+	bool m_paused=false;
 };
 
 class Interpreter

@@ -13,6 +13,7 @@ enum class AppEventID
 	FileSaved,
 	ViewOptionsChanged,
 	DebugStarted,
+	DebugStop,
 	CallstackFrameChanged
 };
 

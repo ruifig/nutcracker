@@ -282,6 +282,17 @@ void FileEditorWnd::syncBreakpoint(Breakpoint& brk)
 	}
 }
 
+void FileEditorWnd::syncBreakInfo(BreakInfo& brk)
+{
+	if (brk.file != m_file)
+		return;
+
+	m_textCtrl->MarkerDeleteAll(MARK_DEBUGCURSOR);
+	m_textCtrl->MarkerAdd(brk.line - 1, MARK_DEBUGCURSOR);
+	setFile(m_file, brk.line - 1, 0);
+}
+
+
 void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 {
 	switch(event.GetMargin())
@@ -722,6 +733,9 @@ void FileEditorWnd::onAppEvent(const AppEvent& evt)
 	{
 		case AppEventID::ViewOptionsChanged:
 			updateViewOptions();
+			break;
+		case AppEventID::DebugStop:
+			m_textCtrl->MarkerDeleteAll(MARK_DEBUGCURSOR);
 			break;
 		default:
 			break;

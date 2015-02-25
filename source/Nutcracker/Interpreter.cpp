@@ -51,6 +51,15 @@ bool DebugSession::start(const std::string& ip, int port)
 			return false;
 
 		m_messenger->setOnIncoming([this]{ processIncoming(); });
+
+		m_messenger->setOnDisconnected([this]{
+			auto this_ = shared_from_this();
+			postAppLambdaEvent([this_]
+			{
+				this_->disconnectListeners.fire();
+			});
+		});
+
 		m_messenger->send("aw:0:unusedGlobalVariable\n");
 		m_messenger->send("aw:1:unusedFunctionVariable\n");
 		m_messenger->send("aw:2:someArray\n");
@@ -59,14 +68,54 @@ bool DebugSession::start(const std::string& ip, int port)
 		// Setup breakpoints
 		gWorkspace->breakpoints.iterate([&](Breakpoint& brk)
 		{
-			//m_messenger->send(cz::formatString("ab:%d:%s\n", brk.line+1, cz::ansiToLower(brk.file->fullpath).c_str()));
-			m_messenger->send(cz::formatString("ab:%d:%s\n", brk.line+1, brk.file->fullpath.c_str()));
+			m_messenger->send(cz::formatString("ab:%x:%s\n", brk.line+1, brk.file->fullpath.c_str()));
 		});
 
 		m_messenger->send("rd\n");
 	}
 
+	m_paused = false;
 	return true;
+}
+
+void DebugSession::stepInto()
+{
+	if (!m_paused)
+		return;
+	m_messenger->send("si\n");
+}
+
+void DebugSession::stepReturn()
+{
+	if (!m_paused)
+		return;
+	m_messenger->send("sr\n");
+}
+
+void DebugSession::stepOver()
+{
+	if (!m_paused)
+		return;
+	m_messenger->send("so\n");
+}
+
+void DebugSession::resume()
+{
+	if (!m_paused)
+		return;
+	m_messenger->send("go\n");
+}
+
+void DebugSession::suspend()
+{
+	if (m_paused)
+		return;
+	m_messenger->send("sp\n");
+}
+
+void DebugSession::terminate()
+{
+	m_messenger->send("tr\n");
 }
 
 const char* getString(tinyxml2::XMLElement* ele, const char* name, const char* defValue=0)
@@ -93,6 +142,7 @@ void DebugSession::processMsgAddBreakpoint(tinyxml2::XMLElement* xml)
 
 void DebugSession::processMsgBreak(tinyxml2::XMLElement* xml)
 {
+	m_paused = true;
 	auto info = std::make_shared<BreakInfo>();
 	CZ_CHECK(xml->QueryAttribute("line", &info->line)==tinyxml2::XML_SUCCESS);
 	info->file = gWorkspace->files.createFile( getString(xml, "src"));

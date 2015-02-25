@@ -12,6 +12,7 @@
 #include "FileEditorGroupWnd.h"
 #include "FileEditorWnd.h"
 #include "WorkspaceWnd.h"
+#include "Interpreter.h"
 
 namespace nutcracker
 {
@@ -180,6 +181,16 @@ void FileEditorGroupWnd::onAppEvent(const AppEvent& evt)
 		case AppEventID::OpenWorkspace:
 		case AppEventID::NewWorkspace:
 			//cursorHistory_Clear();
+			break;
+
+		case AppEventID::DebugStarted:
+			gUIState->debugSession->breakListeners.add(
+				this, [&](const std::shared_ptr<BreakInfo>& info)
+			{
+				gotoFile(info->file);
+				auto fwnd = findFileWnd(info->file, nullptr);
+				fwnd->syncBreakInfo(*info);
+			});
 			break;
 	}
 }

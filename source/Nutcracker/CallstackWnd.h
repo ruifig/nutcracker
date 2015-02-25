@@ -36,6 +36,7 @@ private:
 
 	void updateState();
 	void adjustSize(int width);
+	void updateFrameMarker(int previous, int current);
 
 	std::shared_ptr<BreakInfo> m_info;
 	int m_infoColMinSize = 0;

@@ -11,6 +11,7 @@
 
 #include "AutoUI/FileEditorWnd_Auto.h"
 #include "AppEvents.h"
+#include "Interpreter.h"
 
 namespace nutcracker
 {
@@ -33,6 +34,7 @@ public:
 	std::pair<int, int> getCursorLocation();
 	bool markerToLine(int markerHandle, int& line);
 	void syncBreakpoint(Breakpoint& brk);
+	void syncBreakInfo(BreakInfo& brk);
 
 private:
 	DECLARE_EVENT_TABLE()

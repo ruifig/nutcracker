@@ -21,6 +21,12 @@ bool launch(bool debug)
 	});
 
 	gUIState->debugSession = gUIState->currentInterpreter->launch(vars, file->fullpath, debug);
+	gUIState->debugSession->disconnectListeners.add(gUIState->debugSession.get(), []()
+	{
+		gUIState->debugSession = nullptr;
+		fireAppEvent(AppEventID::DebugStop);
+	});
+
 	fireAppEvent(AppEventID::DebugStarted);
 	return true;
 }
