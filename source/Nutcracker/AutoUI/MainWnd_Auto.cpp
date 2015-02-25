@@ -150,9 +150,9 @@ void MainWnd_Auto::CreateControls()
 	itemFrame1->GetAuiManager().AddPane(itemWindow14, wxAuiPaneInfo()
 		.Name(wxT("Pane4")).Centre().MinSize(wxSize(100, -1)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
-	wxAuiNotebook* itemAuiNotebook15 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_DEFAULT_STYLE|wxAUI_NB_TOP );
+	wxAuiNotebook* itemAuiNotebook15 = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_BOTTOM|wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_TAB_EXTERNAL_MOVE|wxNO_BORDER );
 
-	wxPanel* itemPanel16 = new wxPanel( itemAuiNotebook15, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+	wxPanel* itemPanel16 = new wxPanel( itemAuiNotebook15, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 	wxBoxSizer* itemBoxSizer17 = new wxBoxSizer(wxVERTICAL);
 	itemPanel16->SetSizer(itemBoxSizer17);
 
@@ -161,24 +161,24 @@ void MainWnd_Auto::CreateControls()
 
 	itemAuiNotebook15->AddPage(itemPanel16, _("Log"), false);
 
-	nutcracker::BreakpointsWnd* itemPanel19 = new nutcracker::BreakpointsWnd( itemAuiNotebook15, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::BreakpointsWnd* itemPanel19 = new nutcracker::BreakpointsWnd( itemAuiNotebook15, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
 	itemAuiNotebook15->AddPage(itemPanel19, _("Breakpoints"), false);
 
-	nutcracker::CallstackWnd* itemPanel20 = new nutcracker::CallstackWnd( itemAuiNotebook15, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::CallstackWnd* itemPanel20 = new nutcracker::CallstackWnd( itemAuiNotebook15, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
 	itemAuiNotebook15->AddPage(itemPanel20, _("Callstack"), false);
 
-	nutcracker::LocalsWnd* itemPanel21 = new nutcracker::LocalsWnd( itemAuiNotebook15, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::LocalsWnd* itemPanel21 = new nutcracker::LocalsWnd( itemAuiNotebook15, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
 	itemAuiNotebook15->AddPage(itemPanel21, _("Locals"), false);
 
-	nutcracker::WatchesWnd* itemPanel22 = new nutcracker::WatchesWnd( itemAuiNotebook15, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::WatchesWnd* itemPanel22 = new nutcracker::WatchesWnd( itemAuiNotebook15, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
 	itemAuiNotebook15->AddPage(itemPanel22, _("Watches"), false);
 
 	itemFrame1->GetAuiManager().AddPane(itemAuiNotebook15, wxAuiPaneInfo()
-		.Name(wxT("Pane3")).Caption(_("Output")).Bottom().MinSize(wxSize(80, 80)).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));
+		.Name(wxT("Pane3")).Bottom().MinSize(wxSize(80, 80)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));
 
 	GetAuiManager().Update();
 

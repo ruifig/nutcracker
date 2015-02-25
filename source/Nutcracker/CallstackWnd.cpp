@@ -12,6 +12,7 @@
 #include "Interpreter.h"
 #include "Workspace.h"
 #include "FileEditorGroupWnd.h"
+#include "GridCellImageRenderer.h"
 
 namespace nutcracker
 {
@@ -44,6 +45,9 @@ void CallstackWnd::onAppEvent(const AppEvent& evt)
 				if (IsShownOnScreen())
 					updateState();
 			});
+			break;
+		case AppEventID::CallstackFrameChanged:
+			break;
 	};
 }
 
@@ -68,6 +72,9 @@ void CallstackWnd::updateState()
 		m_grid->SetReadOnly(r, 0, true);
 		m_grid->SetReadOnly(r, 1, true);
 
+		m_grid->SetCellRenderer(r, 0, new GridCellImageRenderer);
+		m_grid->SetCellAlignment(r, 0, wxALIGN_CENTER, wxALIGN_CENTER);
+
 		m_grid->SetCellValue(r, 1,
 			wxString::Format(wxT("%s!%s() line %d"), c.file->name.c_str(), c.func.c_str(), c.line));
 
@@ -78,6 +85,7 @@ void CallstackWnd::updateState()
 	m_infoColMinSize = m_grid->GetColSize(1);
 	adjustSize(this->GetSize().GetX());
 
+	updateFrameMarker(m_info->currentCallstackFrame, m_info->currentCallstackFrame);
 	m_grid->Thaw();
 }
 
@@ -101,11 +109,21 @@ void CallstackWnd::OnCellClick(wxGridEvent& evt)
 	evt.Skip();
 }
 
+
+void CallstackWnd::updateFrameMarker(int previous, int current)
+{
+	auto previousCell = static_cast<GridCellImageRenderer*>(m_grid->GetCellRenderer(previous, 0));
+	auto newCell = static_cast<GridCellImageRenderer*>(m_grid->GetCellRenderer(current,0));
+	previousCell->setImage(wxNullBitmap);
+	newCell->setImage(gImageListSmall.GetBitmap(SMALLIMG_IDX_CALLSTACK_CURRENT));
+}
+
 void CallstackWnd::OnCellDClick(wxGridEvent& evt)
 {
 	int r = evt.GetRow();
 	int c = evt.GetCol();
 
+	updateFrameMarker(m_info->currentCallstackFrame, r);
 	m_info->currentCallstackFrame = r;
 	auto& entry = m_info->callstack[m_info->currentCallstackFrame];
 	gFileEditorGroupWnd->gotoFile(entry.file, entry.line-1);

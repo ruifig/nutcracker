@@ -174,15 +174,35 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 		return;
 	}
 
-	switch (event.GetKeyCode())
+	const int modifiers = event.GetModifiers();
+	const auto keycode = event.GetKeyCode();
+
+	if (modifiers == wxMOD_NONE && keycode==WXK_F5)
 	{
-	case WXK_F5: // Continue
-		launch(event.ControlDown() ? false : true);
-		break;
-	default:
+		if (gUIState->debugSession)
+			gUIState->debugSession->resume();
+		else
+			launch(true);
+	}
+	else if (modifiers == wxMOD_NONE && keycode == WXK_F10)
+	{
+		if (gUIState->debugSession)
+			gUIState->debugSession->stepOver();
+	}
+	else if (modifiers == wxMOD_NONE && keycode == WXK_F11)
+	{
+		if (gUIState->debugSession)
+			gUIState->debugSession->stepInto();
+	}
+	else if (modifiers == wxMOD_SHIFT && keycode == WXK_F11)
+	{
+		if (gUIState->debugSession)
+			gUIState->debugSession->stepReturn();
+	}
+	else
+	{
 		event.Skip();
 	}
-
 }
 
 void MainWnd::OnExitClick(wxCommandEvent& event)

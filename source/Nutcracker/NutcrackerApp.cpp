@@ -6,6 +6,7 @@
 #include "Interpreter.h"
 #include "Workspace.h"
 
+#include "art/xpm/debugcursor.xpm"
 namespace nutcracker
 {
 
@@ -69,6 +70,7 @@ bool NutcrackerApp::OnInit()
 	gImageListSmall.Replace(SMALLIMG_IDX_FILE_NUT, wxBITMAP_PNG(APP_IMG_16x16_FILE_NUT));
 	gImageListSmall.Replace(SMALLIMG_IDX_REFRESH, wxBITMAP_PNG(APP_IMG_16x16_REFRESH));
 	gImageListSmall.Replace(SMALLIMG_IDX_NUT, wxBITMAP_PNG(APP_IMG_16x16_NUT));
+	gImageListSmall.Replace(SMALLIMG_IDX_CALLSTACK_CURRENT, wxBITMAP_PNG(APP_IMG_16x16_CALLSTACK_CURRENT));
 
 	for (int i = 0; i < BIGIMG_IDX_NUT; i++)
 		gImageList32x32.Add(wxArtProvider::GetBitmap(wxART_MISSING_IMAGE, wxART_OTHER, wxSize(32, 32)));

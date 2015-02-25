@@ -104,6 +104,7 @@
     <ClCompile Include="FileEditorStyles.cpp" />
     <ClCompile Include="FileEditorWnd.cpp" />
     <ClCompile Include="Files.cpp" />
+    <ClCompile Include="GridCellImageRenderer.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="LaunchUtil.cpp" />
     <ClCompile Include="LocalsWnd.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="FileEditorStyles.h" />
     <ClInclude Include="FileEditorWnd.h" />
     <ClInclude Include="Files.h" />
+    <ClInclude Include="GridCellImageRenderer.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="LaunchUtil.h" />
     <ClInclude Include="LocalsWnd.h" />
