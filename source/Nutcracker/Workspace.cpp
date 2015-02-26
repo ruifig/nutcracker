@@ -173,8 +173,11 @@ void Workspace::dropBreakpointChanges(FileId fileId)
 void Workspace::setBreakpointPos(const Breakpoint* brk, int line, int markerHandler)
 {
 	Breakpoint* b = const_cast<Breakpoint*>(brk);
+	bool fire = b->line != line;
 	b->line = line;
 	b->markerHandle = markerHandler;
+	if (fire)
+		fireEvent(BreakpointUpdated(brk));
 }
 
 void Workspace::removeBreakpoint(FileId fileId, int line)

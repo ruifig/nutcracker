@@ -19,7 +19,6 @@ public:
 	BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
 	virtual ~BreakpointsWnd();
 
-	void updateState();
 private:
 
 	DECLARE_EVENT_TABLE()
@@ -30,9 +29,11 @@ private:
 	void OnShow(wxShowEvent& evt);
 
 	virtual void onAppEvent(const AppEvent& evt) override;
+	void updateState();
 
 	void adjustSize(int width);
 	int m_infoColMinSize = 0;
+	bool m_pendingUpdate = false;
 };
 
 } // namespace nutcracker

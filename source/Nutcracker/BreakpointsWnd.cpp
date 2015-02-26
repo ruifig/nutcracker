@@ -8,6 +8,7 @@
 *********************************************************************/
 
 #include "NutcrackerPCH.h"
+#include "NutcrackerApp.h"
 #include "AppEvents.h"
 #include "BreakpointsWnd.h"
 #include "Workspace.h"
@@ -38,10 +39,14 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	{
-		if (evt.isBreakpointEvent())
+		if (evt.isBreakpointEvent() && !m_pendingUpdate)
 		{
-			if (IsShownOnScreen())
-				updateState();
+			postAppLambdaEvent([this]()
+			{
+				if (IsShownOnScreen())
+					updateState();
+				m_pendingUpdate = false;
+			});
 		}
 	});
 }
