@@ -39,10 +39,21 @@ FileEditorGroupWnd::FileEditorGroupWnd(wxWindow* parent, wxWindowID id, const wx
 {
 	m_timer.Start(2000);
 	gFileEditorGroupWnd = this;
+
+	gWorkspace->registerListener(this, [this](const DataEvent& evt)
+	{
+		switch (evt.id)
+		{
+			case DataEventID::FileSaved:
+				setPageTitle(static_cast<const FileEvent&>(evt).file);
+			break;
+		}
+	});
 }
 
 FileEditorGroupWnd::~FileEditorGroupWnd()
 {
+	gWorkspace->removeListener(this);
 }
 
 void FileEditorGroupWnd::OnPageClose(wxAuiNotebookEvent& event)
@@ -88,7 +99,7 @@ void FileEditorGroupWnd::OnPageClosed(wxAuiNotebookEvent& event)
 
 }
 
-FileEditorWnd* FileEditorGroupWnd::findFileWnd(const std::shared_ptr<File>& file, int* index)
+FileEditorWnd* FileEditorGroupWnd::findFileWnd(const std::shared_ptr<const File>& file, int* index)
 {
 	// Check if this file is already opened
 	for (size_t i = 0; i < m_notebook->GetPageCount(); i++)
@@ -118,7 +129,7 @@ void FileEditorGroupWnd::iterateFiles(std::function<void(FileEditorWnd*)> func)
 	}
 }
 
-void FileEditorGroupWnd::gotoFile(const std::shared_ptr<File>& file, int line /*= -1*/, int col /*= 0*/, bool columnIsOffset /*= false*/)
+void FileEditorGroupWnd::gotoFile(const std::shared_ptr<const File>& file, int line /*= -1*/, int col /*= 0*/, bool columnIsOffset /*= false*/)
 {
 	try
 	{
@@ -152,7 +163,7 @@ void FileEditorGroupWnd::gotoFile(const std::shared_ptr<File>& file, int line /*
 	}
 }
 
-void FileEditorGroupWnd::setPageTitle(const std::shared_ptr<File>& file)
+void FileEditorGroupWnd::setPageTitle(const std::shared_ptr<const File>& file)
 {
 	try
 	{
@@ -171,13 +182,6 @@ void FileEditorGroupWnd::onAppEvent(const AppEvent& evt)
 {
 	switch (evt.id)
 	{
-		case AppEventID::FileSaved:
-		{
-			FileEditorWnd* wnd = static_cast<const AppEventFileSaved&>(evt).wnd;
-			setPageTitle(wnd->getFile());
-		}
-		break;
-
 		case AppEventID::OpenWorkspace:
 		case AppEventID::NewWorkspace:
 			//cursorHistory_Clear();
@@ -204,7 +208,7 @@ FileEditorWnd* FileEditorGroupWnd::getCurrentPage()
 	return static_cast<FileEditorWnd*>(page);
 }
 
-std::shared_ptr<File> FileEditorGroupWnd::getCurrentFile()
+std::shared_ptr<const File> FileEditorGroupWnd::getCurrentFile()
 {
 	auto page = getCurrentPage();
 	if (!page)

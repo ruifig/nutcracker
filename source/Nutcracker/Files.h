@@ -57,7 +57,9 @@ struct File : public BaseItem
 
 protected:
 	friend class Files;
+	friend class Workspace;
 	explicit File(Files* parent_, UTF8String fullpath_);
+	std::function<bool(const std::shared_ptr<const File>&)> m_saveFunc;
 };
 
 // Used to sort files and folders
@@ -87,7 +89,7 @@ protected:
 class Files
 {
 public:
-	Files();
+	Files(Workspace* outer);
 	~Files();
 
 	// Retrieves an existing file object
@@ -106,6 +108,7 @@ protected:
 	std::unordered_map<cz::u32, std::weak_ptr<BaseItem>> m_all;
 
 private:
+	Workspace* m_outer;
 	std::shared_ptr<Folder> m_root;
 	void populateFromDir(const std::shared_ptr<Folder>& folder);
 };

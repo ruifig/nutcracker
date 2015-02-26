@@ -7,7 +7,7 @@ namespace nutcracker
 	struct File;
 	class Interpreter;
 	class DebugSession;
-	struct Workspace;
+	class Workspace;
 	struct Breakpoint;
 
 	class FileEditorWnd;

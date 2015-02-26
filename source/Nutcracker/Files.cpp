@@ -92,7 +92,7 @@ std::shared_ptr<Folder> Folder::create(Files* parent_, UTF8String fullpath_)
 // Files
 //////////////////////////////////////////////////////////////////////////
 
-Files::Files()
+Files::Files(Workspace* outer) : m_outer(outer)
 {
 	m_root = Folder::create(this, "");
 }

@@ -78,7 +78,7 @@ bool NutcrackerApp::OnInit()
 
 	gWorkspace = std::make_shared<Workspace>();
 	if (gParameters->has("workspace"))
-		gWorkspace->files.addFolder(gParameters->get("workspace"));
+		gWorkspace->addFolder(gParameters->get("workspace"));
 
 
 	// create the main application window
