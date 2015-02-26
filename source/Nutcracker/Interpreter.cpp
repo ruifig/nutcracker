@@ -66,9 +66,9 @@ bool DebugSession::start(const std::string& ip, int port)
 		m_messenger->send("aw:3:someClass\n");
 
 		// Setup breakpoints
-		gWorkspace->breakpoints.iterate([&](Breakpoint& brk)
+		gWorkspace->iterateBreakpoints([&](const Breakpoint* brk)
 		{
-			m_messenger->send(cz::formatString("ab:%x:%s\n", brk.line+1, brk.file->fullpath.c_str()));
+			m_messenger->send(cz::formatString("ab:%x:%s\n", brk->line+1, brk->file->fullpath.c_str()));
 		});
 
 		m_messenger->send("rd\n");
@@ -145,7 +145,7 @@ void DebugSession::processMsgBreak(tinyxml2::XMLElement* xml)
 	m_paused = true;
 	auto info = std::make_shared<BreakInfo>();
 	CZ_CHECK(xml->QueryAttribute("line", &info->line)==tinyxml2::XML_SUCCESS);
-	info->file = gWorkspace->files.createFile( getString(xml, "src"));
+	info->file = gWorkspace->createFile( getString(xml, "src"));
 	auto type = xml->Attribute("type");
 	CZ_CHECK(type);
 	if (strcmp(type, "step") == 0)
@@ -314,7 +314,7 @@ void DebugSession::processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info
 {
 	CallstackEntry e;
 	e.func = getString(ele, "fnc");
-	e.file = gWorkspace->files.createFile(getString(ele, "src"));
+	e.file = gWorkspace->createFile(getString(ele, "src"));
 	CZ_CHECK(ele->QueryAttribute("line", &e.line) == tinyxml2::XML_SUCCESS);
 
 	// Local variables

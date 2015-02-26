@@ -23,8 +23,8 @@ public:
 		const wxSize& size = wxDefaultSize, long style = 0);
 	virtual ~FileEditorWnd();
 
-	std::shared_ptr<File> getFile();
-	void setFile(const std::shared_ptr<File>& file, int line=0, int col=0, bool columnIsOffset=false);
+	std::shared_ptr<const File> getFile();
+	void setFile(const std::shared_ptr<const File>& file, int line=0, int col=0, bool columnIsOffset=false);
 	void setFocusToEditor();
 	wxString getWordUnderCursor();
 	bool editorHasFocus();
@@ -33,7 +33,6 @@ public:
 	void onPageChanged();
 	std::pair<int, int> getCursorLocation();
 	bool markerToLine(int markerHandle, int& line);
-	void syncBreakpoint(Breakpoint& brk);
 	void syncBreakInfo(BreakInfo& brk);
 
 private:
@@ -47,6 +46,7 @@ private:
 	void OnMarginClick(wxStyledTextEvent& event);
 	void OnTimer(wxTimerEvent& evt);
 
+	void syncBreakpoint(const Breakpoint* brk);
 	void setCommonStyle();
 	void updateViewOptions();
 	virtual void onAppEvent(const AppEvent& evt);
@@ -58,7 +58,7 @@ private:
 	void getPositionForParser(int& line, int& column, bool adjustForSymbol);
 	void recolourise(bool reparse);
 
-	std::shared_ptr<File> m_file;
+	std::shared_ptr<const File> m_file;
 
 };
 

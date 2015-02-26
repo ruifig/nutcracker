@@ -51,6 +51,10 @@ void LocalsWnd::onAppEvent(const AppEvent& evt)
 					updateState();
 			});
 			break;
+		case AppEventID::DebugStop:
+			m_info = nullptr;
+			updateState();
+			break;
 		case AppEventID::CallstackFrameChanged:
 			if (IsShownOnScreen())
 				updateState();

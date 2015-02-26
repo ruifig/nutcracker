@@ -248,7 +248,7 @@ struct Variable
 struct CallstackEntry
 {
 	std::string func;
-	std::shared_ptr<File> file;
+	std::shared_ptr<const File> file;
 	int line;
 	std::vector<TableEntry> vars;
 };
@@ -256,7 +256,7 @@ struct CallstackEntry
 struct BreakInfo
 {
 	BreakType type=BreakType::Error;
-	std::shared_ptr<File> file;
+	std::shared_ptr<const File> file;
 	int line=-1;
 	std::string error;
 

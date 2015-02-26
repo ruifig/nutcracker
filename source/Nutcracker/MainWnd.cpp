@@ -270,13 +270,13 @@ void MainWnd::OnDropFiles(wxDropFilesEvent& event)
 		auto fname = wxStringToUtf8(*dropped);
 		if (Filesystem::getSingleton().isExistingFile(fname))
 		{
-			auto file = gWorkspace->files.createFile(fname);
+			auto file = gWorkspace->createFile(fname);
 			if (file)
 				gFileEditorGroupWnd->gotoFile(file);
 		}
 		else if (Filesystem::getSingleton().isExistingDirectory(fname))
 		{
-			gWorkspace->files.addFolder(fname);
+			gWorkspace->addFolder(fname);
 			fireAppEvent(AppEventID::AddedFolder);
 		}
 

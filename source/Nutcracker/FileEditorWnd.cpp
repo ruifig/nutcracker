@@ -56,26 +56,29 @@ FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos
 {
 	m_textCtrl->SetSizeHints(wxSize(640, 350));
 
+	gWorkspace->registerListener(this, [this](const DataEvent& evt)
+	{
+		switch (evt.id)
+		{
+			case DataEventID::BreakpointToggle:
+			{
+				auto brk = static_cast<const BreakpointEvent&>(evt).brk;
+				if (brk->file == m_file)
+					syncBreakpoint(brk);
+			}
+		}
+	});
+
 }
 
 FileEditorWnd::~FileEditorWnd()
 {
-	if (auto file = getFile())
-	{
-		file->dirty = false;
-	}
-
-	gWorkspace->breakpoints.iterate(m_file, [&](Breakpoint& brk)
-	{
-		brk.markerHandle = -1;
-		brk.line = brk.savedline;
-	});
-
-	if (gBreakpointsWnd->IsShownOnScreen())
-		gBreakpointsWnd->updateState();
+	gWorkspace->setFileDirty(m_file->id, false);
+	gWorkspace->dropBreakpointChanges(m_file->id);
+	gWorkspace->removeListener(this);
 }
 
-std::shared_ptr<File> FileEditorWnd::getFile()
+std::shared_ptr<const File> FileEditorWnd::getFile()
 {
 	return m_file;
 }
@@ -168,12 +171,17 @@ void FileEditorWnd::setCommonStyle()
 	m_textCtrl->SetCaretLineVisible(true);
 }
 
-void FileEditorWnd::setFile(const std::shared_ptr<File>& file, int line, int col, bool columnIsOffset)
+void FileEditorWnd::setFile(const std::shared_ptr<const File>& file, int line, int col, bool columnIsOffset)
 {
 	if (m_file != file)
 	{
 		m_file = file;
-		m_file->dirty = false;
+
+		gWorkspace->setFileDirty(m_file->id, false);
+		gWorkspace->setFileSaveFunc(m_file->id, [this](const std::shared_ptr<const File>& file)
+		{
+			return m_textCtrl->SaveFile(file->fullpath.widen());
+		});
 
 		// Find the language we want
 		UTF8String ext = file->extension;
@@ -210,7 +218,7 @@ void FileEditorWnd::setFile(const std::shared_ptr<File>& file, int line, int col
 		m_textCtrl->SetSavePoint();
 		m_textCtrl->EmptyUndoBuffer();
 
-		gWorkspace->breakpoints.iterate(m_file, [&](Breakpoint& brk)
+		gWorkspace->iterateBreakpoints(m_file->id, [&](const Breakpoint* brk)
 		{
 			syncBreakpoint(brk);
 		});
@@ -249,35 +257,36 @@ void FileEditorWnd::checkReload()
 	setFile(file, -1, 0);
 }
 
-void FileEditorWnd::syncBreakpoint(Breakpoint& brk)
+void FileEditorWnd::syncBreakpoint(const Breakpoint* brk)
 {
 	auto deleteAll = [&]()
 	{
-		m_textCtrl->MarkerDelete(brk.line, MARK_BREAKPOINT_INVALID);
-		m_textCtrl->MarkerDelete(brk.line, MARK_BREAKPOINT_ON);
-		m_textCtrl->MarkerDelete(brk.line, MARK_BREAKPOINT_OFF);
+		m_textCtrl->MarkerDelete(brk->line, MARK_BREAKPOINT_INVALID);
+		m_textCtrl->MarkerDelete(brk->line, MARK_BREAKPOINT_ON);
+		m_textCtrl->MarkerDelete(brk->line, MARK_BREAKPOINT_OFF);
 	};
 
-	if (brk.markerHandle == -1)
+	if (brk->markerHandle == -1)
 	{
-		CZ_ASSERT(brk.line != -1);
+		CZ_ASSERT(brk->line != -1);
 		deleteAll();
-		brk.markerHandle = m_textCtrl->MarkerAdd(brk.line, brk.enabled ? MARK_BREAKPOINT_ON : MARK_BREAKPOINT_OFF);
+		gWorkspace->setBreakpointPos(
+			brk, brk->line, m_textCtrl->MarkerAdd(brk->line, brk->enabled ? MARK_BREAKPOINT_ON : MARK_BREAKPOINT_OFF));
 	}
 	else
 	{
-		int line = m_textCtrl->MarkerLineFromHandle(brk.markerHandle);
-		brk.line = line;
+		int line = m_textCtrl->MarkerLineFromHandle(brk->markerHandle);
+		gWorkspace->setBreakpointPos(brk, line, brk->markerHandle);
 		int markers = m_textCtrl->MarkerGet(line);
-		if (brk.enabled && (markers&(1 << MARK_BREAKPOINT_OFF)))
+		if (brk->enabled && (markers&(1 << MARK_BREAKPOINT_OFF)))
 		{
 			deleteAll();
-			brk.markerHandle = m_textCtrl->MarkerAdd(brk.line, MARK_BREAKPOINT_ON);
+			gWorkspace->setBreakpointPos(brk, brk->line, m_textCtrl->MarkerAdd(brk->line, MARK_BREAKPOINT_ON));
 		}
-		else if (!brk.enabled && (markers&(1 << MARK_BREAKPOINT_ON)))
+		else if (!brk->enabled && (markers&(1 << MARK_BREAKPOINT_ON)))
 		{
 			deleteAll();
-			brk.markerHandle = m_textCtrl->MarkerAdd(brk.line, MARK_BREAKPOINT_OFF);
+			gWorkspace->setBreakpointPos(brk, brk->line, m_textCtrl->MarkerAdd(brk->line, MARK_BREAKPOINT_OFF));
 		}
 	}
 }
@@ -304,25 +313,22 @@ void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 
 			if (markers&((1<<MARK_BREAKPOINT_ON)|(1<<MARK_BREAKPOINT_INVALID)))
 			{
-				gWorkspace->breakpoints.remove(m_file, linenumber);
+				gWorkspace->removeBreakpoint(m_file->id, linenumber);
 				m_textCtrl->MarkerDelete(linenumber, MARK_BREAKPOINT_ON);
 			}
 			else if (markers&(1 << MARK_BREAKPOINT_OFF))
 			{
-				auto b = gWorkspace->breakpoints.get(m_file, linenumber);
-				CZ_ASSERT(b && b->enabled==false);
-				b->enabled = true;
-				b->markerHandle = -1;
-				syncBreakpoint(*b);
+				auto brk = gWorkspace->toggleBreakpoint(m_file->id, linenumber);
+				CZ_ASSERT(brk->enabled);
+				gWorkspace->setBreakpointPos(brk, brk->line, -1);
+				syncBreakpoint(brk);
 			}
 			else
 			{
 				auto handle =m_textCtrl->MarkerAdd(linenumber, MARK_BREAKPOINT_ON);
-				gWorkspace->breakpoints.add(m_file, linenumber, handle);
+				gWorkspace->addBreakpoint(m_file->id, linenumber, handle);
 			}
 			
-			gBreakpointsWnd->updateState();
-			//updateMarkers();
 		}
 		break;
 		case MARGIN_FOLD:
@@ -384,14 +390,13 @@ void FileEditorWnd::OnTextChanged(wxStyledTextEvent& event)
 	if ((flags&wxSTC_MOD_INSERTTEXT) == wxSTC_MOD_INSERTTEXT ||
 		(flags&wxSTC_MOD_DELETETEXT) == wxSTC_MOD_DELETETEXT)
 	{
-		auto file = getFile();
-		file->dirty = true;
+		gWorkspace->setFileDirty(m_file->id, true);
 		gFileEditorGroupWnd->setPageTitle(m_file);
 
-		gWorkspace->breakpoints.iterate(m_file, [&](Breakpoint& brk)
+		gWorkspace->iterateBreakpoints(m_file->id, [&](const Breakpoint* brk)
 		{
-			if (brk.markerHandle != -1)
-				brk.line = m_textCtrl->MarkerLineFromHandle(brk.markerHandle);
+			if (brk->markerHandle != -1)
+				gWorkspace->setBreakpointPos(brk, m_textCtrl->MarkerLineFromHandle(brk->markerHandle), brk->markerHandle);
 		});
 
 		if (gBreakpointsWnd->IsShownOnScreen())
@@ -401,7 +406,7 @@ void FileEditorWnd::OnTextChanged(wxStyledTextEvent& event)
 
 void FileEditorWnd::OnTextSavePoint(wxStyledTextEvent& event)
 {
-	m_file->dirty = false;
+	gWorkspace->setFileDirty(m_file->id, false);
 	gFileEditorGroupWnd->setPageTitle(m_file);
 }
 
@@ -549,15 +554,8 @@ void FileEditorWnd::save()
 		return;
 
 	try {
-		m_textCtrl->SaveFile(file->fullpath.widen());
-		file->dirty = false;
-		file->filetime = FileTime::get(file->fullpath, FileTime::kModified);
-		fireAppEvent(AppEventFileSaved(this));
-
-		gWorkspace->breakpoints.iterate(m_file, [&](Breakpoint& brk)
-		{
-			brk.savedline = brk.line;
-		});
+		if (!gWorkspace->saveFile(m_file->id))
+			throw std::runtime_error(cz::formatString("Error saving file '%s'", m_file->fullpath.c_str()));
 	}
 	catch(std::exception& e)
 	{

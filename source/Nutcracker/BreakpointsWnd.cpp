@@ -35,6 +35,15 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 	m_grid->SetColLabelValue(1, "location");
 
 	gBreakpointsWnd = this;
+
+	gWorkspace->registerListener(this, [this](const DataEvent& evt)
+	{
+		if (evt.isBreakpointEvent())
+		{
+			if (IsShownOnScreen())
+				updateState();
+		}
+	});
 }
 
 BreakpointsWnd::~BreakpointsWnd()
@@ -48,19 +57,18 @@ void BreakpointsWnd::updateState()
 
 	if (m_grid->GetNumberRows())
 		m_grid->DeleteRows(0, m_grid->GetNumberRows());
-	m_grid->AppendRows(gWorkspace->breakpoints.getCount());
-
+	m_grid->AppendRows(gWorkspace->getBreakpointCount());
 
 	int r = 0;
-	gWorkspace->breakpoints.iterate([&](Breakpoint& b)
+	gWorkspace->iterateBreakpoints([&](const Breakpoint* b)
 	{
 		m_grid->SetCellRenderer(r, 0, new wxGridCellBoolRenderer);
 		m_grid->SetCellEditor(r, 0, new wxGridCellBoolEditor);
 		m_grid->SetReadOnly(r,0,true);
-		m_grid->SetCellValue(r, 0, b.enabled ? wxT("1") : wxT("0"));
+		m_grid->SetCellValue(r, 0, b->enabled ? wxT("1") : wxT("0"));
 
 		m_grid->SetCellValue(
-			r, 1, wxString::Format(wxT("%s, line %d"), b.file->name.c_str(), b.line+1));
+			r, 1, wxString::Format(wxT("%s, line %d"), b->file->name.c_str(), b->line+1));
 		m_grid->SetReadOnly(r,1,true);
 		r++;
 	});
@@ -91,13 +99,9 @@ void BreakpointsWnd::OnCellClick(wxGridEvent& evt)
 	int r = evt.GetRow();
 	int c = evt.GetCol();
 
-	if (c==0 && r<=gWorkspace->breakpoints.getCount())
+	if (c==0 && r<=gWorkspace->getBreakpointCount())
 	{
-		auto& b = gWorkspace->breakpoints.getAt(r);
-		b.enabled = !b.enabled;
-		auto wnd = gFileEditorGroupWnd->findFileWnd(b.file, nullptr);
-		if (wnd)
-			wnd->syncBreakpoint(b);
+		gWorkspace->toggleBreakpoint(r);
 		updateState();
 	}
 
@@ -108,10 +112,10 @@ void BreakpointsWnd::OnCellDClick(wxGridEvent& evt)
 {
 	int r = evt.GetRow();
 	int c = evt.GetCol();
-	if (c!=0 && r<=gWorkspace->breakpoints.getCount())
+	if (c != 0 && r <= gWorkspace->getBreakpointCount())
 	{
-		const auto& b = gWorkspace->breakpoints.getAt(r);
-		gFileEditorGroupWnd->gotoFile(b.file, b.line);
+		auto b = gWorkspace->getBreakpoint(r);
+		gFileEditorGroupWnd->gotoFile(b->file, b->line);
 	}
 	evt.Skip();
 }
@@ -126,6 +130,7 @@ void BreakpointsWnd::onAppEvent(const AppEvent& evt)
 	switch (evt.id)
 	{
 		case AppEventID::OpenWorkspace:
+		case AppEventID::DebugStop:
 		updateState();
 		break;
 	}

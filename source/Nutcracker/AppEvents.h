@@ -23,14 +23,6 @@ struct AppEvent
 	AppEvent(AppEventID id) : id(id) {}
 };
 
-struct AppEventFileSaved : public AppEvent
-{
-	AppEventFileSaved(FileEditorWnd* wnd) : AppEvent(AppEventID::FileSaved), wnd(wnd)
-	{
-	}
-	FileEditorWnd* wnd;
-};
-
 class AppEventListener
 {
 public:
