@@ -24,6 +24,7 @@ enum class DataEventID
 	BreakpointAdd=BreakpointFIRST,
 	BreakpointToggle,
 	BreakpointDropChanges,
+	BreakpointUpdated,
 	BreakpointRemoved,
 	BreakpointLAST = BreakpointRemoved
 };
@@ -79,6 +80,10 @@ struct BreakpointDropChanges : public BreakpointEvent
 struct BreakpointRemoved : public BreakpointEvent
 {
 	BreakpointRemoved(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointRemoved, brk) {}
+};
+struct BreakpointUpdated : public BreakpointEvent
+{
+	BreakpointUpdated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointUpdated, brk) {}
 };
 
 //////////////////////////////////////////////////////////////////////////

@@ -398,9 +398,6 @@ void FileEditorWnd::OnTextChanged(wxStyledTextEvent& event)
 			if (brk->markerHandle != -1)
 				gWorkspace->setBreakpointPos(brk, m_textCtrl->MarkerLineFromHandle(brk->markerHandle), brk->markerHandle);
 		});
-
-		if (gBreakpointsWnd->IsShownOnScreen())
-			gBreakpointsWnd->updateState();
 	}
 }
 
