@@ -93,15 +93,6 @@ bool NutcrackerApp::OnInit()
 
 	std::shared_ptr<std::function<void()>> func;
 
-	postAppLambdaEvent(
-		[]{
-		czDebug(ID_Log, "Hello World 1!");
-	});
-
-	wxPostEvent(this, NutcrackerLambdaEvent([]{
-		czDebug(ID_Log, "Hello World 2!"); }
-	));
-
 	//
 	// Test project handling
 	//

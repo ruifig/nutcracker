@@ -106,6 +106,7 @@ public:
 	// TODO : Rename this, as it doesn't create a file. It creates the object that tracks an existing file
 	std::shared_ptr<const File> createFile(UTF8String path);
 	void setFileSaveFunc(FileId fileId, std::function<bool(const std::shared_ptr<const File>& file)> func);
+	void removeFileSaveFunc(FileId fileId);
 	void addFolder(const UTF8String& path);
 	void resyncFolders();
 	std::shared_ptr<const Folder> getRoot();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "UIDefs.h"
+#include "NutcrackerApp.h"
 
 namespace nutcracker
 {
@@ -10,7 +11,6 @@ enum class AppEventID
 	OpenWorkspace,
 	AddedFolder,
 	NewWorkspace,
-	FileSaved,
 	ViewOptionsChanged,
 	DebugStarted,
 	DebugStop,

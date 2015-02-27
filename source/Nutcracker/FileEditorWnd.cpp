@@ -73,6 +73,7 @@ FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 FileEditorWnd::~FileEditorWnd()
 {
+	gWorkspace->removeFileSaveFunc(m_file->id);
 	gWorkspace->setFileDirty(m_file->id, false);
 	gWorkspace->dropBreakpointChanges(m_file->id);
 	gWorkspace->removeListener(this);
@@ -175,8 +176,10 @@ void FileEditorWnd::setFile(const std::shared_ptr<const File>& file, int line, i
 {
 	if (m_file != file)
 	{
-		m_file = file;
+		if (m_file)
+			gWorkspace->removeFileSaveFunc(m_file->id);
 
+		m_file = file;
 		gWorkspace->setFileDirty(m_file->id, false);
 		gWorkspace->setFileSaveFunc(m_file->id, [this](const std::shared_ptr<const File>& file)
 		{

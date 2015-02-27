@@ -88,10 +88,20 @@ void Workspace::setFileSaveFunc(FileId fileId, std::function<bool(const std::sha
 	file->m_saveFunc = std::move(func);
 }
 
+void Workspace::removeFileSaveFunc(FileId fileId)
+{
+	auto file = m_files.getFile(fileId);
+	CZ_ASSERT(file);
+	file->m_saveFunc = nullptr;
+}
+
 bool Workspace::saveFile(FileId fileId)
 {
 	auto file = m_files.getFile(fileId);
 	CZ_ASSERT(file);
+
+	CZ_ASSERT_F(file->m_saveFunc, "No save function specified for file '%s'", file->fullpath.c_str());
+
 	if (!file->m_saveFunc(file))
 		return false;
 	file->dirty = false;
