@@ -182,11 +182,6 @@ void FileEditorGroupWnd::onAppEvent(const AppEvent& evt)
 {
 	switch (evt.id)
 	{
-		case AppEventID::OpenWorkspace:
-		case AppEventID::NewWorkspace:
-			//cursorHistory_Clear();
-			break;
-
 		case AppEventID::DebugStarted:
 			gUIState->debugSession->breakListeners.add(
 				this, [&](const std::shared_ptr<BreakInfo>& info)

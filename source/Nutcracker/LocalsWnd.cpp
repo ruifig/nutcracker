@@ -11,6 +11,7 @@
 #include "LocalsWnd.h"
 #include "UIDefs.h"
 #include "MainWnd.h"
+#include "Workspace.h"
 
 namespace nutcracker
 {
@@ -32,6 +33,20 @@ LocalsWnd::LocalsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const 
 	m_tree->AppendColumn("Name");
 	m_tree->AppendColumn("Value");
 	m_tree->AppendColumn("Type");
+
+
+	gWorkspace->registerListener(this, [this](const DataEvent& evt)
+	{
+		if (evt.isBreakpointEvent() && !m_pendingUpdate)
+		{
+			postAppLambdaEvent([this]()
+			{
+				if (IsShownOnScreen())
+					updateState();
+				m_pendingUpdate = false;
+			});
+		}
+	});
 }
 
 LocalsWnd::~LocalsWnd()

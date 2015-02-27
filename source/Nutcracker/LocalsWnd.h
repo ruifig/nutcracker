@@ -38,6 +38,7 @@ private:
 
 	std::shared_ptr<const BreakInfo> m_info;
 	TreeCtrlUtil::TreeListCtrlData m_treeData;
+	bool m_pendingUpdate = false;
 };
 
 } // namespace nutcracker
