@@ -16,6 +16,8 @@ namespace nutcracker
 
 enum class DataEventID
 {
+	// Workspace
+	WorkspaceChanges,
 	// Files
 	FileDirty,
 	FileSaved,
@@ -26,7 +28,11 @@ enum class DataEventID
 	BreakpointDropChanges,
 	BreakpointUpdated,
 	BreakpointRemoved,
-	BreakpointLAST = BreakpointRemoved
+	BreakpointLAST = BreakpointRemoved,
+
+	//
+	DebugStart,
+	DebugStop
 };
 
 struct DataEvent
@@ -127,6 +133,13 @@ public:
 	// This is used to update the breakpoint line when we are editing a file
 	void setBreakpointPos(const Breakpoint* brk, int line, int markerHandler);
 	void removeBreakpoint(FileId fileId, int line);
+
+	//
+	// Debugger
+	//
+	bool debuggerStart();
+
+
 private:
 
 	const Breakpoint* toggleBreakpoint(Breakpoint* brk);
@@ -135,6 +148,7 @@ private:
 	Files m_files;
 	Breakpoints m_breakpoints;
 	int m_inEventHandler = 0;
+	//std::shared_ptr<DebugSession> m_debugSession;
 };
 
 } // namespace nutcracker

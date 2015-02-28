@@ -42,10 +42,23 @@ WorkspaceWnd::WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	// SetImageList doesn't give ownership of the image list to the control, so we can share it with
 	// other controls
 	m_treeCtrl->SetImageList(&gImageListSmall);
-
 	m_refreshBtn->SetBitmap(gImageListSmall.GetBitmap(SMALLIMG_IDX_REFRESH), wxLEFT);
 
 	gWorkspaceWnd = this;
+
+	gWorkspace->registerListener(this, [this](const DataEvent& evt)
+	{
+		if (evt.id==DataEventID::WorkspaceChanges && !m_pendingUpdate)
+		{
+			m_pendingUpdate = true;
+			postAppLambdaEvent([this]()
+			{
+				updateState();
+				m_pendingUpdate = false;
+			});
+		}
+	});
+
 }
 
 WorkspaceWnd::~WorkspaceWnd()
@@ -54,13 +67,6 @@ WorkspaceWnd::~WorkspaceWnd()
 
 void WorkspaceWnd::onAppEvent(const AppEvent& evt)
 {
-	switch (evt.id)
-	{
-		case AppEventID::OpenWorkspace:
-		case AppEventID::AddedFolder:
-			updateState();
-			break;
-	}
 }
 
 // Helper to update recursively

@@ -8,9 +8,6 @@ namespace nutcracker
 
 enum class AppEventID
 {
-	OpenWorkspace,
-	AddedFolder,
-	NewWorkspace,
 	ViewOptionsChanged,
 	DebugStarted,
 	DebugStop,

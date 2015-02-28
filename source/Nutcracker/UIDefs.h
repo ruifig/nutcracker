@@ -12,6 +12,7 @@ namespace nutcracker
 
 	class FileEditorWnd;
 	extern class MainWnd* gMainWnd;
+	extern bool gShuttingDown;
 	extern class WorkspaceWnd* gWorkspaceWnd;
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
 	extern class BreakpointsWnd* gBreakpointsWnd;

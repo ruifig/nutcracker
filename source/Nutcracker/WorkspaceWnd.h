@@ -41,6 +41,7 @@ private:
 	virtual void onAppEvent(const AppEvent& evt) override;
 	TreeCtrlUtil::TreeCtrlData m_treeData;
 	FileId m_selectedFileId;
+	bool m_pendingUpdate = false;
 };
 
 } // namespace nutcracker

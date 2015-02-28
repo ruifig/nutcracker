@@ -8,6 +8,7 @@ namespace nutcracker
 wxImageList gImageListSmall(16, 16);
 wxImageList gImageList32x32(32,32);
 class MainWnd* gMainWnd;
+bool gShuttingDown;
 class WorkspaceWnd* gWorkspaceWnd;
 class FileEditorGroupWnd* gFileEditorGroupWnd;
 class BreakpointsWnd* gBreakpointsWnd;
