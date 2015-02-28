@@ -77,19 +77,20 @@ bool NutcrackerApp::OnInit()
 	gImageList32x32.Replace(BIGIMG_IDX_NUT, wxBITMAP_PNG(APP_IMG_32x32_NUT));
 
 	gWorkspace = std::make_shared<Workspace>();
-	if (gParameters->has("workspace"))
-		gWorkspace->addFolder(gParameters->get("workspace"));
-
-
 	// create the main application window
     MainWnd *mainWnd = new MainWnd();
 
     mainWnd->Show(true);
 
-	mainWnd->addAsyncFunc([]()
+	if (gParameters->has("workspace"))
+		gWorkspace->addFolder(gParameters->get("workspace"));
+
+	/*
+	postAppLambdaEvent([]()
 	{
 		fireAppEvent(AppEventID::OpenWorkspace);
 	});
+	*/
 
 	std::shared_ptr<std::function<void()>> func;
 
@@ -113,6 +114,8 @@ int NutcrackerApp::OnExit()
 
 void NutcrackerApp::OnLambdaEvent(wxCommandEvent& evt)
 {
+	if (gShuttingDown)
+		return;
 	static_cast<NutcrackerLambdaEvent&>(evt).run();
 }
 

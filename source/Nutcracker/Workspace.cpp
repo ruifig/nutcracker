@@ -59,6 +59,7 @@ std::shared_ptr<const File> Workspace::createFile(UTF8String path)
 void Workspace::addFolder(const UTF8String& path)
 {
 	m_files.addFolder(path);
+	fireEvent(DataEvent(DataEventID::WorkspaceChanges));
 }
 
 void Workspace::resyncFolders()
@@ -197,6 +198,11 @@ void Workspace::removeBreakpoint(FileId fileId, int line)
 	auto brk = m_breakpoints.remove(file, line);
 	if (brk)
 		fireEvent(BreakpointRemoved(brk.get()));
+}
+
+bool Workspace::debuggerStart()
+{
+	return false;
 }
 
 } // namespace nutcracker

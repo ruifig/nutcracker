@@ -118,6 +118,7 @@ MainWnd::MainWnd()
 
 MainWnd::~MainWnd()
 {
+	gShuttingDown = true;
 	cz::Logger::getSingleton().removeOutput(m_logger.get());
 }
 
@@ -126,10 +127,6 @@ void MainWnd::OnIdle(wxIdleEvent& evt)
 	m_asyncFuncs.tick(false);
 }
 
-void MainWnd::addAsyncFunc(std::function<void()> f)
-{
-	m_asyncFuncs.send(std::move(f));
-}
 
 void MainWnd::OnMenuClick(wxCommandEvent& event)
 {
@@ -277,7 +274,6 @@ void MainWnd::OnDropFiles(wxDropFilesEvent& event)
 		else if (Filesystem::getSingleton().isExistingDirectory(fname))
 		{
 			gWorkspace->addFolder(fname);
-			fireAppEvent(AppEventID::AddedFolder);
 		}
 
 		dropped++;

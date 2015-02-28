@@ -39,6 +39,7 @@ LocalsWnd::LocalsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const 
 	{
 		if (evt.isBreakpointEvent() && !m_pendingUpdate)
 		{
+			m_pendingUpdate = true;
 			postAppLambdaEvent([this]()
 			{
 				if (IsShownOnScreen())

@@ -41,6 +41,7 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 	{
 		if (evt.isBreakpointEvent() && !m_pendingUpdate)
 		{
+			m_pendingUpdate = true;
 			postAppLambdaEvent([this]()
 			{
 				if (IsShownOnScreen())
@@ -134,7 +135,6 @@ void BreakpointsWnd::onAppEvent(const AppEvent& evt)
 {
 	switch (evt.id)
 	{
-		case AppEventID::OpenWorkspace:
 		case AppEventID::DebugStop:
 		updateState();
 		break;

@@ -23,7 +23,6 @@ public:
 	virtual ~MainWnd();
 
 	// Adds a function to be called on the next tick
-	void addAsyncFunc(std::function<void()> f);
 	int getInterpreterIndex();
 private:
 	DECLARE_EVENT_TABLE()
