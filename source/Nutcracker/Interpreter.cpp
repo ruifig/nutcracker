@@ -428,16 +428,36 @@ bool Interpreter::hasDebugger() const
 	return m_hasDebugger;
 }
 
-std::shared_ptr<DebugSession> Interpreter::launch(const Variables& variables, const UTF8String& file, bool debug)
+bool Interpreter::launch(const Variables& variables, const UTF8String& file)
+{
+	auto cwd = wxGetCwd();
+	auto cmd = variables.replace(m_launchNormal);
+	wxSetWorkingDirectory(Filename(file).getDirectory().c_str());
+	auto res = wxExecute(cmd.c_str());
+	wxSetWorkingDirectory(cwd);
+	if (res == 0)
+	{
+		czDebug(ID_Log, "Error launching '%s'", cmd.c_str());
+		return false;
+	}
+
+	return true;
+}
+
+std::shared_ptr<DebugSession> Interpreter::launchDebug(const Variables& variables, const UTF8String& file)
 {
 	auto session = std::make_shared<DebugSession>();
 
 	auto cwd = wxGetCwd();
-	auto cmd = variables.replace(debug ? m_launchDebug : m_launchNormal);
+	auto cmd = variables.replace(UTF8String("DERP") + m_launchDebug);
 	wxSetWorkingDirectory(Filename(file).getDirectory().c_str());
-	//wxExecute(cmd.c_str(), wxEXEC_NODISABLE | wxEXEC_HIDE_CONSOLE);
-	wxExecute(cmd.c_str());
+	auto res = wxExecute(cmd.c_str());
 	wxSetWorkingDirectory(cwd);
+	if (res == 0)
+	{
+		czDebug(ID_Log, "Error launching '%s'", cmd.c_str());
+		return nullptr;
+	}
 
 	if (!session->start(m_ip, m_port))
 		return nullptr;

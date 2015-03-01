@@ -310,7 +310,8 @@ public:
 	Interpreter();
 	virtual ~Interpreter();
 	bool hasDebugger() const;
-	std::shared_ptr<DebugSession> launch(const Variables& variables, const UTF8String& file, bool debug);
+	bool launch(const Variables& variables, const UTF8String& file);
+	std::shared_ptr<DebugSession> launchDebug(const Variables& variables, const UTF8String& file);
 	const UTF8String& getName() const;
 
 	static std::vector<std::unique_ptr<Interpreter>> initAll(const UTF8String& folder);

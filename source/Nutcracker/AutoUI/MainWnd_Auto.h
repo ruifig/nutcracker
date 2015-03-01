@@ -117,6 +117,7 @@ public:
 
 ////@begin MainWnd_Auto member variables
 	wxAuiManager m_auiManager;
+	wxMenu* m_menuView;
 	wxMenu* m_menuInterpreters;
 	nutcracker::WorkspaceWnd* m_workspaceWnd;
 	wxTextCtrl* m_logTextCtrl;
