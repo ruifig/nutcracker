@@ -15,6 +15,84 @@
 namespace nutcracker
 {
 
+static bool getConfigEntry(IniFile& file, const char* section, const char* entry, UTF8String& dst)
+{
+	UTF8String val = file.getValue(section, entry, "");
+	if (val == "")
+	{
+		showError("Error loading config file", "Config entry '[%s]:%s' is missing.", section, entry);
+		return false;
+	}
+	dst = val;
+	return true;
+}
+
+
+typedef std::map<std::string, std::vector<std::string>> ConfigSaveInfo;
+
+struct ConfigEntry
+{
+	enum Type
+	{
+		String,
+		Boolean
+	};
+
+	ConfigEntry(const char* section, const char* name, UTF8String* var)
+		: section(section), name(name), var(var), type(String) { }
+	ConfigEntry(const char* section, const char* name, bool* var)
+		: section(section), name(name), var(var), type(Boolean) { }
+
+	bool load(cz::IniFile& file)
+	{
+		switch (type)
+		{
+			case String:
+				if (!getConfigEntry(file, section, name, *(UTF8String*)var))
+					return false;
+				break;
+			case Boolean:
+				*((bool*)var) = file.getValue(section, name, false);
+				break;
+			default:
+				CZ_UNEXPECTED();
+		}
+		return true;
+	}
+
+	void save(ConfigSaveInfo& out)
+	{
+		switch (type)
+		{
+			case String:
+				out[section].push_back(cz::formatString("%s=\"%s\"\n", name, ((UTF8String*)var)->c_str()));
+				break;
+			case Boolean:
+				out[section].push_back(cz::formatString("%s=%s\n", name, *(bool*)var ? "true" : "false"));
+				break;
+			default:
+				CZ_UNEXPECTED();
+		}
+	}
+
+	const char* section;
+	const char* name;
+	void* var;
+	Type type;
+};
+
+
+static std::vector<ConfigEntry> getConfig(Options& obj)
+{
+	return
+	{
+		{"General", "defaultInterpreter", &obj.general_defaultInterpreter},
+		{ "View", "indentation", &obj.view_indentation },
+		{ "View", "whitespaces", &obj.view_whitespaces },
+		{ "View", "eol", &obj.view_eol }
+	};
+}
+
 Workspace::Workspace() : m_files(this), m_breakpoints(this)
 {
 }
@@ -223,18 +301,24 @@ void Workspace::removeBreakpoint(FileId fileId, int line)
 		fireEvent(BreakpointRemoved(brk.get()));
 }
 
+static Variables getVariables(File* file)
+{
+	Variables vars;
+	vars.set("%FILE%", [file]()
+	{
+		return UTF8String("\"") + file->fullpath + "\"";
+	});
+	return vars;
+}
+
 bool Workspace::debuggerStart(FileId fileId)
 {
 	auto file = m_files.getFile(fileId);
 	CZ_ASSERT(file);
 
-	Variables vars;
-	vars.set("%FILE%", [&]()
-	{
-		return UTF8String("\"") + file->fullpath + "\"";
-	});
+	auto vars = getVariables(file.get());
 
-	m_debugSession = getCurrentInterpreter()->launch(vars, file->fullpath, true);
+	m_debugSession = _getCurrentInterpreter()->launchDebug(vars, file->fullpath);
 	if (!m_debugSession)
 		return false;
 
@@ -253,6 +337,16 @@ bool Workspace::debuggerStart(FileId fileId)
 
 	fireEvent(DataEventID::DebugStart);
 	return true;
+}
+
+
+bool Workspace::run(FileId fileId)
+{
+	auto file = m_files.getFile(fileId);
+	CZ_ASSERT(file);
+	auto vars = getVariables(file.get());
+	auto res = _getCurrentInterpreter()->launch(vars, file->fullpath);
+	return res;
 }
 
 bool Workspace::debuggerActive()
@@ -302,22 +396,66 @@ void Workspace::debuggerStepReturn()
 	m_debugSession->stepReturn();
 }
 
+void Workspace::loadConfig()
+{
+	IniFile file;
+	auto cfgFile = "config.ini";
+	if (!file.open("config.ini"))
+		showError("Error loading config file '%s'", cfgFile);
+
+	Options options;
+	auto cfg = getConfig(options);
+	for (auto& i : cfg)
+	{
+		if (!i.load(file))
+			return;
+	}
+	m_options = options;
+}
+
+void Workspace::saveConfig()
+{
+	auto cfg = getConfig(m_options);
+	cz::IniFile ini;
+
+	ConfigSaveInfo saveInfo;
+
+	for (auto& i : cfg)
+		i.save(saveInfo);
+
+	cz::File file;
+	if (!file.try_open("config.ini", cz::File::FILEMODE_WRITE))
+		return;
+	auto write = [&file](const char* str)
+	{
+		file.write(str, strlen(str));
+	};
+
+	for (auto& s : saveInfo)
+	{
+		write(cz::formatString("[%s]\n", s.first.c_str()));
+		for (auto& e : s.second)
+			write(e.c_str());
+		write("\n");
+	}
+
+}
 
 void Workspace::setViewIdentation(bool enabled)
 {
-	m_options.viewIndentation = enabled;
+	m_options.view_indentation = enabled;
 	fireEvent(DataEventID::ViewIndentation);
 }
 
 void Workspace::setViewWhitespaces(bool enabled)
 {
-	m_options.viewWhitespaces = enabled;
+	m_options.view_whitespaces = enabled;
 	fireEvent(DataEventID::ViewWhitespaces);
 }
 
 void Workspace::setViewEOL(bool enabled)
 {
-	m_options.viewEOL = enabled;
+	m_options.view_eol = enabled;
 	fireEvent(DataEventID::ViewEOL);
 }
 
@@ -329,6 +467,16 @@ const Options* Workspace::getViewOptions()
 void Workspace::loadInterpreters()
 {
 	m_interpreters.all = Interpreter::initAll(Filesystem::getSingleton().getCWD() + "interpreters\\");
+
+	m_interpreters.current = 0;
+	for (int i=0; i<(int)m_interpreters.all.size(); i++)
+	{
+		if (m_interpreters.all[i]->getName() == m_options.general_defaultInterpreter)
+		{
+			m_interpreters.current = i;
+			break;
+		}
+	}
 }
 
 int Workspace::getNumInterpreters()
@@ -341,15 +489,22 @@ const Interpreter* Workspace::getInterpreter(int index)
 	return m_interpreters.all[index].get();
 }
 
-Interpreter* Workspace::getCurrentInterpreter()
+const Interpreter* Workspace::getCurrentInterpreter()
 {
 	return m_interpreters.all[m_interpreters.current].get();
 }
+
+Interpreter* Workspace::_getCurrentInterpreter()
+{
+	return m_interpreters.all[m_interpreters.current].get();
+}
+
 
 void Workspace::setCurrentInterpreter(int index)
 {
 	CZ_ASSERT(static_cast<size_t>(index) < m_interpreters.all.size());
 	m_interpreters.current = index;
+	m_options.general_defaultInterpreter = _getCurrentInterpreter()->getName();
 	fireEvent(DataEventID::InterpreterChanged);
 }
 

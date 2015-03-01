@@ -85,6 +85,15 @@ MainWnd::MainWnd()
 	m_logger = std::make_unique<MainWndLoggerOutput>(&m_asyncFuncs, m_logTextCtrl);
 	cz::Logger::getSingleton().addOutput(m_logger.get());
 
+
+	//
+	//
+	//
+	gWorkspace->loadConfig();
+	m_menuView->FindItem(ID_MENU_VIEW_INDENTATION)->Check(gWorkspace->getViewOptions()->view_indentation);
+	m_menuView->FindItem(ID_MENU_VIEW_WHITESPACE)->Check(gWorkspace->getViewOptions()->view_whitespaces);
+	m_menuView->FindItem(ID_MENU_VIEW_EOL)->Check(gWorkspace->getViewOptions()->view_eol);
+
 	//
 	// Initialize interpreters
 	//
@@ -95,17 +104,17 @@ MainWnd::MainWnd()
 		//bind(wxevt_command_menu_selected, &mainwnd::oninterpreterclick, this, interpretermenuid);
 		//m_menuinterpreters->append(interpretermenuid++, "test", wxemptystring, wxitem_check);
 
-		wxMenuItem* firstItem = nullptr;
+		wxMenuItem* current = nullptr;
 		for(int index=0; index<gWorkspace->getNumInterpreters(); index++)
 		{
 			auto i = gWorkspace->getInterpreter(index);
 			auto item = m_menuInterpreters->AppendRadioItem(interpreterMenuId, i->getName().c_str());
-			if (!firstItem)
-				firstItem = item;
+			if (i == gWorkspace->getCurrentInterpreter())
+				current = item;
 			Bind(wxEVT_COMMAND_MENU_SELECTED, &MainWnd::OnInterpreterClick, this, interpreterMenuId);
 			interpreterMenuId++;
 		}
-		firstItem->Check();
+		current->Check();
 	}
 
 	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainWnd::OnCharHook));
@@ -116,6 +125,7 @@ MainWnd::MainWnd()
 
 MainWnd::~MainWnd()
 {
+	gWorkspace->saveConfig();
 	gShuttingDown = true;
 	cz::Logger::getSingleton().removeOutput(m_logger.get());
 }
@@ -174,15 +184,20 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 		{
 			auto file = gFileEditorGroupWnd->getCurrentFile();
 			if (!file)
-			{
 				showError("No file selected","No file selected to start debugger!\nOpen a file first");
-			}
 			else
-			{
-				auto focusedWnd = this->FindFocus();
 				gWorkspace->debuggerStart(file->id);
-			}
 		}
+	}
+	else if (modifiers == wxMOD_CONTROL && keycode == WXK_F5)
+	{
+		if (gWorkspace->debuggerActive())
+			return;
+		auto file = gFileEditorGroupWnd->getCurrentFile();
+		if (!file)
+			showError("No file selected", "No file selected to start execution!\nOpen a file first");
+		else
+			gWorkspace->run(file->id);
 	}
 	else if (modifiers == wxMOD_NONE && keycode == WXK_F10)
 	{

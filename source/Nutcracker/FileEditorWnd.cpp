@@ -722,9 +722,9 @@ bool FileEditorWnd::editorHasFocus()
 void FileEditorWnd::updateViewOptions()
 {
 	auto options = gWorkspace->getViewOptions();
-	m_textCtrl->SetIndentationGuides(options->viewIndentation ? wxSTC_IV_LOOKBOTH : wxSTC_IV_NONE);
-	m_textCtrl->SetViewWhiteSpace( options->viewWhitespaces ? wxSTC_WS_VISIBLEALWAYS : wxSTC_WS_INVISIBLE);
-	m_textCtrl->SetViewEOL( options->viewEOL ? true : false);
+	m_textCtrl->SetIndentationGuides(options->view_indentation ? wxSTC_IV_LOOKBOTH : wxSTC_IV_NONE);
+	m_textCtrl->SetViewWhiteSpace( options->view_whitespaces ? wxSTC_WS_VISIBLEALWAYS : wxSTC_WS_INVISIBLE);
+	m_textCtrl->SetViewEOL( options->view_eol ? true : false);
 	m_textCtrl->SetEdgeMode(wxSTC_EDGE_LINE);
 	m_textCtrl->SetEdgeColumn(80);
 	m_textCtrl->SetEdgeColour(wxColour(210,210,210));

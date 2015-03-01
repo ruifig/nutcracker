@@ -19,11 +19,13 @@ class DebugSession;
 struct BreakInfo;
 class Interpreter;
 
+
 struct Options
 {
-	bool viewIndentation = false;
-	bool viewWhitespaces = false;
-	bool viewEOL = false;
+	UTF8String general_defaultInterpreter;
+	bool view_indentation = false;
+	bool view_whitespaces = false;
+	bool view_eol = false;
 };
 
 enum class DataEventID
@@ -135,9 +137,15 @@ public:
 	Workspace();
 	Workspace(const Workspace&) = delete;
 
-
 	void registerListener(void* listener, std::function<void(const DataEvent&)> func);
 	void removeListener(void* listener);
+
+
+	//
+	// Config
+	//
+	void loadConfig();
+	void saveConfig();
 
 	//
 	// Files
@@ -169,6 +177,11 @@ public:
 	void removeBreakpoint(FileId fileId, int line);
 
 	//
+	//
+	//
+	bool run(FileId fileId);
+
+	//
 	// Debugger
 	//
 	bool debuggerStart(FileId fileId);
@@ -195,10 +208,12 @@ public:
 	void loadInterpreters();
 	int getNumInterpreters();
 	const Interpreter* getInterpreter(int index);
-	Interpreter* getCurrentInterpreter();
+	const Interpreter* getCurrentInterpreter();
 	void setCurrentInterpreter(int index);
 
 private:
+
+	Interpreter* _getCurrentInterpreter();
 
 	const Breakpoint* toggleBreakpoint(Breakpoint* brk);
 	void fireEvent(const DataEvent& evt);

@@ -106,6 +106,7 @@ MainWnd_Auto::~MainWnd_Auto()
 void MainWnd_Auto::Init()
 {
 ////@begin MainWnd_Auto member initialisation
+	m_menuView = NULL;
 	m_menuInterpreters = NULL;
 	m_workspaceWnd = NULL;
 	m_logTextCtrl = NULL;
@@ -130,11 +131,11 @@ void MainWnd_Auto::CreateControls()
 	itemMenu3->AppendSeparator();
 	itemMenu3->Append(wxID_EXIT, _("E&xit"), wxEmptyString, wxITEM_NORMAL);
 	menuBar->Append(itemMenu3, _("&File"));
-	wxMenu* itemMenu7 = new wxMenu;
-	itemMenu7->Append(ID_MENU_VIEW_INDENTATION, _("&Indentation guides"), wxEmptyString, wxITEM_CHECK);
-	itemMenu7->Append(ID_MENU_VIEW_WHITESPACE, _("&Whitespaces"), wxEmptyString, wxITEM_CHECK);
-	itemMenu7->Append(ID_MENU_VIEW_EOL, _("&End of line"), wxEmptyString, wxITEM_CHECK);
-	menuBar->Append(itemMenu7, _("&View"));
+	m_menuView = new wxMenu;
+	m_menuView->Append(ID_MENU_VIEW_INDENTATION, _("&Indentation guides"), wxEmptyString, wxITEM_CHECK);
+	m_menuView->Append(ID_MENU_VIEW_WHITESPACE, _("&Whitespaces"), wxEmptyString, wxITEM_CHECK);
+	m_menuView->Append(ID_MENU_VIEW_EOL, _("&End of line"), wxEmptyString, wxITEM_CHECK);
+	menuBar->Append(m_menuView, _("&View"));
 	m_menuInterpreters = new wxMenu;
 	menuBar->Append(m_menuInterpreters, _("&Interpreter"));
 	itemFrame1->SetMenuBar(menuBar);

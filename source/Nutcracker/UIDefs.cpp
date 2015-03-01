@@ -27,6 +27,7 @@ void showError(const char* title, const char* fmt, ...)
 	va_start(vp, fmt);
 
 	vsnprintf(buf, sizeof(buf), fmt, vp);
+	czWarning(ID_Log, buf);
 	wxMessageBox(wxString::FromUTF8(buf), wxString::FromUTF8(title ? title : "Error"), wxOK|wxICON_ERROR);
 	va_end(vp);
 }

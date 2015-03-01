@@ -415,7 +415,7 @@
               <long name="owns-file">1</long>
               <bool name="proxy-Enabled">1</bool>
               <string name="proxy-Label">"&amp;View"</string>
-              <string name="proxy-Member variable name">""</string>
+              <string name="proxy-Member variable name">"m_menuView"</string>
               <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
               <string name="title">"View"</string>
               <long name="title-mode">0</long>
