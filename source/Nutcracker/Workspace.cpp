@@ -21,17 +21,28 @@ Workspace::Workspace() : m_files(this), m_breakpoints(this)
 
 void Workspace::registerListener(void* listener, std::function<void(const DataEvent&)> func)
 {
-	CZ_ASSERT(m_inEventHandler == 0);
-	m_listeners.emplace_back(listener, std::move(func));
+	auto f = [this, listener, func]() { m_listeners.emplace_back(listener, std::move(func)); };
+	if (m_inEventHandler)
+		m_pendingFuncs.push_back(std::move(f));
+	else
+		f();
 }
 
 void Workspace::removeListener(void* listener)
 {
 	CZ_ASSERT(m_inEventHandler == 0);
-	cz::erase_if(m_listeners, [&](decltype(m_listeners[0])& i)
+	auto f = [this, listener]
 	{
-		return i.first == listener;
-	});
+		cz::erase_if(m_listeners, [&](decltype(m_listeners[0])& i)
+		{
+			return i.first == listener;
+		});
+	};
+
+	if (m_inEventHandler)
+		m_pendingFuncs.push_back(std::move(f));
+	else
+		f();
 }
 
 void Workspace::fireEvent(const DataEvent& evt)
@@ -40,6 +51,17 @@ void Workspace::fireEvent(const DataEvent& evt)
 	for (auto& i : m_listeners)
 		i.second(evt);
 	m_inEventHandler--;
+
+	// Only add or remove listeners when we don't have any more nested fireEvent calls
+	if (m_inEventHandler == 0)
+	{
+		if (m_pendingFuncs.size())
+		{
+			for (auto& f : m_pendingFuncs)
+				f();
+			m_pendingFuncs.clear();
+		}
+	}
 }
 
 void Workspace::fireEvent(const DataEventID id)
@@ -212,7 +234,7 @@ bool Workspace::debuggerStart(FileId fileId)
 		return UTF8String("\"") + file->fullpath + "\"";
 	});
 
-	m_debugSession = gUIState->currentInterpreter->launch(vars, file->fullpath, true);
+	m_debugSession = getCurrentInterpreter()->launch(vars, file->fullpath, true);
 	if (!m_debugSession)
 		return false;
 
@@ -303,5 +325,33 @@ const Options* Workspace::getViewOptions()
 {
 	return &m_options;
 }
+
+void Workspace::loadInterpreters()
+{
+	m_interpreters.all = Interpreter::initAll(Filesystem::getSingleton().getCWD() + "interpreters\\");
+}
+
+int Workspace::getNumInterpreters()
+{
+	return m_interpreters.all.size();
+}
+
+const Interpreter* Workspace::getInterpreter(int index)
+{
+	return m_interpreters.all[index].get();
+}
+
+Interpreter* Workspace::getCurrentInterpreter()
+{
+	return m_interpreters.all[m_interpreters.current].get();
+}
+
+void Workspace::setCurrentInterpreter(int index)
+{
+	CZ_ASSERT(static_cast<size_t>(index) < m_interpreters.all.size());
+	m_interpreters.current = index;
+	fireEvent(DataEventID::InterpreterChanged);
+}
+
 
 } // namespace nutcracker

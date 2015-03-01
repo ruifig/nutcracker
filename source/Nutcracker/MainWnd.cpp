@@ -84,21 +84,21 @@ MainWnd::MainWnd()
 
 	m_logger = std::make_unique<MainWndLoggerOutput>(&m_asyncFuncs, m_logTextCtrl);
 	cz::Logger::getSingleton().addOutput(m_logger.get());
-	gUIState = std::make_unique<UIState>();
 
 	//
 	// Initialize interpreters
 	//
 	{
-		gUIState->interpreters = Interpreter::initAll(Filesystem::getSingleton().getCWD() + "interpreters\\");
+		gWorkspace->loadInterpreters();
 		int interpreterMenuId = ID_MENU_INTERPRETER_FIRST;
 
 		//bind(wxevt_command_menu_selected, &mainwnd::oninterpreterclick, this, interpretermenuid);
 		//m_menuinterpreters->append(interpretermenuid++, "test", wxemptystring, wxitem_check);
 
 		wxMenuItem* firstItem = nullptr;
-		for (auto& i : gUIState->interpreters)
+		for(int index=0; index<gWorkspace->getNumInterpreters(); index++)
 		{
+			auto i = gWorkspace->getInterpreter(index);
 			auto item = m_menuInterpreters->AppendRadioItem(interpreterMenuId, i->getName().c_str());
 			if (!firstItem)
 				firstItem = item;
@@ -106,7 +106,6 @@ MainWnd::MainWnd()
 			interpreterMenuId++;
 		}
 		firstItem->Check();
-		gUIState->currentInterpreter = gUIState->interpreters[0].get();
 	}
 
 	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(MainWnd::OnCharHook));
@@ -152,7 +151,7 @@ void MainWnd::OnMenuClick(wxCommandEvent& event)
 
 void MainWnd::OnInterpreterClick(wxCommandEvent& event)
 {
-	gUIState->currentInterpreter = gUIState->interpreters[event.GetId() - ID_MENU_INTERPRETER_FIRST].get();
+	gWorkspace->setCurrentInterpreter(event.GetId() - ID_MENU_INTERPRETER_FIRST);
 }
 
 void MainWnd::OnCharHook(wxKeyEvent& event)

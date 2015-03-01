@@ -17,7 +17,7 @@ namespace nutcracker
 // Forward declarations
 class DebugSession;
 struct BreakInfo;
-
+class Interpreter;
 
 struct Options
 {
@@ -53,7 +53,11 @@ enum class DataEventID
 	ViewIndentation=ViewFIRST,
 	ViewWhitespaces,
 	ViewEOL,
-	ViewLAST = ViewEOL
+	ViewLAST = ViewEOL,
+
+	// Interpreters
+	InterpreterChanged
+
 };
 
 struct DataEvent
@@ -184,18 +188,38 @@ public:
 	void setViewEOL(bool enabled);
 	const Options* getViewOptions();
 
+
+	//
+	// Interpreters
+	//
+	void loadInterpreters();
+	int getNumInterpreters();
+	const Interpreter* getInterpreter(int index);
+	Interpreter* getCurrentInterpreter();
+	void setCurrentInterpreter(int index);
+
 private:
 
 	const Breakpoint* toggleBreakpoint(Breakpoint* brk);
 	void fireEvent(const DataEvent& evt);
 	void fireEvent(DataEventID id);
 	std::vector<std::pair<void*,std::function<void(const DataEvent&)>>> m_listeners;
+	std::vector<std::function<void()>> m_pendingFuncs;
 	Files m_files;
 	Breakpoints m_breakpoints;
 	int m_inEventHandler = 0;
 	std::shared_ptr<DebugSession> m_debugSession;
 	std::shared_ptr<BreakInfo> m_breakInfo;
 	Options m_options;
+
+
+	//
+	// Interpreters
+	struct Interpreters
+	{
+		std::vector<std::unique_ptr<Interpreter>> all;
+		int current=0; // index of the current interpreter
+	} m_interpreters;
 
 };
 
