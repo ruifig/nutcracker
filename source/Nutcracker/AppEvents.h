@@ -9,9 +9,6 @@ namespace nutcracker
 enum class AppEventID
 {
 	ViewOptionsChanged,
-	DebugStarted,
-	DebugStop,
-	CallstackFrameChanged
 };
 
 struct AppEvent

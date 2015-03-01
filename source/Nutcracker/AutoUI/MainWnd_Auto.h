@@ -83,6 +83,12 @@ public:
 	/// wxEVT_IDLE event handler for ID_MAINWND_AUTO
 	virtual void OnIdle( wxIdleEvent& event );
 
+	/// wxEVT_SET_FOCUS event handler for ID_MAINWND_AUTO
+	virtual void OnSetFocus( wxFocusEvent& event );
+
+	/// wxEVT_KILL_FOCUS event handler for ID_MAINWND_AUTO
+	virtual void OnKillFocus( wxFocusEvent& event );
+
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_OPENFILE
 	virtual void OnMenuOpenFile( wxCommandEvent& event );
 

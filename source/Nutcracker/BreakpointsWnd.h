@@ -29,6 +29,7 @@ private:
 	void OnShow(wxShowEvent& evt);
 
 	virtual void onAppEvent(const AppEvent& evt) override;
+	void tryUpdateState(bool force = false);
 	void updateState();
 
 	void adjustSize(int width);

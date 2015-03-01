@@ -43,6 +43,8 @@ BEGIN_EVENT_TABLE( MainWnd_Auto, wxFrame )
 ////@begin MainWnd_Auto event table entries
 	EVT_CLOSE( MainWnd_Auto::OnCloseWindow )
 	EVT_IDLE( MainWnd_Auto::OnIdle )
+	EVT_SET_FOCUS( MainWnd_Auto::OnSetFocus )
+	EVT_KILL_FOCUS( MainWnd_Auto::OnKillFocus )
 	EVT_MENU( ID_MENU_FILE_OPENFILE, MainWnd_Auto::OnMenuOpenFile )
 	EVT_MENU( wxID_EXIT, MainWnd_Auto::OnExitClick )
 	EVT_MENU( ID_MENU_VIEW_INDENTATION, MainWnd_Auto::OnMenuClick )
@@ -283,5 +285,31 @@ void MainWnd_Auto::OnMenuClick( wxCommandEvent& event )
 	// Before editing this code, remove the block markers.
 	event.Skip();
 ////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_INDENTATION in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_SET_FOCUS event handler for ID_MAINWND_AUTO
+ */
+
+void MainWnd_Auto::OnSetFocus( wxFocusEvent& event )
+{
+////@begin wxEVT_SET_FOCUS event handler for ID_MAINWND_AUTO in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_SET_FOCUS event handler for ID_MAINWND_AUTO in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_KILL_FOCUS event handler for ID_MAINWND_AUTO
+ */
+
+void MainWnd_Auto::OnKillFocus( wxFocusEvent& event )
+{
+////@begin wxEVT_KILL_FOCUS event handler for ID_MAINWND_AUTO in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_KILL_FOCUS event handler for ID_MAINWND_AUTO in MainWnd_Auto. 
 }
 

@@ -12,7 +12,6 @@
 
 #include "AppEvents.h"
 #include "Interpreter.h"
-#include "LaunchUtil.h"
 #include "FileEditorGroupWnd.h"
 #include "Workspace.h"
 
@@ -176,25 +175,33 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 
 	if (modifiers == wxMOD_NONE && keycode==WXK_F5)
 	{
-		if (gUIState->debugSession)
-			gUIState->debugSession->resume();
+		if (gWorkspace->debuggerActive())
+			gWorkspace->debuggerResume();
 		else
-			launch(true);
+		{
+			auto file = gFileEditorGroupWnd->getCurrentFile();
+			if (!file)
+			{
+				showError("No file selected","No file selected to start debugger!\nOpen a file first");
+			}
+			else
+			{
+				auto focusedWnd = this->FindFocus();
+				gWorkspace->debuggerStart(file->id);
+			}
+		}
 	}
 	else if (modifiers == wxMOD_NONE && keycode == WXK_F10)
 	{
-		if (gUIState->debugSession)
-			gUIState->debugSession->stepOver();
+		gWorkspace->debuggerStepOver();
 	}
 	else if (modifiers == wxMOD_NONE && keycode == WXK_F11)
 	{
-		if (gUIState->debugSession)
-			gUIState->debugSession->stepInto();
+		gWorkspace->debuggerStepInto();
 	}
 	else if (modifiers == wxMOD_SHIFT && keycode == WXK_F11)
 	{
-		if (gUIState->debugSession)
-			gUIState->debugSession->stepReturn();
+		gWorkspace->debuggerStepReturn();
 	}
 	else
 	{
@@ -257,6 +264,15 @@ void MainWnd::OnMenuOpenFile(wxCommandEvent& event)
 	{
 		showException(e);
 	}
+}
+
+void MainWnd::OnSetFocus(wxFocusEvent& event)
+{
+}
+
+void MainWnd::OnKillFocus(wxFocusEvent& event)
+{
+
 }
 
 void MainWnd::OnDropFiles(wxDropFilesEvent& event)

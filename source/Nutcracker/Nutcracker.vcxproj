@@ -106,7 +106,6 @@
     <ClCompile Include="Files.cpp" />
     <ClCompile Include="GridCellImageRenderer.cpp" />
     <ClCompile Include="Interpreter.cpp" />
-    <ClCompile Include="LaunchUtil.cpp" />
     <ClCompile Include="LocalsWnd.cpp" />
     <ClCompile Include="MainWnd.cpp" />
     <ClCompile Include="Messenger.cpp" />
@@ -142,7 +141,6 @@
     <ClInclude Include="Files.h" />
     <ClInclude Include="GridCellImageRenderer.h" />
     <ClInclude Include="Interpreter.h" />
-    <ClInclude Include="LaunchUtil.h" />
     <ClInclude Include="LocalsWnd.h" />
     <ClInclude Include="MainWnd.h" />
     <ClInclude Include="Messenger.h" />

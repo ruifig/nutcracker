@@ -34,18 +34,12 @@ LocalsWnd::LocalsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const 
 	m_tree->AppendColumn("Value");
 	m_tree->AppendColumn("Type");
 
-
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
-	{
-		if (evt.isBreakpointEvent() && !m_pendingUpdate)
+	 {
+		if (evt.isBreakpointEvent() || evt.id == DataEventID::DebugStart || evt.id == DataEventID::DebugStop ||
+			evt.id == DataEventID::DebugBreak || evt.id == DataEventID::DebugChangedCallstackFrame)
 		{
-			m_pendingUpdate = true;
-			postAppLambdaEvent([this]()
-			{
-				if (IsShownOnScreen())
-					updateState();
-				m_pendingUpdate = false;
-			});
+			tryUpdateState();
 		}
 	});
 }
@@ -56,26 +50,6 @@ LocalsWnd::~LocalsWnd()
 
 void LocalsWnd::onAppEvent(const AppEvent& evt)
 {
-	switch (evt.id)
-	{
-		case AppEventID::DebugStarted:
-			gUIState->debugSession->breakListeners.add(this,
-				[&](const std::shared_ptr<const BreakInfo>& info)
-			{
-				m_info = info;
-				if (IsShownOnScreen())
-					updateState();
-			});
-			break;
-		case AppEventID::DebugStop:
-			m_info = nullptr;
-			updateState();
-			break;
-		case AppEventID::CallstackFrameChanged:
-			if (IsShownOnScreen())
-				updateState();
-			break;
-	}
 }
 
 void LocalsWnd::addVar(const std::shared_ptr<TreeCtrlUtil::TreeListCtrlItemData>& parentItem, const TableEntry& entry, int& idcounter)
@@ -93,12 +67,27 @@ void LocalsWnd::addVar(const std::shared_ptr<TreeCtrlUtil::TreeListCtrlItemData>
 	}
 }
 
+void LocalsWnd::tryUpdateState(bool force)
+{
+	if (m_pendingUpdate && !force)
+		return;
+
+	m_pendingUpdate = true;
+	postAppLambdaEvent([this, force]()
+	{
+		if (IsShownOnScreen() || force)
+			updateState();
+		m_pendingUpdate = false;
+	});
+}
+
 void LocalsWnd::updateState()
 {
 	m_treeData.clear();
 	m_treeData.startRefresh();
 
-	if (!m_info)
+	auto info = gWorkspace->debuggerGetBreakInfo();
+	if (!info)
 	{
 		m_treeData.endRefresh();
 		return;
@@ -106,7 +95,7 @@ void LocalsWnd::updateState()
 
 	int idcounter = 0;
 	auto root = m_treeData.setupRoot(TreeCtrlUtil::TreeItemID(idcounter++));
-	const auto& vars = m_info->callstack[m_info->currentCallstackFrame].vars;
+	const auto& vars = info->callstack[info->currentCallstackFrame].vars;
 
 	for (auto& v : vars)
 		addVar(root, v, idcounter);

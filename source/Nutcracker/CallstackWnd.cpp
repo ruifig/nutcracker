@@ -13,6 +13,7 @@
 #include "Workspace.h"
 #include "FileEditorGroupWnd.h"
 #include "GridCellImageRenderer.h"
+#include "Workspace.h"
 
 namespace nutcracker
 {
@@ -27,34 +28,47 @@ CallstackWnd::CallstackWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	m_grid->EnableDragRowSize(false);
 	m_grid->EnableDragColMove(false);
 	m_grid->EnableDragGridSize(false);
+
+	gWorkspace->registerListener(this, [this](const DataEvent& evt)
+	{
+		bool tryUpdate = false;
+		if (evt.id == DataEventID::DebugBreak)
+		{
+			tryUpdate = true;
+		}
+		else if (evt.id == DataEventID::DebugStop)
+		{
+			tryUpdate = true;
+		}
+		else if (evt.id == DataEventID::DebugChangedCallstackFrame)
+		{
+			auto info = gWorkspace->debuggerGetBreakInfo();
+			updateFrameMarker(m_currentIndex, info->currentCallstackFrame);
+			auto& entry = info->callstack[info->currentCallstackFrame];
+			gFileEditorGroupWnd->gotoFile(entry.file, entry.line - 1);
+		}
+
+		if (tryUpdate && !m_pendingUpdate)
+		{
+			m_pendingUpdate = true;
+			postAppLambdaEvent([this]()
+			{
+				updateState();
+				m_pendingUpdate = false;
+			});
+		}
+
+	});
+
 }
 
 CallstackWnd::~CallstackWnd()
 {
+	gWorkspace->removeListener(this);
 }
 
 void CallstackWnd::onAppEvent(const AppEvent& evt)
 {
-	switch (evt.id)
-	{
-		case AppEventID::DebugStarted:
-			gUIState->debugSession->breakListeners.add(
-				this, [&](const std::shared_ptr<BreakInfo>& info)
-			{
-				m_info = info;
-				if (IsShownOnScreen())
-					updateState();
-			});
-			break;
-
-		case AppEventID::DebugStop:
-			m_info = nullptr;
-			updateState();
-			break;
-
-		case AppEventID::CallstackFrameChanged:
-			break;
-	};
 }
 
 void CallstackWnd::updateState()
@@ -64,16 +78,17 @@ void CallstackWnd::updateState()
 	if (m_grid->GetNumberRows())
 		m_grid->DeleteRows(0, m_grid->GetNumberRows());
 
-	if (!m_info)
+	auto info = gWorkspace->debuggerGetBreakInfo();
+	if (!info)
 	{
 		m_grid->Thaw();
 		return;
 	}
 
-	m_grid->AppendRows(m_info->callstack.size());
+	m_grid->AppendRows(info->callstack.size());
 
 	int r = 0;
-	for (auto& c : m_info->callstack)
+	for (auto& c : info->callstack)
 	{
 		m_grid->SetReadOnly(r, 0, true);
 		m_grid->SetReadOnly(r, 1, true);
@@ -91,7 +106,7 @@ void CallstackWnd::updateState()
 	m_infoColMinSize = m_grid->GetColSize(1);
 	adjustSize(this->GetSize().GetX());
 
-	updateFrameMarker(m_info->currentCallstackFrame, m_info->currentCallstackFrame);
+	updateFrameMarker(info->currentCallstackFrame, info->currentCallstackFrame);
 	m_grid->Thaw();
 }
 
@@ -122,24 +137,20 @@ void CallstackWnd::updateFrameMarker(int previous, int current)
 	auto newCell = static_cast<GridCellImageRenderer*>(m_grid->GetCellRenderer(current,0));
 	previousCell->setImage(wxNullBitmap);
 	newCell->setImage(gImageListSmall.GetBitmap(SMALLIMG_IDX_CALLSTACK_CURRENT));
+	m_currentIndex = current;
 }
 
 void CallstackWnd::OnCellDClick(wxGridEvent& evt)
 {
 	int r = evt.GetRow();
 	int c = evt.GetCol();
-
-	updateFrameMarker(m_info->currentCallstackFrame, r);
-	m_info->currentCallstackFrame = r;
-	auto& entry = m_info->callstack[m_info->currentCallstackFrame];
-	gFileEditorGroupWnd->gotoFile(entry.file, entry.line-1);
-	fireAppEvent(AppEventID::CallstackFrameChanged);
+	gWorkspace->debuggerSetCallstackFrame(r);
 	evt.Skip();
 }
 
 void CallstackWnd::OnShow(wxShowEvent& evt)
 {
-	if (evt.IsShown())
+	if (evt.IsShown() && !m_pendingUpdate)
 		updateState();
 	evt.Skip();
 }

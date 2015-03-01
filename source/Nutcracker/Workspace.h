@@ -14,6 +14,12 @@
 namespace nutcracker
 {
 
+// Forward declarations
+class DebugSession;
+struct BreakInfo;
+
+
+
 enum class DataEventID
 {
 	// Workspace
@@ -32,7 +38,9 @@ enum class DataEventID
 
 	//
 	DebugStart,
-	DebugStop
+	DebugStop,
+	DebugBreak,
+	DebugChangedCallstackFrame
 };
 
 struct DataEvent
@@ -93,6 +101,10 @@ struct BreakpointUpdated : public BreakpointEvent
 };
 
 //////////////////////////////////////////////////////////////////////////
+//	Debugger events
+//////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////
 //	Workspace
 //////////////////////////////////////////////////////////////////////////
 class Workspace
@@ -137,18 +149,26 @@ public:
 	//
 	// Debugger
 	//
-	bool debuggerStart();
-
+	bool debuggerStart(FileId fileId);
+	bool debuggerActive();
+	const BreakInfo* debuggerGetBreakInfo();
+	void debuggerSetCallstackFrame(int index);
+	void debuggerResume();
+	void debuggerStepOver();
+	void debuggerStepInto();
+	void debuggerStepReturn();
 
 private:
 
 	const Breakpoint* toggleBreakpoint(Breakpoint* brk);
 	void fireEvent(const DataEvent& evt);
+	void fireEvent(DataEventID id);
 	std::vector<std::pair<void*,std::function<void(const DataEvent&)>>> m_listeners;
 	Files m_files;
 	Breakpoints m_breakpoints;
 	int m_inEventHandler = 0;
-	//std::shared_ptr<DebugSession> m_debugSession;
+	std::shared_ptr<DebugSession> m_debugSession;
+	std::shared_ptr<BreakInfo> m_breakInfo;
 };
 
 } // namespace nutcracker

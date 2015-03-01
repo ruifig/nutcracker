@@ -435,6 +435,7 @@ std::shared_ptr<DebugSession> Interpreter::launch(const Variables& variables, co
 	auto cwd = wxGetCwd();
 	auto cmd = variables.replace(debug ? m_launchDebug : m_launchNormal);
 	wxSetWorkingDirectory(Filename(file).getDirectory().c_str());
+	//wxExecute(cmd.c_str(), wxEXEC_NODISABLE | wxEXEC_HIDE_CONSOLE);
 	wxExecute(cmd.c_str());
 	wxSetWorkingDirectory(cwd);
 
