@@ -183,10 +183,6 @@ void FileEditorGroupWnd::setPageTitle(const std::shared_ptr<const File>& file)
 	}
 }
 
-void FileEditorGroupWnd::onAppEvent(const AppEvent& evt)
-{
-}
-
 FileEditorWnd* FileEditorGroupWnd::getCurrentPage()
 {
 	wxWindow* page = m_notebook->GetCurrentPage();

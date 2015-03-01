@@ -17,7 +17,7 @@
 namespace nutcracker
 {
 
-class WorkspaceWnd : public WorkspaceWnd_Auto, public AppEventListener
+class WorkspaceWnd : public WorkspaceWnd_Auto
 {
 public:
 	WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
@@ -38,7 +38,6 @@ private:
 	void updateState();
 	wxTreeItemId findFileTreeItem(FileId fileId);
 
-	virtual void onAppEvent(const AppEvent& evt) override;
 	TreeCtrlUtil::TreeCtrlData m_treeData;
 	FileId m_selectedFileId;
 	bool m_pendingUpdate = false;

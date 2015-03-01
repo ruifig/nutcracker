@@ -16,7 +16,7 @@
 namespace nutcracker
 {
 
-class FileEditorWnd : public FileEditorWnd_Auto, public AppEventListener
+class FileEditorWnd : public FileEditorWnd_Auto
 {
 public:
 	FileEditorWnd(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition,
@@ -49,7 +49,6 @@ private:
 	void syncBreakpoint(const Breakpoint* brk);
 	void setCommonStyle();
 	void updateViewOptions();
-	virtual void onAppEvent(const AppEvent& evt);
 	void showAutoComplete();
 	void showCallTip(bool updatePos);
 	void updateErrorMarkers();

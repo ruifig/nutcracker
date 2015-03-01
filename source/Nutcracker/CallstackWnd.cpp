@@ -67,10 +67,6 @@ CallstackWnd::~CallstackWnd()
 	gWorkspace->removeListener(this);
 }
 
-void CallstackWnd::onAppEvent(const AppEvent& evt)
-{
-}
-
 void CallstackWnd::updateState()
 {
 	m_grid->Freeze();

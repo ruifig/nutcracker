@@ -48,10 +48,6 @@ LocalsWnd::~LocalsWnd()
 {
 }
 
-void LocalsWnd::onAppEvent(const AppEvent& evt)
-{
-}
-
 void LocalsWnd::addVar(const std::shared_ptr<TreeCtrlUtil::TreeListCtrlItemData>& parentItem, const TableEntry& entry, int& idcounter)
 {
 	auto itemRoot = m_treeData.addItem(parentItem, TreeCtrlUtil::TreeItemID(idcounter++), entry.getName().c_str());

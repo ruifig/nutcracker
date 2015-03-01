@@ -143,10 +143,6 @@ void BreakpointsWnd::OnShow(wxShowEvent& evt)
 	updateState();
 }
 
-void BreakpointsWnd::onAppEvent(const AppEvent& evt)
-{
-}
-
 void BreakpointsWnd::OnSize(wxSizeEvent& evt)
 {
 	auto size = evt.GetSize();

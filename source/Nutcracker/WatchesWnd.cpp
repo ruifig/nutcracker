@@ -26,10 +26,6 @@ WatchesWnd::~WatchesWnd()
 {
 }
 
-void WatchesWnd::onAppEvent(const AppEvent& evt)
-{
-}
-
 void WatchesWnd::updateState()
 {
 	m_tree->Freeze();

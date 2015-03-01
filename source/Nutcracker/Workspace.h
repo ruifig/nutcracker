@@ -19,6 +19,12 @@ class DebugSession;
 struct BreakInfo;
 
 
+struct Options
+{
+	bool viewIndentation = false;
+	bool viewWhitespaces = false;
+	bool viewEOL = false;
+};
 
 enum class DataEventID
 {
@@ -40,7 +46,14 @@ enum class DataEventID
 	DebugStart,
 	DebugStop,
 	DebugBreak,
-	DebugChangedCallstackFrame
+	DebugChangedCallstackFrame,
+
+	// Options
+	ViewFIRST,
+	ViewIndentation=ViewFIRST,
+	ViewWhitespaces,
+	ViewEOL,
+	ViewLAST = ViewEOL
 };
 
 struct DataEvent
@@ -51,6 +64,11 @@ struct DataEvent
 	bool isBreakpointEvent() const
 	{
 		return id >= DataEventID::BreakpointFIRST && id <= DataEventID::BreakpointLAST;
+	}
+	
+	bool isViewOptionsEvent() const
+	{
+		return id >= DataEventID::ViewFIRST && id <= DataEventID::ViewLAST;
 	}
 };
 
@@ -158,6 +176,14 @@ public:
 	void debuggerStepInto();
 	void debuggerStepReturn();
 
+	//
+	// View options
+	//
+	void setViewIdentation(bool enabled);
+	void setViewWhitespaces(bool enabled);
+	void setViewEOL(bool enabled);
+	const Options* getViewOptions();
+
 private:
 
 	const Breakpoint* toggleBreakpoint(Breakpoint* brk);
@@ -169,6 +195,8 @@ private:
 	int m_inEventHandler = 0;
 	std::shared_ptr<DebugSession> m_debugSession;
 	std::shared_ptr<BreakInfo> m_breakInfo;
+	Options m_options;
+
 };
 
 } // namespace nutcracker

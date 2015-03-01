@@ -135,20 +135,14 @@ void MainWnd::OnMenuClick(wxCommandEvent& event)
 	switch(event.GetId())
 	{
 		case ID_MENU_VIEW_INDENTATION:
-			gUIState->view_ShowIndentationGuides = val;
-			fireAppEvent(AppEventID::ViewOptionsChanged);
+			gWorkspace->setViewIdentation(val);
 		break;
-
 		case ID_MENU_VIEW_WHITESPACE:
-			gUIState->view_Whitespace = val;
-			fireAppEvent(AppEventID::ViewOptionsChanged);
+			gWorkspace->setViewWhitespaces(val);
 		break;
-
 		case ID_MENU_VIEW_EOL:
-			gUIState->view_EOL = val;
-			fireAppEvent(AppEventID::ViewOptionsChanged);
+			gWorkspace->setViewEOL(val);
 		break;
-
 		case ID_MENU_FILE_OPENFILE:
 			showMsg("TODO", "TODO");
 		break;

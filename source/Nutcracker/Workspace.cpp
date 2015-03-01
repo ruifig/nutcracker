@@ -281,4 +281,27 @@ void Workspace::debuggerStepReturn()
 }
 
 
+void Workspace::setViewIdentation(bool enabled)
+{
+	m_options.viewIndentation = enabled;
+	fireEvent(DataEventID::ViewIndentation);
+}
+
+void Workspace::setViewWhitespaces(bool enabled)
+{
+	m_options.viewWhitespaces = enabled;
+	fireEvent(DataEventID::ViewWhitespaces);
+}
+
+void Workspace::setViewEOL(bool enabled)
+{
+	m_options.viewEOL = enabled;
+	fireEvent(DataEventID::ViewEOL);
+}
+
+const Options* Workspace::getViewOptions()
+{
+	return &m_options;
+}
+
 } // namespace nutcracker

@@ -13,7 +13,7 @@
 namespace nutcracker
 {
 
-class FileEditorGroupWnd : public FileEditorGroupWnd_Auto , public AppEventListener
+class FileEditorGroupWnd : public FileEditorGroupWnd_Auto
 {
 public:
 	FileEditorGroupWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
@@ -41,7 +41,6 @@ private:
 	void OnCloseAllButThis( wxCommandEvent& event );
 	void OnTimer(wxTimerEvent& evt);
 
-	virtual void onAppEvent(const AppEvent& evt);
 	FileEditorWnd* getCurrentPage();
 
 	void iterateFiles(std::function<void(FileEditorWnd*)> func);
