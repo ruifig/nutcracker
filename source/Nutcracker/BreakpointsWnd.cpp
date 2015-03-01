@@ -39,15 +39,13 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	{
-		if (evt.isBreakpointEvent() && !m_pendingUpdate)
+		if (evt.isBreakpointEvent())
 		{
-			m_pendingUpdate = true;
-			postAppLambdaEvent([this]()
-			{
-				if (IsShownOnScreen())
-					updateState();
-				m_pendingUpdate = false;
-			});
+			tryUpdateState();
+		}
+		else if (evt.id == DataEventID::DebugStop)
+		{
+			tryUpdateState(true);
 		}
 	});
 }
@@ -55,6 +53,20 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 BreakpointsWnd::~BreakpointsWnd()
 {
 	gBreakpointsWnd = nullptr;
+}
+
+void BreakpointsWnd::tryUpdateState(bool force)
+{
+	if (m_pendingUpdate && !force)
+		return;
+
+	m_pendingUpdate = true;
+	postAppLambdaEvent([this, force]()
+	{
+		if (IsShownOnScreen() || force)
+			updateState();
+		m_pendingUpdate = false;
+	});
 }
 
 void BreakpointsWnd::updateState()
@@ -133,12 +145,6 @@ void BreakpointsWnd::OnShow(wxShowEvent& evt)
 
 void BreakpointsWnd::onAppEvent(const AppEvent& evt)
 {
-	switch (evt.id)
-	{
-		case AppEventID::DebugStop:
-		updateState();
-		break;
-	}
 }
 
 void BreakpointsWnd::OnSize(wxSizeEvent& evt)

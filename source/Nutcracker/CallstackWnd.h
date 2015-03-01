@@ -9,11 +9,12 @@
 #pragma once
 
 #include "AutoUI/CallstackWnd_Auto.h"
-#include "Interpreter.h"
 #include "AppEvents.h"
 
 namespace nutcracker
 {
+
+struct BreakInfo;
 
 class CallstackWnd : public CallstackWnd_Auto, public AppEventListener
 {
@@ -38,8 +39,9 @@ private:
 	void adjustSize(int width);
 	void updateFrameMarker(int previous, int current);
 
-	std::shared_ptr<BreakInfo> m_info;
 	int m_infoColMinSize = 0;
+	bool m_pendingUpdate = false;
+	int m_currentIndex = 0;
 };
 
 } // namespace nutcracker

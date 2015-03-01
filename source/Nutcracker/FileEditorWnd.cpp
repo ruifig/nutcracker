@@ -58,17 +58,17 @@ FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	{
-		switch (evt.id)
+		if (evt.id == DataEventID::BreakpointToggle)
 		{
-			case DataEventID::BreakpointToggle:
-			{
-				auto brk = static_cast<const BreakpointEvent&>(evt).brk;
-				if (brk->file == m_file)
-					syncBreakpoint(brk);
-			}
+			auto brk = static_cast<const BreakpointEvent&>(evt).brk;
+			if (brk->file == m_file)
+				syncBreakpoint(brk);
+		}
+		else if (evt.id == DataEventID::DebugStop)
+		{
+			m_textCtrl->MarkerDeleteAll(MARK_DEBUGCURSOR);
 		}
 	});
-
 }
 
 FileEditorWnd::~FileEditorWnd()
@@ -294,7 +294,7 @@ void FileEditorWnd::syncBreakpoint(const Breakpoint* brk)
 	}
 }
 
-void FileEditorWnd::syncBreakInfo(BreakInfo& brk)
+void FileEditorWnd::syncBreakInfo(const BreakInfo& brk)
 {
 	if (brk.file != m_file)
 		return;
@@ -731,9 +731,6 @@ void FileEditorWnd::onAppEvent(const AppEvent& evt)
 	{
 		case AppEventID::ViewOptionsChanged:
 			updateViewOptions();
-			break;
-		case AppEventID::DebugStop:
-			m_textCtrl->MarkerDeleteAll(MARK_DEBUGCURSOR);
 			break;
 		default:
 			break;

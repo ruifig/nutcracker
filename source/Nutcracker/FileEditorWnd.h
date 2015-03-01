@@ -33,7 +33,7 @@ public:
 	void onPageChanged();
 	std::pair<int, int> getCursorLocation();
 	bool markerToLine(int markerHandle, int& line);
-	void syncBreakInfo(BreakInfo& brk);
+	void syncBreakInfo(const BreakInfo& brk);
 
 private:
 	DECLARE_EVENT_TABLE()

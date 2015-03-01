@@ -32,11 +32,11 @@ private:
 	// AppEventListener
 	virtual void onAppEvent(const AppEvent& evt) override;
 
+	void tryUpdateState(bool force = false);
 	void updateState();
 	void adjustSize(int width);
 	void LocalsWnd::addVar(const std::shared_ptr<TreeCtrlUtil::TreeListCtrlItemData>& parentItem, const TableEntry& entry, int& idcounter);
 
-	std::shared_ptr<const BreakInfo> m_info;
 	TreeCtrlUtil::TreeListCtrlData m_treeData;
 	bool m_pendingUpdate = false;
 };

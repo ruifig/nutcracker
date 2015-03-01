@@ -9,6 +9,8 @@
 
 #include "NutcrackerPCH.h"
 #include "Workspace.h"
+#include "Interpreter.h"
+#include "UIDefs.h"
 
 namespace nutcracker
 {
@@ -35,15 +37,14 @@ void Workspace::removeListener(void* listener)
 void Workspace::fireEvent(const DataEvent& evt)
 {
 	m_inEventHandler++;
-	/*
-	auto todo = std::move(m_listeners);
-	for (auto& i : todo)
-		i.second(evt);
-	m_listeners.insert(m_listeners.begin(), todo.begin(), todo.end());
-	*/
 	for (auto& i : m_listeners)
 		i.second(evt);
 	m_inEventHandler--;
+}
+
+void Workspace::fireEvent(const DataEventID id)
+{
+	fireEvent(DataEvent(id));
 }
 
 std::shared_ptr<const File> Workspace::getFile(FileId fileId)
@@ -59,7 +60,7 @@ std::shared_ptr<const File> Workspace::createFile(UTF8String path)
 void Workspace::addFolder(const UTF8String& path)
 {
 	m_files.addFolder(path);
-	fireEvent(DataEvent(DataEventID::WorkspaceChanges));
+	fireEvent(DataEventID::WorkspaceChanges);
 }
 
 void Workspace::resyncFolders()
@@ -200,9 +201,84 @@ void Workspace::removeBreakpoint(FileId fileId, int line)
 		fireEvent(BreakpointRemoved(brk.get()));
 }
 
-bool Workspace::debuggerStart()
+bool Workspace::debuggerStart(FileId fileId)
 {
-	return false;
+	auto file = m_files.getFile(fileId);
+	CZ_ASSERT(file);
+
+	Variables vars;
+	vars.set("%FILE%", [&]()
+	{
+		return UTF8String("\"") + file->fullpath + "\"";
+	});
+
+	m_debugSession = gUIState->currentInterpreter->launch(vars, file->fullpath, true);
+	if (!m_debugSession)
+		return false;
+
+	m_debugSession->disconnectListeners.add(this, [this]()
+	{
+		m_debugSession = nullptr;
+		m_breakInfo = nullptr;
+		fireEvent(DataEventID::DebugStop);
+	});
+
+	m_debugSession->breakListeners.add(this, [this](const std::shared_ptr<BreakInfo>& info)
+	{
+		m_breakInfo = info;
+		fireEvent(DataEventID::DebugBreak);
+	});
+
+	fireEvent(DataEventID::DebugStart);
+	return true;
 }
+
+bool Workspace::debuggerActive()
+{
+	return m_debugSession ? true : false;
+}
+
+const BreakInfo* Workspace::debuggerGetBreakInfo()
+{
+	return m_breakInfo ? m_breakInfo.get() : nullptr;
+}
+
+void Workspace::debuggerSetCallstackFrame(int index)
+{
+	if (!m_breakInfo || (static_cast<size_t>(index)>=m_breakInfo->callstack.size()))
+		return;
+
+	m_breakInfo->currentCallstackFrame = index;
+	fireEvent(DataEventID::DebugChangedCallstackFrame);
+}
+
+void Workspace::debuggerResume()
+{
+	if (!m_debugSession)
+		return;
+	m_debugSession->resume();
+}
+
+void Workspace::debuggerStepOver()
+{
+	if (!m_debugSession)
+		return;
+	m_debugSession->stepOver();
+}
+
+void Workspace::debuggerStepInto()
+{
+	if (!m_debugSession)
+		return;
+	m_debugSession->stepInto();
+}
+
+void Workspace::debuggerStepReturn()
+{
+	if (!m_debugSession)
+		return;
+	m_debugSession->stepReturn();
+}
+
 
 } // namespace nutcracker

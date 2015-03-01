@@ -42,11 +42,16 @@ FileEditorGroupWnd::FileEditorGroupWnd(wxWindow* parent, wxWindowID id, const wx
 
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	{
-		switch (evt.id)
+		if (evt.id == DataEventID::FileSaved)
 		{
-			case DataEventID::FileSaved:
-				setPageTitle(static_cast<const FileEvent&>(evt).file);
-			break;
+			setPageTitle(static_cast<const FileEvent&>(evt).file);
+		}
+		else if (evt.id == DataEventID::DebugBreak)
+		{
+			auto info = gWorkspace->debuggerGetBreakInfo();
+			gotoFile(info->file);
+			auto fwnd = findFileWnd(info->file, nullptr);
+			fwnd->syncBreakInfo(*info);
 		}
 	});
 }
@@ -180,18 +185,6 @@ void FileEditorGroupWnd::setPageTitle(const std::shared_ptr<const File>& file)
 
 void FileEditorGroupWnd::onAppEvent(const AppEvent& evt)
 {
-	switch (evt.id)
-	{
-		case AppEventID::DebugStarted:
-			gUIState->debugSession->breakListeners.add(
-				this, [&](const std::shared_ptr<BreakInfo>& info)
-			{
-				gotoFile(info->file);
-				auto fwnd = findFileWnd(info->file, nullptr);
-				fwnd->syncBreakInfo(*info);
-			});
-			break;
-	}
 }
 
 FileEditorWnd* FileEditorGroupWnd::getCurrentPage()
