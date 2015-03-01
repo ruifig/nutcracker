@@ -3,11 +3,9 @@
 
 namespace nutcracker
 {
-	class Files;
-	struct File;
 	class Interpreter;
-	class DebugSession;
 	class Workspace;
+	struct File;
 	struct Breakpoint;
 
 	class FileEditorWnd;
@@ -44,12 +42,8 @@ namespace nutcracker
 
 	struct UIState
 	{
-		bool view_ShowIndentationGuides = false;
-		bool view_Whitespace = false;
-		bool view_EOL = false;
 		std::vector<std::unique_ptr<Interpreter>> interpreters;
 		Interpreter* currentInterpreter=nullptr;
-		std::shared_ptr<DebugSession> debugSession;
 	};
 
 	extern std::unique_ptr<UIState> gUIState;

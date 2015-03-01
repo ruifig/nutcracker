@@ -13,7 +13,7 @@
 namespace nutcracker
 {
 
-class BreakpointsWnd : public BreakpointsWnd_Auto, public AppEventListener
+class BreakpointsWnd : public BreakpointsWnd_Auto
 {
 public:
 	BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
@@ -28,7 +28,6 @@ private:
 	virtual void OnSize(wxSizeEvent& event) override;
 	void OnShow(wxShowEvent& evt);
 
-	virtual void onAppEvent(const AppEvent& evt) override;
 	void tryUpdateState(bool force = false);
 	void updateState();
 

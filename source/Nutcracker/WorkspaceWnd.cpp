@@ -65,10 +65,6 @@ WorkspaceWnd::~WorkspaceWnd()
 {
 }
 
-void WorkspaceWnd::onAppEvent(const AppEvent& evt)
-{
-}
-
 // Helper to update recursively
 std::shared_ptr<TreeCtrlUtil::TreeItemData> WorkspaceWnd::updateState(
 	const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent, const std::shared_ptr<const BaseItem>& item)

@@ -6,28 +6,6 @@
 namespace nutcracker
 {
 
-enum class AppEventID
-{
-	ViewOptionsChanged,
-};
-
-struct AppEvent
-{
-	AppEventID id;
-	AppEvent(AppEventID id) : id(id) {}
-};
-
-class AppEventListener
-{
-public:
-	AppEventListener();
-	virtual ~AppEventListener();
-	virtual void onAppEvent(const AppEvent& evt) = 0;
-private:
-};
-
-void fireAppEvent(const AppEvent& evt);
-
 class NutcrackerLambdaEvent;
 wxDECLARE_EVENT(NUTCRACKER_LAMBDA_EVENT, NutcrackerLambdaEvent);
 

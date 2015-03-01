@@ -68,6 +68,10 @@ FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos
 		{
 			m_textCtrl->MarkerDeleteAll(MARK_DEBUGCURSOR);
 		}
+		else if (evt.isViewOptionsEvent())
+		{
+			updateViewOptions();
+		}
 	});
 }
 
@@ -717,24 +721,13 @@ bool FileEditorWnd::editorHasFocus()
 
 void FileEditorWnd::updateViewOptions()
 {
-	m_textCtrl->SetIndentationGuides( gUIState->view_ShowIndentationGuides ? wxSTC_IV_LOOKBOTH : wxSTC_IV_NONE);
-	m_textCtrl->SetViewWhiteSpace( gUIState->view_Whitespace ? wxSTC_WS_VISIBLEALWAYS : wxSTC_WS_INVISIBLE);
-	m_textCtrl->SetViewEOL( gUIState->view_EOL ? true : false);
+	auto options = gWorkspace->getViewOptions();
+	m_textCtrl->SetIndentationGuides(options->viewIndentation ? wxSTC_IV_LOOKBOTH : wxSTC_IV_NONE);
+	m_textCtrl->SetViewWhiteSpace( options->viewWhitespaces ? wxSTC_WS_VISIBLEALWAYS : wxSTC_WS_INVISIBLE);
+	m_textCtrl->SetViewEOL( options->viewEOL ? true : false);
 	m_textCtrl->SetEdgeMode(wxSTC_EDGE_LINE);
 	m_textCtrl->SetEdgeColumn(80);
 	m_textCtrl->SetEdgeColour(wxColour(210,210,210));
-}
-
-void FileEditorWnd::onAppEvent(const AppEvent& evt)
-{
-	switch (evt.id)
-	{
-		case AppEventID::ViewOptionsChanged:
-			updateViewOptions();
-			break;
-		default:
-			break;
-	};
 }
 
 void FileEditorWnd::recolourise(bool reparse)

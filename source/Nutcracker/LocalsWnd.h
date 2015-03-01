@@ -16,7 +16,7 @@
 namespace nutcracker
 {
 
-class LocalsWnd : public BaseWatchesWnd, public AppEventListener
+class LocalsWnd : public BaseWatchesWnd
 {
 public:
 	LocalsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
@@ -28,9 +28,6 @@ private:
 	// BaseWatchesWnd
 	virtual void OnSize(wxSizeEvent& evt) override;
 	void OnShow(wxShowEvent& evt);
-
-	// AppEventListener
-	virtual void onAppEvent(const AppEvent& evt) override;
 
 	void tryUpdateState(bool force = false);
 	void updateState();

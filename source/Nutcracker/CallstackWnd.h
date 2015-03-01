@@ -16,7 +16,7 @@ namespace nutcracker
 
 struct BreakInfo;
 
-class CallstackWnd : public CallstackWnd_Auto, public AppEventListener
+class CallstackWnd : public CallstackWnd_Auto
 {
 public:
 	CallstackWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style);
@@ -31,9 +31,6 @@ private:
 	virtual void OnCellDClick( wxGridEvent& evt ) override;
 	virtual void OnSize(wxSizeEvent& evt) override;
 	void OnShow(wxShowEvent& evt);
-
-	// AppEventListener
-	virtual void onAppEvent(const AppEvent& evt) override;
 
 	void updateState();
 	void adjustSize(int width);

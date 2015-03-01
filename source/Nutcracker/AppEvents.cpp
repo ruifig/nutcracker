@@ -4,24 +4,6 @@
 namespace nutcracker
 {
 
-static std::vector<AppEventListener*> appEventListeners;
-
-AppEventListener::AppEventListener()
-{
-	appEventListeners.push_back(this);
-}
-
-AppEventListener::~AppEventListener()
-{
-	cz::erase(appEventListeners, this);
-}
-
-void fireAppEvent(const AppEvent& evt)
-{
-	for (auto& i : appEventListeners)
-		i->onAppEvent(evt);
-}
-
 wxDEFINE_EVENT(NUTCRACKER_LAMBDA_EVENT, NutcrackerLambdaEvent);
 
 NutcrackerLambdaEvent::NutcrackerLambdaEvent(const NutcrackerLambdaEvent& event)
