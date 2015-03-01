@@ -13,10 +13,10 @@ namespace nutcracker
 	extern bool gShuttingDown;
 	extern class WorkspaceWnd* gWorkspaceWnd;
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
-	extern class BreakpointsWnd* gBreakpointsWnd;
 	extern wxImageList gImageListSmall;
 	extern wxImageList gImageList32x32;
 	extern std::shared_ptr<Workspace> gWorkspace;
+	extern std::unique_ptr<cz::Parameters> gParameters;
 
 	enum
 	{
@@ -39,15 +39,6 @@ namespace nutcracker
 	void showError(const char* title, const char* fmt, ...);
 	void showMsg(const char* title, const char* fmt, ...);
 	void showException(std::exception& e);
-
-	struct UIState
-	{
-		std::vector<std::unique_ptr<Interpreter>> interpreters;
-		Interpreter* currentInterpreter=nullptr;
-	};
-
-	extern std::unique_ptr<UIState> gUIState;
-	extern std::unique_ptr<cz::Parameters> gParameters;
 
 	#define CZ_TODO CZ_UNEXPECTED
 

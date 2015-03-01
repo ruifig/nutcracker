@@ -180,7 +180,8 @@ void WorkspaceWnd::OnRunScriptFile(wxCommandEvent& /*event*/)
 	{
 		return UTF8String("\"") + file->fullpath + "\"";
 	});
-	gUIState->currentInterpreter->launch(vars, file->fullpath, false);
+
+	gWorkspace->debuggerStart(file->id);
 }
 
 wxTreeItemId WorkspaceWnd::findFileTreeItem(FileId fileId)

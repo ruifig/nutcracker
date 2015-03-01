@@ -423,7 +423,7 @@ Interpreter::~Interpreter()
 {
 }
 
-bool Interpreter::hasDebugger()
+bool Interpreter::hasDebugger() const
 {
 	return m_hasDebugger;
 }
@@ -482,7 +482,7 @@ std::vector<std::unique_ptr<Interpreter>> Interpreter::initAll(const UTF8String&
 	return res;
 }
 
-const UTF8String& Interpreter::getName()
+const UTF8String& Interpreter::getName() const
 {
 	return m_name;
 }

@@ -35,8 +35,6 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 	m_grid->SetColLabelValue(0, "-");
 	m_grid->SetColLabelValue(1, "location");
 
-	gBreakpointsWnd = this;
-
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	{
 		if (evt.isBreakpointEvent())
@@ -52,7 +50,6 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 
 BreakpointsWnd::~BreakpointsWnd()
 {
-	gBreakpointsWnd = nullptr;
 }
 
 void BreakpointsWnd::tryUpdateState(bool force)

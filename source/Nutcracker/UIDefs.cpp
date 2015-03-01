@@ -11,10 +11,8 @@ class MainWnd* gMainWnd;
 bool gShuttingDown;
 class WorkspaceWnd* gWorkspaceWnd;
 class FileEditorGroupWnd* gFileEditorGroupWnd;
-class BreakpointsWnd* gBreakpointsWnd;
 std::shared_ptr<Workspace> gWorkspace;
 
-std::unique_ptr<UIState> gUIState;
 std::unique_ptr<cz::Parameters> gParameters;
 
 cz::UTF8String wxStringToUtf8(const wxString& str)

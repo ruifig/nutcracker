@@ -107,7 +107,6 @@ bool NutcrackerApp::OnInit()
 int NutcrackerApp::OnExit()
 {
 	gWorkspace.reset();
-	gUIState.reset();
 	gParameters.reset();
 	return wxApp::OnExit();
 }
