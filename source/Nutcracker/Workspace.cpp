@@ -396,6 +396,20 @@ void Workspace::debuggerStepReturn()
 	m_debugSession->stepReturn();
 }
 
+void Workspace::debuggerTerminate()
+{
+	if (!m_debugSession)
+		return;
+	m_debugSession->terminate();
+}
+
+void Workspace::debuggerSuspend()
+{
+	if (!m_debugSession)
+		return;
+	m_debugSession->suspend();
+}
+
 void Workspace::loadConfig()
 {
 	IniFile file;

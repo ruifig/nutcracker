@@ -449,7 +449,7 @@ std::shared_ptr<DebugSession> Interpreter::launchDebug(const Variables& variable
 	auto session = std::make_shared<DebugSession>();
 
 	auto cwd = wxGetCwd();
-	auto cmd = variables.replace(UTF8String("DERP") + m_launchDebug);
+	auto cmd = variables.replace(m_launchDebug);
 	wxSetWorkingDirectory(Filename(file).getDirectory().c_str());
 	auto res = wxExecute(cmd.c_str());
 	wxSetWorkingDirectory(cwd);
