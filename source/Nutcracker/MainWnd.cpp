@@ -199,6 +199,18 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 		else
 			gWorkspace->run(file->id);
 	}
+	else if (modifiers == wxMOD_SHIFT && keycode == WXK_F5)
+	{
+		if (!gWorkspace->debuggerActive())
+			return;
+		gWorkspace->debuggerTerminate();
+	}
+	else if (modifiers == (wxMOD_CONTROL|wxMOD_ALT) && keycode == WXK_PAUSE /*PAUSE is actually BREAK*/)
+	{
+		if (!gWorkspace->debuggerActive())
+			return;
+		gWorkspace->debuggerSuspend();
+	}
 	else if (modifiers == wxMOD_NONE && keycode == WXK_F10)
 	{
 		gWorkspace->debuggerStepOver();

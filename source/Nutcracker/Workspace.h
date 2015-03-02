@@ -192,6 +192,8 @@ public:
 	void debuggerStepOver();
 	void debuggerStepInto();
 	void debuggerStepReturn();
+	void debuggerTerminate();
+	void debuggerSuspend();
 
 	//
 	// View options
