@@ -316,6 +316,13 @@ static Variables getVariables(File* file)
 	return vars;
 }
 
+void Workspace::doDebugStop()
+{
+	m_debugSession = nullptr;
+	m_breakInfo = nullptr;
+	fireEvent(DataEventID::DebugStop);
+}
+
 bool Workspace::debuggerStart(FileId fileId)
 {
 	auto file = m_files.getFile(fileId);
@@ -329,9 +336,7 @@ bool Workspace::debuggerStart(FileId fileId)
 
 	m_debugSession->disconnectListeners.add(this, [this]()
 	{
-		m_debugSession = nullptr;
-		m_breakInfo = nullptr;
-		fireEvent(DataEventID::DebugStop);
+		doDebugStop();
 	});
 
 	m_debugSession->breakListeners.add(this, [this](const std::shared_ptr<BreakInfo>& info)
@@ -406,6 +411,7 @@ void Workspace::debuggerTerminate()
 	if (!m_debugSession)
 		return;
 	m_debugSession->terminate();
+	doDebugStop();
 }
 
 void Workspace::debuggerSuspend()

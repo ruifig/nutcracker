@@ -222,6 +222,7 @@ private:
 	const Breakpoint* toggleBreakpoint(Breakpoint* brk);
 	void fireEvent(const DataEvent& evt);
 	void fireEvent(DataEventID id);
+	void doDebugStop();
 	std::vector<std::pair<void*,std::function<void(const DataEvent&)>>> m_listeners;
 	std::vector<std::function<void()>> m_pendingFuncs;
 	Files m_files;

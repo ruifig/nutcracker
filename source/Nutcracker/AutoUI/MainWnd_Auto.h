@@ -32,6 +32,7 @@
 ////@begin forward declarations
 class wxMenu;
 namespace nutcracker { class WorkspaceWnd; }
+class wxAuiNotebook;
 ////@end forward declarations
 #else
 	FORWARD_DECLARE_VIEWCLASS(WorkspaceWnd);
@@ -120,6 +121,7 @@ public:
 	wxMenu* m_menuView;
 	wxMenu* m_menuInterpreters;
 	nutcracker::WorkspaceWnd* m_workspaceWnd;
+	wxAuiNotebook* m_notebook;
 	wxTextCtrl* m_logTextCtrl;
 	/// Control identifiers
 	enum {

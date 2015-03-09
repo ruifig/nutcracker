@@ -895,7 +895,7 @@
             <string name="proxy-Id name">"ID_AUINOTEBOOK"</string>
             <long name="proxy-Id value">10009</long>
             <string name="proxy-Implementation filename">""</string>
-            <string name="proxy-Member variable name">""</string>
+            <string name="proxy-Member variable name">"m_notebook"</string>
             <string name="proxy-Name">""</string>
             <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
             <bool name="proxy-Separate files">0</bool>
