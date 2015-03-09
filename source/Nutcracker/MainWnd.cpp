@@ -14,6 +14,7 @@
 #include "Interpreter.h"
 #include "FileEditorGroupWnd.h"
 #include "Workspace.h"
+#include "FindFileDlg.h"
 
 namespace nutcracker
 {
@@ -222,6 +223,14 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 	else if (modifiers == wxMOD_SHIFT && keycode == WXK_F11)
 	{
 		gWorkspace->debuggerStepReturn();
+	}
+	else if (modifiers == (wxMOD_SHIFT | wxMOD_ALT) && keycode == 'O' )
+	{
+		FindFileDlg dlg(this);
+		dlg.ShowModal();
+		if (auto file = dlg.getResult())
+			gFileEditorGroupWnd->gotoFile(file);
+		return;
 	}
 	else
 	{

@@ -100,6 +100,7 @@ public:
 	void addFolder(const UTF8String& path);
 	void resyncFolders();
 	std::shared_ptr<const Folder> getRoot();
+	void iterateFiles(std::function<void(const std::shared_ptr<const File>&)> func);
 
 protected:
 	friend BaseItem;
@@ -111,6 +112,7 @@ private:
 	Workspace* m_outer;
 	std::shared_ptr<Folder> m_root;
 	void populateFromDir(const std::shared_ptr<Folder>& folder);
+	void iterateFilesHelper(const std::shared_ptr<const Folder>& folder, std::function<void(const std::shared_ptr<const File>&)>& func);
 };
 
 } // namespace nutcracker
