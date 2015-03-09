@@ -160,6 +160,8 @@ public:
 	std::shared_ptr<const Folder> getRoot();
 	void setFileDirty(FileId fileId, bool dirty);
 	bool saveFile(FileId fileId);
+	void iterateFiles(std::function<void(const std::shared_ptr<const File>&)>&& func);
+
 
 	//
 	// Breakpoints

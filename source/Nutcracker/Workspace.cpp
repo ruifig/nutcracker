@@ -217,6 +217,11 @@ bool Workspace::saveFile(FileId fileId)
 	return true;
 }
 
+void Workspace::iterateFiles(std::function<void(const std::shared_ptr<const File>&)>&& func)
+{
+	m_files.iterateFiles(func);
+}
+
 const Breakpoint* Workspace::addBreakpoint(FileId fileId, int line, int markerHandler)
 {
 	auto file = m_files.getFile(fileId);

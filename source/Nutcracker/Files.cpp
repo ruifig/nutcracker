@@ -214,6 +214,24 @@ std::shared_ptr<const Folder> Files::getRoot()
 	return m_root;
 }
 
+void Files::iterateFilesHelper(const std::shared_ptr<const Folder>& folder, std::function<void(const std::shared_ptr<const File>&)>& func)
+{
+	// Process file items first
+	for (const auto& n : folder->items)
+		if (n->type == ItemType::File)
+			func(std::static_pointer_cast<File>(n));
+
+	// Iterate folders
+	for (const auto& n : folder->items)
+		if (n->type == ItemType::Folder)
+			iterateFilesHelper(std::static_pointer_cast<Folder>(n), func);
+}
+
+void Files::iterateFiles(std::function<void(const std::shared_ptr<const File>&)> func)
+{
+	iterateFilesHelper(m_root, func);
+}
+
 
 } // namespace nutcracker
 
