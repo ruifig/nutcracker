@@ -2566,7 +2566,7 @@
               <string name="proxy-Class">"wxGrid"</string>
               <long name="proxy-Column label height">25</long>
               <long name="proxy-Column width">100</long>
-              <long name="proxy-Columns">3</long>
+              <long name="proxy-Columns">2</long>
               <string name="proxy-Custom arguments">""</string>
               <string name="proxy-Custom ctor arguments">""</string>
               <string name="proxy-Custom styles">""</string>

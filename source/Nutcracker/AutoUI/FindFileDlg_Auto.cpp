@@ -119,7 +119,7 @@ void FindFileDlg_Auto::CreateControls()
 	m_grid->SetDefaultRowSize(20);
 	m_grid->SetColLabelSize(25);
 	m_grid->SetRowLabelSize(0);
-	m_grid->CreateGrid(1, 3, wxGrid::wxGridSelectRows);
+	m_grid->CreateGrid(1, 2, wxGrid::wxGridSelectRows);
 	itemBoxSizer2->Add(m_grid, 1, wxGROW|wxALL, 5);
 
 	wxFlexGridSizer* itemFlexGridSizer4 = new wxFlexGridSizer(2, 2, 0, 0);
