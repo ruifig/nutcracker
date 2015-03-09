@@ -12,8 +12,7 @@ FindFileDlg::FindFileDlg(wxWindow* parent)
 	: FindFileDlg_Auto(parent), m_timer(this)
 {
 	m_grid->SetColLabelValue(0, "File");
-	m_grid->SetColLabelValue(1, "Project");
-	m_grid->SetColLabelValue(2, "Path");
+	m_grid->SetColLabelValue(1, "Path");
 
 	m_grid->Freeze();
 	if (m_grid->GetNumberRows())
@@ -67,8 +66,7 @@ void FindFileDlg::updateGrid()
 		int r = m_grid->GetNumberRows() - 1;
 
 		m_grid->SetCellValue(r, 0, it.second->name.c_str());
-		m_grid->SetCellValue(r, 1, "NA");
-		m_grid->SetCellValue(r, 2, it.second->fullpath.c_str());
+		m_grid->SetCellValue(r, 1, it.second->fullpath.c_str());
 		for (int c=0; c<m_grid->GetNumberCols(); c++)
 			m_grid->SetReadOnly(r, c, true);
 	}
