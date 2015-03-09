@@ -22,6 +22,9 @@ FindFileDlg::FindFileDlg(wxWindow* parent)
 
 	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(FindFileDlg::OnCharHook));
 	m_txt->SetFocus();
+
+	m_needsUpdate = true;
+	m_timer.Start(250, true);
 }
 
 void FindFileDlg::updateGrid()
@@ -81,7 +84,7 @@ void FindFileDlg::updateGrid()
 void FindFileDlg::OnTextctrlTextUpdated(wxCommandEvent& event)
 {
 	m_needsUpdate = true;
-	m_timer.Start(500, true);
+	m_timer.Start(250, true);
 }
 
 void FindFileDlg::doPick(int row)
@@ -99,19 +102,25 @@ void FindFileDlg::OnGridCellDClick(wxGridEvent& event)
 
 void FindFileDlg::OnTimer(wxTimerEvent& event)
 {
-	if (m_needsUpdate && m_txt->GetValue().Trim() != "")
+	if (m_needsUpdate/* && m_txt->GetValue().Trim() != ""*/)
 		updateGrid();
 }
 
 void FindFileDlg::OnCharHook(wxKeyEvent& event)
 {
+	auto keycode = event.GetKeyCode();
+	if (keycode == WXK_ESCAPE)
+	{
+		Close(true);
+		return;
+	}
+
 	if (m_grid->GetNumberRows() == 0)
 	{
 		event.Skip();
 		return;
 	}
 
-	auto keycode = event.GetKeyCode();
 	auto getCurrentRow = [&]()
 	{
 		if (m_needsUpdate)
