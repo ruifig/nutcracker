@@ -30,6 +30,7 @@ dependencies/squirrel/sqstdlib/Release
 dependencies/squirrel/sqstdlib/Template
 dependencies/squirrel/sqdbg/Debug
 dependencies/squirrel/sqdbg/Release
+dependencies/squirrel/doc/squirrel3.chw
 
 # CppDepend
 CppDepend/CppDependOut
