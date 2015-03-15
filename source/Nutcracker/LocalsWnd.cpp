@@ -37,7 +37,7 @@ LocalsWnd::LocalsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const 
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	 {
 		if (evt.isBreakpointEvent() || evt.id == DataEventID::DebugStart || evt.id == DataEventID::DebugStop ||
-			evt.id == DataEventID::DebugBreak || evt.id == DataEventID::DebugChangedCallstackFrame)
+			evt.id == DataEventID::DebugBreak || evt.id == DataEventID::DebugChangedCallstackFrame || evt.id==DataEventID::DebugResume)
 		{
 			tryUpdateState();
 		}

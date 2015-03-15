@@ -30,28 +30,43 @@ void Messenger::setOnDisconnected(std::function<void()> callback)
 	m_onDisconnectedCallback = std::move(callback);
 }
 
-bool Messenger::connect(const char* ip, unsigned int port, unsigned timeoutMs)
+bool Messenger::connect(const char* ip, unsigned int port, unsigned timeoutSeconds)
 {
 	wxIPV4address addr;
 	addr.Hostname(ip);
 	addr.Service(port);
 	czDebug(ID_Log, "Messenger: Trying to connect to %s:%u", ip, port);
-	m_sock.SetTimeout(timeoutMs);
+	m_sock.SetTimeout(timeoutSeconds);
 	//m_sock.SetFlags(wxSOCKET_WAITALL);
 	m_sock.SetFlags(wxSOCKET_NOWAIT);
 	m_sock.Notify(false);
-	m_sock.Connect(addr, true);
 
-	if (!m_sock.WaitOnConnect())
+	int todo = timeoutSeconds;
+	while (todo)
 	{
-		czDebug(ID_Log, "Messenger: Failed to connect");
-		return false;
-	}
+		m_sock.Connect(addr, false);
+		if (!m_sock.WaitOnConnect(timeoutSeconds))
+		{
+			czDebug(ID_Log, "Messenger: Failed to connect");
+			//return false;
+		}
 
-	if (!m_sock.IsConnected())
-	{
-		czDebug(ID_Log, "Messenger: Server refused connection request");
-		return false;
+		if (!m_sock.IsConnected())
+		{
+			czDebug(ID_Log, "Messenger: Server refused connection request");
+			//return false;
+		}
+		else
+		{
+			czDebug(ID_Log, "Messenger: Connected");
+			break;
+		}
+
+		todo--;
+		if (todo <= 0)
+			return false;
+		::Sleep(1000);
+		czDebug(ID_Log, "Messenger: Retrying in 1 second");
 	}
 
 	m_isRunning = true;

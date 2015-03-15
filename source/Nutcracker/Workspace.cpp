@@ -323,6 +323,12 @@ void Workspace::doDebugStop()
 	fireEvent(DataEventID::DebugStop);
 }
 
+void Workspace::doDebugResume()
+{
+	m_breakInfo = nullptr;
+	fireEvent(DataEventID::DebugResume);
+}
+
 bool Workspace::debuggerStart(FileId fileId)
 {
 	auto file = m_files.getFile(fileId);
@@ -343,6 +349,11 @@ bool Workspace::debuggerStart(FileId fileId)
 	{
 		m_breakInfo = info;
 		fireEvent(DataEventID::DebugBreak);
+	});
+
+	m_debugSession->resumeListeners.add(this, [this]()
+	{
+		doDebugResume();
 	});
 
 	fireEvent(DataEventID::DebugStart);

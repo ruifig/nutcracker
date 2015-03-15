@@ -34,3 +34,9 @@ function bar3(a)
 
 foo3(0);
 bar3(0);
+local i=0;
+while(1)
+{
+	print("Hello " + i + "\n");
+	i++;
+}

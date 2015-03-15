@@ -47,7 +47,7 @@ bool DebugSession::start(const std::string& ip, int port)
 	if (port)
 	{
 		m_messenger = std::make_unique<Messenger>();
-		if (!m_messenger->connect(ip.c_str(), port, 5))
+		if (!m_messenger->connect(ip.c_str(), port, 60*60))
 			return false;
 
 		m_messenger->setOnIncoming([this]{ processIncoming(); });
@@ -65,10 +65,12 @@ bool DebugSession::start(const std::string& ip, int port)
 		m_messenger->send("aw:2:someArray\n");
 		m_messenger->send("aw:3:someClass\n");
 
+
 		// Setup breakpoints
 		gWorkspace->iterateBreakpoints([&](const Breakpoint* brk)
 		{
-			m_messenger->send(cz::formatString("ab:%x:%s\n", brk->line+1, brk->file->fullpath.c_str()));
+			if (brk->enabled)
+				m_messenger->send(cz::formatString("ab:%x:%s\n", brk->line + 1, brk->file->fullpath.c_str()));
 		});
 
 		m_messenger->send("rd\n");
@@ -134,6 +136,13 @@ const char* getString(tinyxml2::XMLElement* ele, const char* name, const char* d
 
 void DebugSession::processMsgResumed(tinyxml2::XMLElement* xml)
 {
+	// Keep a pointer to this session
+	m_paused = false;
+	auto this_ = shared_from_this();
+	postAppLambdaEvent([this_]
+	{
+		this_->resumeListeners.fire();
+	});
 }
 
 void DebugSession::processMsgAddBreakpoint(tinyxml2::XMLElement* xml)

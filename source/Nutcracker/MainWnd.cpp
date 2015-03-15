@@ -122,6 +122,20 @@ MainWnd::MainWnd()
 
 	DragAcceptFiles(true);
 
+	gWorkspace->registerListener(this, [this](const DataEvent& evt)
+	{
+		if (evt.isDebugEvent())
+		{
+			wxString t;
+			if (gWorkspace->debuggerActive())
+				t = gWorkspace->debuggerGetBreakInfo() ? "(Debugging)" : "(Running)";
+			wxString title = "Nutcracker IDE";
+			if (!t.empty())
+				title += wxString(wxT(" ")) + t;
+			SetTitle(title);
+		}
+	});
+
 }
 
 MainWnd::~MainWnd()
