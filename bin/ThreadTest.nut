@@ -1,6 +1,14 @@
+
+function otherfunc()
+{
+	print("From other\n");
+}
+local other = ::newthread(otherfunc);
+
 function do2(a)
 {
 	print(a);
+	other.call();
 	::suspend("s3");
 	return 10;
 }
@@ -10,7 +18,7 @@ function do1(a,b)
 	local c;
 	c = a + b;
 	::suspend("s2");
-	r = do2(c);
+	local r = do2(c);
 	return c;
 }
 

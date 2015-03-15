@@ -8,7 +8,7 @@ class Messenger
 public:
 	Messenger();
 	~Messenger();
-	bool connect(const char* ip, unsigned int port, unsigned timeoutMs);
+	bool connect(const char* ip, unsigned int port, unsigned timeoutSeconds);
 	void send(std::string msg);
 	bool read(std::string& msg);
 	void setOnIncoming(std::function<void()> callback);

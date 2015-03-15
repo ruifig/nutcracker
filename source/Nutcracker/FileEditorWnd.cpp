@@ -64,7 +64,7 @@ FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos
 			if (brk->file == m_file)
 				syncBreakpoint(brk);
 		}
-		else if (evt.id == DataEventID::DebugStop)
+		else if (evt.id == DataEventID::DebugStop || evt.id==DataEventID::DebugResume)
 		{
 			m_textCtrl->MarkerDeleteAll(MARK_DEBUGCURSOR);
 		}

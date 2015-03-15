@@ -45,10 +45,13 @@ enum class DataEventID
 	BreakpointLAST = BreakpointRemoved,
 
 	//
-	DebugStart,
+	DebugFIRST,
+	DebugStart=DebugFIRST,
 	DebugStop,
 	DebugBreak,
 	DebugChangedCallstackFrame,
+	DebugResume,
+	DebugLAST=DebugResume,
 
 	// Options
 	ViewFIRST,
@@ -76,6 +79,12 @@ struct DataEvent
 	{
 		return id >= DataEventID::ViewFIRST && id <= DataEventID::ViewLAST;
 	}
+	
+	bool isDebugEvent() const
+	{
+		return id >= DataEventID::DebugFIRST && id <= DataEventID::DebugLAST;
+	}
+
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -223,6 +232,7 @@ private:
 	void fireEvent(const DataEvent& evt);
 	void fireEvent(DataEventID id);
 	void doDebugStop();
+	void doDebugResume();
 	std::vector<std::pair<void*,std::function<void(const DataEvent&)>>> m_listeners;
 	std::vector<std::function<void()>> m_pendingFuncs;
 	Files m_files;

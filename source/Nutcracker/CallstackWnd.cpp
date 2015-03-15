@@ -36,7 +36,7 @@ CallstackWnd::CallstackWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 		{
 			tryUpdate = true;
 		}
-		else if (evt.id == DataEventID::DebugStop)
+		else if (evt.id == DataEventID::DebugStop || evt.id==DataEventID::DebugResume)
 		{
 			tryUpdate = true;
 		}
