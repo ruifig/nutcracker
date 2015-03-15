@@ -86,7 +86,7 @@ Breakpoint* Breakpoints::get(const std::shared_ptr<const File>& file, int line)
 {
 	for (auto& b : m_all)
 	{
-		if (b->file == file)
+		if (b->file == file && b->line==line)
 			return b.get();
 	}
 	return nullptr;

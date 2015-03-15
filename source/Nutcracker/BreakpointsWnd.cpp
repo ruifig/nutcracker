@@ -83,7 +83,7 @@ void BreakpointsWnd::updateState()
 		m_grid->SetCellValue(r, 0, b->enabled ? wxT("1") : wxT("0"));
 
 		m_grid->SetCellValue(
-			r, 1, wxString::Format(wxT("%s, line %d"), b->file->name.c_str(), b->line+1));
+			r, 1, wxString::Format(wxT("%s, line %d"), b->file->name.c_str(), b->line));
 		m_grid->SetReadOnly(r,1,true);
 		r++;
 	});

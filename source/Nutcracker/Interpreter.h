@@ -277,12 +277,14 @@ public:
 	bool start(const std::string& ip, int port);
 
 	Listeners < std::function<void()>> resumeListeners;
+	Listeners < std::function<void(int, std::shared_ptr<const File>)>> addBreakpointListeners;
 	Listeners < std::function<void(const std::shared_ptr<BreakInfo>&)>> breakListeners;
 	Listeners < std::function<void()> > disconnectListeners;
 
 	void removeListener(void* listener)
 	{
 		resumeListeners.remove(listener);
+		addBreakpointListeners.remove(listener);
 		breakListeners.remove(listener);
 		disconnectListeners.remove(listener);
 	}
@@ -293,6 +295,9 @@ public:
 	void resume();
 	void suspend();
 	void terminate();
+
+	void removeBreakpoint(Breakpoint* brk);
+	void updateBreakpoint(Breakpoint* brk);
 
 private:
 	void processIncoming();

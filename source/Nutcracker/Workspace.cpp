@@ -227,6 +227,8 @@ const Breakpoint* Workspace::addBreakpoint(FileId fileId, int line, int markerHa
 	auto file = m_files.getFile(fileId);
 	CZ_ASSERT(file);
 	auto brk = m_breakpoints.add(file, line, markerHandler);
+	if (debuggerActive())
+		m_debugSession->updateBreakpoint(brk);
 	fireEvent(BreakpointAdd(brk));
 	return brk;
 }
@@ -248,6 +250,11 @@ void Workspace::iterateBreakpoints(std::function<void(const Breakpoint* brk)> fu
 	m_breakpoints.iterate(std::move(func));
 }
 
+void Workspace::_iterateBreakpoints(std::function<void(Breakpoint* brk)> func)
+{
+	m_breakpoints.iterate(std::move(func));
+}
+
 const Breakpoint* Workspace::getBreakpoint(int index)
 {
 	return m_breakpoints.getAt(index);
@@ -256,6 +263,8 @@ const Breakpoint* Workspace::getBreakpoint(int index)
 const Breakpoint* Workspace::toggleBreakpoint(Breakpoint* brk)
 {
 	brk->enabled = !brk->enabled;
+	if (debuggerActive())
+		m_debugSession->updateBreakpoint(brk);
 	fireEvent(BreakpointToggle(brk));
 	return brk;
 }
@@ -303,7 +312,11 @@ void Workspace::removeBreakpoint(FileId fileId, int line)
 	CZ_ASSERT(file);
 	auto brk = m_breakpoints.remove(file, line);
 	if (brk)
+	{
+		if (debuggerActive())
+			m_debugSession->removeBreakpoint(brk.get());
 		fireEvent(BreakpointRemoved(brk.get()));
+	}
 }
 
 static Variables getVariables(File* file)
@@ -354,6 +367,14 @@ bool Workspace::debuggerStart(FileId fileId)
 	m_debugSession->resumeListeners.add(this, [this]()
 	{
 		doDebugResume();
+	});
+
+	m_debugSession->addBreakpointListeners.add(this, [this](int line, std::shared_ptr<const File> file)
+	{
+		auto brk = m_breakpoints.get(file, line);
+		brk->valid = true;
+		if (brk)
+			fireEvent(BreakpointValidated(brk));
 	});
 
 	fireEvent(DataEventID::DebugStart);

@@ -42,6 +42,19 @@ DebugSession::~DebugSession()
 {
 }
 
+void DebugSession::removeBreakpoint(Breakpoint* brk)
+{
+	m_messenger->send(cz::formatString("rb:%x:%s\n", brk->line, brk->file->fullpath.c_str()));
+}
+
+void DebugSession::updateBreakpoint(Breakpoint* brk)
+{
+	if (brk->enabled)
+		m_messenger->send(cz::formatString("ab:%x:%s\n", brk->line, brk->file->fullpath.c_str()));
+	else
+		removeBreakpoint(brk);
+}
+
 bool DebugSession::start(const std::string& ip, int port)
 {
 	if (port)
@@ -65,12 +78,12 @@ bool DebugSession::start(const std::string& ip, int port)
 		m_messenger->send("aw:2:someArray\n");
 		m_messenger->send("aw:3:someClass\n");
 
-
-		// Setup breakpoints
-		gWorkspace->iterateBreakpoints([&](const Breakpoint* brk)
+		// Setup existing breakpoints
+		gWorkspace->_iterateBreakpoints([&](Breakpoint* brk)
 		{
+			brk->valid = false;
 			if (brk->enabled)
-				m_messenger->send(cz::formatString("ab:%x:%s\n", brk->line + 1, brk->file->fullpath.c_str()));
+				m_messenger->send(cz::formatString("ab:%x:%s\n", brk->line, brk->file->fullpath.c_str()));
 		});
 
 		m_messenger->send("rd\n");
@@ -147,6 +160,15 @@ void DebugSession::processMsgResumed(tinyxml2::XMLElement* xml)
 
 void DebugSession::processMsgAddBreakpoint(tinyxml2::XMLElement* xml)
 {
+	int line;
+	CZ_CHECK(xml->QueryAttribute("line", &line) == tinyxml2::XML_SUCCESS);
+	auto file = gWorkspace->createFile( getString(xml, "src"));
+	CZ_ASSERT(file);
+	auto this_ = shared_from_this();
+	postAppLambdaEvent([this_, line, file ]
+	{
+		this_->addBreakpointListeners.fire(line, file);
+	});
 }
 
 void DebugSession::processMsgBreak(tinyxml2::XMLElement* xml)

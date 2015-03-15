@@ -31,7 +31,6 @@ function bar3(a)
 	return r;
 }
 
-
 foo3(0);
 bar3(0);
 local i=0;
