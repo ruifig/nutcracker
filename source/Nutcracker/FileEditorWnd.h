@@ -32,7 +32,6 @@ public:
 	void save();
 	void onPageChanged();
 	std::pair<int, int> getCursorLocation();
-	bool markerToLine(int markerHandle, int& line);
 	void syncBreakInfo(const BreakInfo& brk);
 
 private:

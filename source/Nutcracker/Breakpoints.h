@@ -20,6 +20,7 @@ struct Breakpoint
 	int line = -1;
 	int savedline = -1; // Line this breakpoint was at the last time the file was saved
 	bool enabled = false;
+	bool valid = false;
 	Breakpoint(const std::shared_ptr<const File>& file, int line, int markerHandle, bool enabled);
 };
 

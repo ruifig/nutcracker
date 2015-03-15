@@ -41,6 +41,7 @@ enum class DataEventID
 	BreakpointToggle,
 	BreakpointDropChanges,
 	BreakpointUpdated,
+	BreakpointValidated,
 	BreakpointRemoved,
 	BreakpointLAST = BreakpointRemoved,
 
@@ -132,6 +133,11 @@ struct BreakpointUpdated : public BreakpointEvent
 {
 	BreakpointUpdated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointUpdated, brk) {}
 };
+struct BreakpointValidated : public BreakpointEvent
+{
+	BreakpointValidated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointValidated, brk) {}
+};
+
 
 //////////////////////////////////////////////////////////////////////////
 //	Debugger events
@@ -223,6 +229,10 @@ public:
 	const Interpreter* getInterpreter(int index);
 	const Interpreter* getCurrentInterpreter();
 	void setCurrentInterpreter(int index);
+
+protected:
+	friend class DebugSession;
+	void _iterateBreakpoints(std::function<void(Breakpoint* brk)> func);
 
 private:
 

@@ -45,7 +45,7 @@ CallstackWnd::CallstackWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 			auto info = gWorkspace->debuggerGetBreakInfo();
 			updateFrameMarker(m_currentIndex, info->currentCallstackFrame);
 			auto& entry = info->callstack[info->currentCallstackFrame];
-			gFileEditorGroupWnd->gotoFile(entry.file, entry.line - 1);
+			gFileEditorGroupWnd->gotoFile(entry.file, entry.line);
 		}
 
 		if (tryUpdate && !m_pendingUpdate)
