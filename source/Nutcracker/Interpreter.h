@@ -254,9 +254,8 @@ enum class WatchState
 
 struct WatchValue : public TableEntry
 {
-	int id;
-	WatchState state;
-	WatchValue() : state(WatchState::Unknown){}
+	int id = 0;
+	WatchState state = WatchState::Unknown;
 };
 
 struct CallstackEntry

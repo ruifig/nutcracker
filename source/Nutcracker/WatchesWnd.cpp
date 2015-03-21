@@ -16,6 +16,9 @@ namespace nutcracker
 
 BEGIN_EVENT_TABLE(WatchesWnd, BaseWatchesWnd)
 	EVT_SHOW(WatchesWnd::OnShow)
+	EVT_SET_FOCUS(WatchesWnd::OnFocus)
+	EVT_ENTER_WINDOW(WatchesWnd::OnEnterWindow)
+	EVT_LEAVE_WINDOW(WatchesWnd::OnLeaveWindow)
 END_EVENT_TABLE()
 
 WatchesWnd::WatchesWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
@@ -89,9 +92,10 @@ void WatchesWnd::updateState()
 
 	// Add an empty line at the end to allow adding new watches
 	auto emptyRow = m_treeData.addItem(root, TreeCtrlUtil::TreeItemID(idcounter++), "");
+	if (!selectedEntry)
+		selectedEntry = emptyRow;
 
-	if (selectedEntry)
-		m_tree->Select(selectedEntry->getWxItem());
+	m_tree->Select(selectedEntry->getWxItem());
 
 	adjustSize(this->GetSize().GetX());
 	m_treeData.endRefresh();
@@ -124,15 +128,25 @@ void WatchesWnd::OnItemActivated(wxTreeListEvent& event)
 	wxRect rect;
 	int col;
 	int id = getSelectedWatchID(&rect, &col);
+	m_selectedWatchID = id;
 
 	if (col != 0)
 		return;
 
+	CZ_ASSERT(m_txtCtrl == nullptr);
 	m_txtCtrl = new wxTextCtrl(this, BaseWatchesWnd::ID_TXTCTRL, wxT(""), rect.GetPosition(), rect.GetSize());
 	m_txtCtrl->Connect(BaseWatchesWnd::ID_TXTCTRL, wxEVT_CHAR_HOOK, wxKeyEventHandler(WatchesWnd::OnTextChar), NULL, this);
 	m_txtCtrl->Connect(BaseWatchesWnd::ID_TXTCTRL, wxEVT_KILL_FOCUS, wxFocusEventHandler(WatchesWnd::OnTextKillFocus), NULL, this);
+	m_txtCtrl->Connect(BaseWatchesWnd::ID_TXTCTRL, wxEVT_LEAVE_WINDOW, wxMouseEventHandler(WatchesWnd::OnTextLeaveWindow), nullptr, this);
+	m_txtCtrl->Connect(BaseWatchesWnd::ID_TXTCTRL, wxEVT_ENTER_WINDOW, wxMouseEventHandler(WatchesWnd::OnTextEnterWindow), nullptr, this);
+
+	// This is necessary, otherwise there will be a bunch of problems with Mouse Events. The wxTreeListCtrl seems to steal
+	// events from the text box. This is probably because even though the text box in on top visually, it's the same leve
+	// regarding event handling?
+	m_tree->Lower();
+	m_txtCtrl->Raise();
+	
 	m_txtCtrl->SetFocus();
-	//m_tree->Disable();
 
 	const Watch* watch = (id != 0) ? gWorkspace->getWatchByID(id) : nullptr;
 	if (watch !=0)
@@ -145,16 +159,15 @@ void WatchesWnd::OnTextChar(wxKeyEvent& event)
 {
 	if (event.GetKeyCode() == WXK_ESCAPE)
 	{
-		m_tree->Enable();
 		m_tree->SetFocus();
-		//delete m_txtCtrl;
 		return;
 	}
 	else if (event.GetKeyCode() == WXK_RETURN)
 	{
-		m_tree->Enable();
+		wxString str = m_txtCtrl->GetValue().Trim();
+		if (str != wxT(""))
+			m_selectedWatchID = gWorkspace->addWatch(str.c_str().AsChar(), m_selectedWatchID);
 		m_tree->SetFocus();
-		//delete m_txtCtrl;
 		return;
 	}
 
@@ -163,6 +176,12 @@ void WatchesWnd::OnTextChar(wxKeyEvent& event)
 
 void WatchesWnd::OnCharHook(wxKeyEvent& event)
 {
+	if (m_txtCtrl)
+	{
+		event.Skip();
+		return;
+	}
+
 	if (event.GetKeyCode() == WXK_DELETE)
 	{
 		auto current = m_tree->GetSelection();
@@ -178,11 +197,41 @@ void WatchesWnd::OnCharHook(wxKeyEvent& event)
 	}
 }
 
+void WatchesWnd::OnFocus(wxFocusEvent& event)
+{
+	//czDebug(ID_Log, "%s", __FUNCTION__);
+	event.Skip();
+}
+
+void WatchesWnd::OnEnterWindow(wxMouseEvent& event)
+{
+	//czDebug(ID_Log, "%s", __FUNCTION__);
+	event.Skip();
+}
+
+void WatchesWnd::OnLeaveWindow(wxMouseEvent& event)
+{
+	//czDebug(ID_Log, "%s", __FUNCTION__);
+	event.Skip();
+}
+
 void WatchesWnd::OnTextKillFocus(wxFocusEvent& event)
 {
-	m_tree->Enable();
+	//czDebug(ID_Log, "%s", __FUNCTION__);
 	delete m_txtCtrl;
 	m_txtCtrl = nullptr;
+}
+
+void WatchesWnd::OnTextEnterWindow(wxMouseEvent& event)
+{
+	//czDebug(ID_Log, "%s", __FUNCTION__);
+	event.Skip();
+}
+
+void WatchesWnd::OnTextLeaveWindow(wxMouseEvent& event)
+{
+	//czDebug(ID_Log, "%s", __FUNCTION__);
+	event.Skip();
 }
 
 void WatchesWnd::OnSize(wxSizeEvent& evt)

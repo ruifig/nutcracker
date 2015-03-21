@@ -30,6 +30,14 @@ private:
 	virtual void OnCharHook(wxKeyEvent& event) override;
 	void OnTextChar(wxKeyEvent& event);
 	void OnTextKillFocus(wxFocusEvent& event);
+	void OnTextEnterWindow(wxMouseEvent& event);
+	void OnTextLeaveWindow(wxMouseEvent& event);
+
+	void OnFocus(wxFocusEvent& event);
+	void OnEnterWindow(wxMouseEvent& event);
+	void OnLeaveWindow(wxMouseEvent& event);
+
+
 
 	void updateState();
 	void adjustSize(int width);

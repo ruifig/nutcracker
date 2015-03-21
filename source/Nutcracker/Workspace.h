@@ -203,7 +203,7 @@ public:
 	//
 	// Watches
 	//
-	void addWatch(std::string watch);
+	int addWatch(std::string watch, int id=0);
 	int getWatchCount() const;
 	void iterateWatches(std::function<void(const struct Watch*, const struct WatchValue*)> func);
 	const Watch* getWatchByID(int id);
