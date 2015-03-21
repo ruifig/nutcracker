@@ -31,6 +31,7 @@ private:
 	virtual void OnTreeItemMenu(wxTreeEvent& event) override;
 	void OnOpenContainingFolder(wxCommandEvent& event);
 	void OnRunScriptFile(wxCommandEvent& event);
+	void OnRemoveFolder(wxCommandEvent& event);
 	virtual void OnRefreshClick(wxCommandEvent& event) override;
 
 	std::shared_ptr<TreeCtrlUtil::TreeItemData> updateState(const std::shared_ptr<TreeCtrlUtil::TreeItemData>& parent,

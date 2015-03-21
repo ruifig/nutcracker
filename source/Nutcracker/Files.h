@@ -32,8 +32,9 @@ struct BaseItem : std::enable_shared_from_this<BaseItem>
 	FileId id;
 	UTF8String getDirectory() const;
 	Files *parent=nullptr;
+	int level;
 protected:
-	explicit BaseItem(Files* parent_, ItemType type_, UTF8String fullpath_);
+	explicit BaseItem(Files* parent_, ItemType type_, UTF8String fullpath_, int level);
 	BaseItem(const BaseItem&) = delete;
 	void addToParent();
 };
@@ -53,12 +54,12 @@ struct File : public BaseItem
 		UTF8String desc;
 	};
 	std::vector<ErrorInfo> errorLines;
-	static std::shared_ptr<File> create(Files* parent_, UTF8String fullpath_);
+	static std::shared_ptr<File> create(Files* parent_, UTF8String fullpath_, int level);
 
 protected:
 	friend class Files;
 	friend class Workspace;
-	explicit File(Files* parent_, UTF8String fullpath_);
+	explicit File(Files* parent_, UTF8String fullpath_, int level);
 	std::function<bool(const std::shared_ptr<const File>&)> m_saveFunc;
 };
 
@@ -79,10 +80,10 @@ struct Folder : public BaseItem
 {
 	virtual ~Folder() {}
 	std::set<std::shared_ptr<BaseItem>, ProjectItemCompare> items;
-	static std::shared_ptr<Folder> create(Files* parent_, UTF8String fullpath_);
+	static std::shared_ptr<Folder> create(Files* parent_, UTF8String fullpath_, int level);
 protected:
 	friend Files;
-	explicit Folder(Files* parent_, UTF8String fullpath_);
+	explicit Folder(Files* parent_, UTF8String fullpath_, int level);
 };
 
 // Manages all the files and folders
@@ -94,10 +95,13 @@ public:
 
 	// Retrieves an existing file object
 	std::shared_ptr<File> getFile(FileId fileId);
+	std::shared_ptr<Folder> getFolder(FileId folderId);
+	std::shared_ptr<BaseItem> getItem(FileId itemId);
 
 	// Adds a new file, or retrieves an existing one
 	std::shared_ptr<File> createFile(UTF8String path);
 	void addFolder(const UTF8String& path);
+	void removeFolder(const UTF8String& path);
 	void resyncFolders();
 	std::shared_ptr<const Folder> getRoot();
 	void iterateFiles(std::function<void(const std::shared_ptr<const File>&)> func);
@@ -111,6 +115,7 @@ protected:
 private:
 	Workspace* m_outer;
 	std::shared_ptr<Folder> m_root;
+	std::shared_ptr<File> createFileImpl(UTF8String path, int level);
 	void populateFromDir(const std::shared_ptr<Folder>& folder);
 	void iterateFilesHelper(const std::shared_ptr<const Folder>& folder, std::function<void(const std::shared_ptr<const File>&)>& func);
 };

@@ -24,12 +24,14 @@ Control ids
 	enum
 	{
 		ID_RunScriptFile,
-		ID_OpenContainingFolder
+		ID_OpenContainingFolder,
+		ID_RemoveFolder
 	};
 
 BEGIN_EVENT_TABLE(WorkspaceWnd, WorkspaceWnd_Auto)
 	EVT_MENU(ID_OpenContainingFolder, WorkspaceWnd::OnOpenContainingFolder)
 	EVT_MENU(ID_RunScriptFile, WorkspaceWnd::OnRunScriptFile)
+	EVT_MENU(ID_RemoveFolder, WorkspaceWnd::OnRemoveFolder)
 END_EVENT_TABLE()
 
 
@@ -131,10 +133,25 @@ void WorkspaceWnd::OnTreeItemMenu(wxTreeEvent& event)
     wxPoint screenpt = ClientToScreen(clientpt);
 	wxString title;
 
+	FileId projectItemId(itemData->getItemId().id[0]);
+
 	switch (ItemType(itemData->getItemId().itemtype))
 	{
 		case ItemType::Folder:
-			break;
+		{
+			auto folder = gWorkspace->getFolder(projectItemId);
+			wxMenu menu;
+			wxMenu* addmenu = new wxMenu;
+			menu.Append(ID_OpenContainingFolder, wxT("Open in Explorer"));
+			if (folder->level == 1)
+			{
+				menu.AppendSeparator();
+				menu.Append(ID_RemoveFolder, wxT("Remove from workspace"));
+			}
+			m_selectedFileId = projectItemId;
+			PopupMenu(&menu, clientpt);
+		}
+		break;
 
 		case ItemType::File:
 		{
@@ -160,12 +177,12 @@ void WorkspaceWnd::OnTreeItemMenu(wxTreeEvent& event)
 
 void WorkspaceWnd::OnOpenContainingFolder(wxCommandEvent& event)
 {
-	auto file = gWorkspace->getFile(m_selectedFileId);
-	if (!file)
+	auto item = gWorkspace->getItem(m_selectedFileId);
+	if (!item)
 		return;
 
 	UTF8String res;
-	Filesystem::getSingleton().fullPath(res, file->getDirectory());
+	Filesystem::getSingleton().fullPath(res, item->getDirectory());
 	wxExecute(wxString("explorer \"") + res.widen() + "\"");
 }
 
@@ -182,6 +199,14 @@ void WorkspaceWnd::OnRunScriptFile(wxCommandEvent& /*event*/)
 	});
 
 	gWorkspace->debuggerStart(file->id);
+}
+
+void WorkspaceWnd::OnRemoveFolder(wxCommandEvent& event)
+{
+	auto folder = gWorkspace->getFolder(m_selectedFileId);
+	if (!folder)
+		return;
+	gWorkspace->removeFolder(folder->fullpath);
 }
 
 wxTreeItemId WorkspaceWnd::findFileTreeItem(FileId fileId)
