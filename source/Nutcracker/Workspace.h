@@ -32,6 +32,7 @@ enum class DataEventID
 {
 	// Workspace
 	WorkspaceChanges,
+	WorkspaceDirty,
 
 	// Files
 	FileDirty,
@@ -73,8 +74,12 @@ enum class DataEventID
 
 struct DataEvent
 {
-	explicit DataEvent(DataEventID id) : id(id){}
+	explicit DataEvent(DataEventID id, bool makesWorkspaceDirty) : id(id), makesWorkspaceDirty(makesWorkspaceDirty)
+	{
+	}
+
 	DataEventID id;
+	bool makesWorkspaceDirty = false;
 
 	bool isBreakpointEvent() const
 	{
@@ -98,7 +103,7 @@ struct DataEvent
 //////////////////////////////////////////////////////////////////////////
 struct FileEvent : public DataEvent
 {
-	FileEvent(DataEventID id, const std::shared_ptr<File>& file) : DataEvent(id), file(file) {}
+	FileEvent(DataEventID id, const std::shared_ptr<File>& file): DataEvent(id, false), file(file) {}
 	std::shared_ptr<File> file;
 };
 struct FileDirty : public FileEvent
@@ -115,32 +120,32 @@ struct FileSaved : public FileEvent
 //////////////////////////////////////////////////////////////////////////
 struct BreakpointEvent : public DataEvent
 {
-	BreakpointEvent(DataEventID id, const Breakpoint* brk) : DataEvent(id), brk(brk){}
+	BreakpointEvent(DataEventID id, const Breakpoint* brk, bool makesWSDirty) : DataEvent(id, makesWSDirty), brk(brk){}
 	const Breakpoint* brk;
 };
 struct BreakpointAdd : public BreakpointEvent
 {
-	BreakpointAdd(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointAdd, brk) {}
+	BreakpointAdd(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointAdd, brk, true) {}
 };
 struct BreakpointToggle : public BreakpointEvent
 {
-	BreakpointToggle(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointToggle, brk) {}
+	BreakpointToggle(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointToggle, brk, true) {}
 };
 struct BreakpointDropChanges : public BreakpointEvent
 {
-	BreakpointDropChanges(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointDropChanges, brk) {}
+	BreakpointDropChanges(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointDropChanges, brk, false) {}
 };
 struct BreakpointRemoved : public BreakpointEvent
 {
-	BreakpointRemoved(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointRemoved, brk) {}
+	BreakpointRemoved(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointRemoved, brk, true) {}
 };
 struct BreakpointUpdated : public BreakpointEvent
 {
-	BreakpointUpdated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointUpdated, brk) {}
+	BreakpointUpdated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointUpdated, brk, true) {}
 };
 struct BreakpointValidated : public BreakpointEvent
 {
-	BreakpointValidated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointValidated, brk) {}
+	BreakpointValidated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointValidated, brk, false) {}
 };
 
 struct Watch
@@ -158,9 +163,16 @@ public:
 	Workspace();
 	Workspace(const Workspace&) = delete;
 
+	cz::UTF8String getName() const;
+	cz::UTF8String getFullPath() const;
+	bool isDirty();
+
 	void registerListener(void* listener, std::function<void(const DataEvent&)> func);
 	void removeListener(void* listener);
 
+	void save(const UTF8String& filename);
+	void load(const UTF8String& filename);
+	void close();
 
 	//
 	// Config
@@ -185,14 +197,14 @@ public:
 	std::shared_ptr<const Folder> getRoot();
 	void setFileDirty(FileId fileId, bool dirty);
 	bool saveFile(FileId fileId);
-	void iterateFiles(std::function<void(const std::shared_ptr<const File>&)>&& func);
+	void iterateFiles(std::function<bool(const std::shared_ptr<const File>&)>&& func);
 
 
 	//
 	// Breakpoints
 	//
 	int getBreakpointCount();
-	const Breakpoint* addBreakpoint(FileId fileId, int line, int markerHandler);
+	const Breakpoint* addBreakpoint(FileId fileId, int line, int markerHandler, bool enabled=true);
 	void iterateBreakpoints(FileId fileId , std::function<void(const Breakpoint* brk)> func);
 	void iterateBreakpoints(std::function<void(const Breakpoint* brk)> func);
 	const Breakpoint* getBreakpoint(int index);
@@ -201,6 +213,7 @@ public:
 	void dropBreakpointChanges(FileId fileId);
 	// This is used to update the breakpoint line when we are editing a file
 	void setBreakpointPos(const Breakpoint* brk, int line, int markerHandler);
+	void removeBreakpoint(int index);
 	void removeBreakpoint(FileId fileId, int line);
 
 
@@ -258,11 +271,19 @@ private:
 
 	Interpreter* _getCurrentInterpreter();
 
+	void doSave(tinyxml2::XMLDocument& doc);
+	void doLoad(tinyxml2::XMLDocument& doc);
+
 	const Breakpoint* toggleBreakpoint(Breakpoint* brk);
 	void fireEvent(const DataEvent& evt);
-	void fireEvent(DataEventID id);
+	void fireEvent(DataEventID id, bool makesWSDirty);
 	void doDebugStop();
 	void doDebugResume();
+
+	void doRemoveBreakpoint(const std::unique_ptr<Breakpoint>& brk);
+	cz::Filename m_filename;
+	bool m_isDirty = false;
+
 	std::vector<std::pair<void*,std::function<void(const DataEvent&)>>> m_listeners;
 	std::vector<std::function<void()>> m_pendingFuncs;
 	Files m_files;

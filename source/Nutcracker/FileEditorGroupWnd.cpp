@@ -58,7 +58,8 @@ FileEditorGroupWnd::FileEditorGroupWnd(wxWindow* parent, wxWindowID id, const wx
 
 FileEditorGroupWnd::~FileEditorGroupWnd()
 {
-	gWorkspace->removeListener(this);
+	if (gWorkspace)
+		gWorkspace->removeListener(this);
 }
 
 void FileEditorGroupWnd::OnPageClose(wxAuiNotebookEvent& event)

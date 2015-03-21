@@ -63,11 +63,16 @@ FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos
 
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	{
-		if (evt.id == DataEventID::BreakpointToggle || evt.id==DataEventID::BreakpointValidated)
+		if (evt.id == DataEventID::BreakpointToggle || evt.id==DataEventID::BreakpointValidated || evt.id==DataEventID::BreakpointRemoved)
 		{
 			auto brk = static_cast<const BreakpointEvent&>(evt).brk;
 			if (brk->file == m_file)
-				syncBreakpoint(brk);
+			{
+				if (evt.id == DataEventID::BreakpointRemoved)
+					deleteBreakpointMarkers(brk);
+				else
+					syncBreakpoint(brk);
+			}
 		}
 		else if (evt.id == DataEventID::DebugStop || evt.id==DataEventID::DebugResume)
 		{
@@ -224,7 +229,9 @@ void FileEditorWnd::setFile(const std::shared_ptr<const File>& file, int line, i
 		updateViewOptions();
 	
 		m_textCtrl->SetReadOnly(false);
+		m_isLoading = true;
 		m_textCtrl->LoadFile(file->fullpath.c_str(), wxTEXT_TYPE_ANY);
+		m_isLoading = false;
 		m_textCtrl->Connect(wxEVT_STC_MARGINCLICK, wxStyledTextEventHandler(FileEditorWnd::OnMarginClick), NULL, this);
 		m_textCtrl->Thaw();
 		m_textCtrl->SetSavePoint();
@@ -283,19 +290,19 @@ static int getBreakpointMarker(const Breakpoint* brk)
 	}
 }
 
+void FileEditorWnd::deleteBreakpointMarkers(const Breakpoint* brk)
+{
+	m_textCtrl->MarkerDelete(TO_TXTLINE(brk->line), MARK_BREAKPOINT_INVALID);
+	m_textCtrl->MarkerDelete(TO_TXTLINE(brk->line), MARK_BREAKPOINT_ON);
+	m_textCtrl->MarkerDelete(TO_TXTLINE(brk->line), MARK_BREAKPOINT_OFF);
+}
+
 void FileEditorWnd::syncBreakpoint(const Breakpoint* brk)
 {
-	auto deleteAll = [&]()
-	{
-		m_textCtrl->MarkerDelete(TO_TXTLINE(brk->line), MARK_BREAKPOINT_INVALID);
-		m_textCtrl->MarkerDelete(TO_TXTLINE(brk->line), MARK_BREAKPOINT_ON);
-		m_textCtrl->MarkerDelete(TO_TXTLINE(brk->line), MARK_BREAKPOINT_OFF);
-	};
-
 	if (brk->markerHandle == -1)
 	{
 		CZ_ASSERT(brk->line != -1);
-		deleteAll();
+		deleteBreakpointMarkers(brk);
 		gWorkspace->setBreakpointPos(
 			brk, brk->line, m_textCtrl->MarkerAdd(TO_TXTLINE(brk->line), getBreakpointMarker(brk)));
 	}
@@ -306,12 +313,12 @@ void FileEditorWnd::syncBreakpoint(const Breakpoint* brk)
 		int markers = m_textCtrl->MarkerGet(txtline);
 		if (brk->enabled && (markers& ((1<< MARK_BREAKPOINT_OFF) | (1<<MARK_BREAKPOINT_INVALID))))
 		{
-			deleteAll();
+			deleteBreakpointMarkers(brk);
 			gWorkspace->setBreakpointPos(brk, brk->line, m_textCtrl->MarkerAdd(TO_TXTLINE(brk->line), getBreakpointMarker(brk)));
 		}
 		else if (!brk->enabled && (markers&(1 << MARK_BREAKPOINT_ON)))
 		{
-			deleteAll();
+			deleteBreakpointMarkers(brk);
 			gWorkspace->setBreakpointPos(brk, brk->line, m_textCtrl->MarkerAdd(TO_TXTLINE(brk->line), MARK_BREAKPOINT_OFF));
 		}
 	}
@@ -414,7 +421,8 @@ void FileEditorWnd::OnTextChanged(wxStyledTextEvent& event)
 	if ((flags&wxSTC_MOD_INSERTTEXT) == wxSTC_MOD_INSERTTEXT ||
 		(flags&wxSTC_MOD_DELETETEXT) == wxSTC_MOD_DELETETEXT)
 	{
-		gWorkspace->setFileDirty(m_file->id, true);
+		if (!m_isLoading)
+			gWorkspace->setFileDirty(m_file->id, true);
 		gFileEditorGroupWnd->setPageTitle(m_file);
 
 		gWorkspace->iterateBreakpoints(m_file->id, [&](const Breakpoint* brk)

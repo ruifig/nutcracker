@@ -45,7 +45,9 @@ BEGIN_EVENT_TABLE( MainWnd_Auto, wxFrame )
 	EVT_IDLE( MainWnd_Auto::OnIdle )
 	EVT_SET_FOCUS( MainWnd_Auto::OnSetFocus )
 	EVT_KILL_FOCUS( MainWnd_Auto::OnKillFocus )
-	EVT_MENU( ID_MENU_FILE_OPENFILE, MainWnd_Auto::OnMenuOpenFile )
+	EVT_MENU( ID_MENU_FILE_SAVEWORKSPACE, MainWnd_Auto::OnMenuFileSaveWorkspace )
+	EVT_MENU( ID_MENU_FILE_LOADWORKSPACE, MainWnd_Auto::OnMenuFileLoadWorkspace )
+	EVT_MENU( ID_MENU_FILE_CLOSEWORKSPACE, MainWnd_Auto::OnMenuFileCloseWorkspace )
 	EVT_MENU( wxID_EXIT, MainWnd_Auto::OnExitClick )
 	EVT_MENU( ID_MENU_VIEW_INDENTATION, MainWnd_Auto::OnMenuClick )
 	EVT_MENU( ID_MENU_VIEW_WHITESPACE, MainWnd_Auto::OnMenuClick )
@@ -128,7 +130,9 @@ void MainWnd_Auto::CreateControls()
 
 	wxMenuBar* menuBar = new wxMenuBar;
 	wxMenu* itemMenu3 = new wxMenu;
-	itemMenu3->Append(ID_MENU_FILE_OPENFILE, _("&Open file"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu3->Append(ID_MENU_FILE_SAVEWORKSPACE, _("Save Workspace"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu3->Append(ID_MENU_FILE_LOADWORKSPACE, _("Load Workspace"), wxEmptyString, wxITEM_NORMAL);
+	itemMenu3->Append(ID_MENU_FILE_CLOSEWORKSPACE, _("Close Workspace"), wxEmptyString, wxITEM_NORMAL);
 	itemMenu3->AppendSeparator();
 	itemMenu3->Append(wxID_EXIT, _("E&xit"), wxEmptyString, wxITEM_NORMAL);
 	menuBar->Append(itemMenu3, _("&File"));
@@ -141,46 +145,45 @@ void MainWnd_Auto::CreateControls()
 	menuBar->Append(m_menuInterpreters, _("&Interpreter"));
 	itemFrame1->SetMenuBar(menuBar);
 
-	wxAuiToolBar* itemAuiToolBar12 = new wxAuiToolBar( itemFrame1, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_GRIPPER );
-	itemAuiToolBar12->Realize();
-	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar12, wxAuiPaneInfo()
+	wxAuiToolBar* itemAuiToolBar14 = new wxAuiToolBar( itemFrame1, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_GRIPPER );
+	itemAuiToolBar14->Realize();
+	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar14, wxAuiPaneInfo()
 		.ToolbarPane().Name(wxT("Pane1")).Top().Layer(10).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(false).Floatable(false).Gripper(true));
 
 	m_workspaceWnd = new nutcracker::WorkspaceWnd( itemFrame1, ID_FOREIGN, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
 		.Name(wxT("Pane2")).Caption(_("Workspace")).MinSize(wxSize(80, 80)).BestSize(wxSize(180, -1)).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
-	nutcracker::FileEditorGroupWnd* itemWindow14 = new nutcracker::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
-	itemFrame1->GetAuiManager().AddPane(itemWindow14, wxAuiPaneInfo()
+	nutcracker::FileEditorGroupWnd* itemWindow16 = new nutcracker::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
+	itemFrame1->GetAuiManager().AddPane(itemWindow16, wxAuiPaneInfo()
 		.Name(wxT("Pane4")).Centre().MinSize(wxSize(100, -1)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
 	m_notebook = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_BOTTOM|wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_TAB_EXTERNAL_MOVE|wxNO_BORDER );
 
-	wxPanel* itemPanel16 = new wxPanel( m_notebook, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	wxBoxSizer* itemBoxSizer17 = new wxBoxSizer(wxVERTICAL);
-	itemPanel16->SetSizer(itemBoxSizer17);
+	wxPanel* itemPanel18 = new wxPanel( m_notebook, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxVERTICAL);
+	itemPanel18->SetSizer(itemBoxSizer19);
 
-	m_logTextCtrl = new wxTextCtrl( itemPanel16, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
-	itemBoxSizer17->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
+	m_logTextCtrl = new wxTextCtrl( itemPanel18, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
+	itemBoxSizer19->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
 
-	m_notebook->AddPage(itemPanel16, _("Log"), false);
+	m_notebook->AddPage(itemPanel18, _("Log"), false);
 
-	nutcracker::BreakpointsWnd* itemPanel19 = new nutcracker::BreakpointsWnd( m_notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::BreakpointsWnd* itemPanel21 = new nutcracker::BreakpointsWnd( m_notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel19, _("Breakpoints"), false);
+	m_notebook->AddPage(itemPanel21, _("Breakpoints"), false);
 
-	nutcracker::CallstackWnd* itemPanel20 = new nutcracker::CallstackWnd( m_notebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::CallstackWnd* itemPanel22 = new nutcracker::CallstackWnd( m_notebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel20, _("Callstack"), false);
+	m_notebook->AddPage(itemPanel22, _("Callstack"), false);
 
-	nutcracker::LocalsWnd* itemPanel21 = new nutcracker::LocalsWnd( m_notebook, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	wxTreeCtrl* itemTreeCtrl22 = new wxTreeCtrl( itemPanel21, ID_TREECTRL, wxDefaultPosition, wxSize(100, 100), wxTR_SINGLE );
+	nutcracker::LocalsWnd* itemPanel23 = new nutcracker::LocalsWnd( m_notebook, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel21, _("Locals"), false);
+	m_notebook->AddPage(itemPanel23, _("Locals"), false);
 
-	nutcracker::WatchesWnd* itemPanel23 = new nutcracker::WatchesWnd( m_notebook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::WatchesWnd* itemPanel24 = new nutcracker::WatchesWnd( m_notebook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel23, _("Watches"), false);
+	m_notebook->AddPage(itemPanel24, _("Watches"), false);
 
 	itemFrame1->GetAuiManager().AddPane(m_notebook, wxAuiPaneInfo()
 		.Name(wxT("Pane3")).Bottom().MinSize(wxSize(80, 80)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));
@@ -254,19 +257,6 @@ void MainWnd_Auto::OnIdle( wxIdleEvent& event )
 
 
 /*
- * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_IDENTATION
- */
-
-void MainWnd_Auto::OnMenuOpenFile( wxCommandEvent& event )
-{
-////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_IDENTATION in MainWnd_Auto.
-	// Before editing this code, remove the block markers.
-	event.Skip();
-////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_IDENTATION in MainWnd_Auto. 
-}
-
-
-/*
  * wxEVT_COMMAND_MENU_SELECTED event handler for wxID_EXIT
  */
 
@@ -314,5 +304,44 @@ void MainWnd_Auto::OnKillFocus( wxFocusEvent& event )
 	// Before editing this code, remove the block markers.
 	event.Skip();
 ////@end wxEVT_KILL_FOCUS event handler for ID_MAINWND_AUTO in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_SAVEWORKSPACE
+ */
+
+void MainWnd_Auto::OnMenuFileSaveWorkspace( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_SAVEWORKSPACE in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_SAVEWORKSPACE in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_LOADWORKSPACE
+ */
+
+void MainWnd_Auto::OnMenuFileLoadWorkspace( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_LOADWORKSPACE in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_LOADWORKSPACE in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_CLOSEWORKSPACE
+ */
+
+void MainWnd_Auto::OnMenuFileCloseWorkspace( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_CLOSEWORKSPACE in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_CLOSEWORKSPACE in MainWnd_Auto. 
 }
 

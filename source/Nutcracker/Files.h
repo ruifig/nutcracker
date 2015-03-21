@@ -104,20 +104,24 @@ public:
 	void removeFolder(const UTF8String& path);
 	void resyncFolders();
 	std::shared_ptr<const Folder> getRoot();
-	void iterateFiles(std::function<void(const std::shared_ptr<const File>&)> func);
+	void iterateFiles(std::function<bool(const std::shared_ptr<const File>&)> func);
+	bool hasDirtyFiles();
 
 protected:
 	friend BaseItem;
 	friend File;
 	friend Folder;
+	friend Workspace;
 	std::unordered_map<cz::u32, std::weak_ptr<BaseItem>> m_all;
+
+	void _clearAll();
 
 private:
 	Workspace* m_outer;
 	std::shared_ptr<Folder> m_root;
 	std::shared_ptr<File> createFileImpl(UTF8String path, int level);
 	void populateFromDir(const std::shared_ptr<Folder>& folder);
-	void iterateFilesHelper(const std::shared_ptr<const Folder>& folder, std::function<void(const std::shared_ptr<const File>&)>& func);
+	bool iterateFilesHelper(const std::shared_ptr<const Folder>& folder, std::function<bool(const std::shared_ptr<const File>&)>& func);
 };
 
 } // namespace nutcracker

@@ -38,7 +38,7 @@ void FindFileDlg::updateGrid()
 		std::string name = file->name.c_str();
 		auto res = cz::ci_find_substr(name, txt);
 		if (res == std::string::npos)
-			return;
+			return true;
 
 		int penalty = res;
 		bool exactMatch = (res==0 && name == txt);
@@ -47,6 +47,7 @@ void FindFileDlg::updateGrid()
 		int postfixPenalty = name.size() - (res + txt.size());
 		penalty += postfixPenalty;
 		m_files.emplace_back(penalty, file);
+		return true;
 	});
 
 	auto pairCompare =

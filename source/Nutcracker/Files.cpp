@@ -101,6 +101,12 @@ Files::~Files()
 {
 }
 
+void Files::_clearAll()
+{
+	m_all.clear();
+	m_root->items.clear();
+}
+
 std::shared_ptr<File> Files::getFile(FileId fileId)
 {
 	auto it = m_all.find(fileId.val);
@@ -143,7 +149,8 @@ void Files::addFolder(const UTF8String& path)
 
 	if (!Filesystem::getSingleton().isExistingDirectory(fullpath))
 	{
-		throw std::runtime_error(formatString("'%s' is not a folder", path.c_str()));
+		czWarning(ID_Log, formatString("'%s' is not a folder", path.c_str()));
+		return;
 	}
 
 	FileId id(FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes()));
@@ -259,24 +266,50 @@ std::shared_ptr<const Folder> Files::getRoot()
 	return m_root;
 }
 
-void Files::iterateFilesHelper(const std::shared_ptr<const Folder>& folder, std::function<void(const std::shared_ptr<const File>&)>& func)
+bool Files::iterateFilesHelper(const std::shared_ptr<const Folder>& folder, std::function<bool(const std::shared_ptr<const File>&)>& func)
 {
 	// Process file items first
 	for (const auto& n : folder->items)
 		if (n->type == ItemType::File)
-			func(std::static_pointer_cast<File>(n));
+		{
+			if (!func(std::static_pointer_cast<File>(n)))
+				return false;
+		}
 
 	// Iterate folders
 	for (const auto& n : folder->items)
 		if (n->type == ItemType::Folder)
-			iterateFilesHelper(std::static_pointer_cast<Folder>(n), func);
+		{
+			if (!iterateFilesHelper(std::static_pointer_cast<Folder>(n), func))
+				return false;
+		}
+
+	return true;
 }
 
-void Files::iterateFiles(std::function<void(const std::shared_ptr<const File>&)> func)
+void Files::iterateFiles(std::function<bool(const std::shared_ptr<const File>&)> func)
 {
 	iterateFilesHelper(m_root, func);
 }
 
+bool Files::hasDirtyFiles()
+{
+	bool hasDirty = false;
+	iterateFiles([&](const std::shared_ptr<const File>& file)
+	{
+		if (file->dirty)
+		{
+			hasDirty = true;
+			return false; // Break iteration
+		}
+		else
+		{
+			return true; // Continue iteration
+		}
+	});
+
+	return hasDirty;
+}
 
 } // namespace nutcracker
 

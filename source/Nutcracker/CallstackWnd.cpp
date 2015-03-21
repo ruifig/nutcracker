@@ -64,7 +64,8 @@ CallstackWnd::CallstackWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 
 CallstackWnd::~CallstackWnd()
 {
-	gWorkspace->removeListener(this);
+	if (gWorkspace)
+		gWorkspace->removeListener(this);
 }
 
 void CallstackWnd::updateState()
