@@ -34,6 +34,7 @@ BreakpointsWnd::BreakpointsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 
 	m_grid->SetColLabelValue(0, "-");
 	m_grid->SetColLabelValue(1, "location");
+	Connect(wxEVT_CHAR_HOOK, wxKeyEventHandler(BreakpointsWnd::OnCharHook));
 
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	{
@@ -91,6 +92,10 @@ void BreakpointsWnd::updateState()
 	m_grid->AutoSizeColumns(true);
 	m_infoColMinSize = m_grid->GetColSize(1);
 	adjustSize(this->GetSize().GetX());
+
+	m_selectedRow = std::max(0, std::min(m_selectedRow, gWorkspace->getBreakpointCount()));
+	m_grid->SetGridCursor(m_selectedRow, 0);
+	m_grid->SelectRow(m_selectedRow);
 	m_grid->Thaw();
 }
 
@@ -103,6 +108,26 @@ void BreakpointsWnd::adjustSize(int width)
 	int remaining = width - col1Size;
 	m_grid->SetColSize(1,std::max(m_infoColMinSize, remaining));
 	m_grid->SetMargins(0 - wxSYS_VSCROLL_X, 0);
+}
+
+void BreakpointsWnd::OnCharHook(wxKeyEvent& evt)
+{
+	if (evt.GetKeyCode() == WXK_DELETE)
+	{
+		int r = m_grid->GetCursorRow();
+		m_selectedRow = r;
+		gWorkspace->removeBreakpoint(r);
+	}
+	else if (evt.GetKeyCode() == WXK_SPACE)
+	{
+		int r = m_grid->GetCursorRow();
+		m_selectedRow = r;
+		gWorkspace->toggleBreakpoint(r);
+	}
+	else
+	{
+		evt.Skip();
+	}
 }
 
 void BreakpointsWnd::OnCellChanged(wxGridEvent& evt)
@@ -137,7 +162,8 @@ void BreakpointsWnd::OnCellDClick(wxGridEvent& evt)
 
 void BreakpointsWnd::OnShow(wxShowEvent& evt)
 {
-	updateState();
+	if (gWorkspace)
+		updateState();
 }
 
 void BreakpointsWnd::OnSize(wxSizeEvent& evt)

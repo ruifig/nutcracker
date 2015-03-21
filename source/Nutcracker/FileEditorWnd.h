@@ -33,6 +33,7 @@ public:
 	void onPageChanged();
 	std::pair<int, int> getCursorLocation();
 	void syncBreakInfo(const BreakInfo& brk);
+	void deleteBreakpointMarkers(const Breakpoint* brk);
 
 private:
 	DECLARE_EVENT_TABLE()
@@ -57,7 +58,7 @@ private:
 	void recolourise(bool reparse);
 
 	std::shared_ptr<const File> m_file;
-
+	bool m_isLoading = false; // used to detect if we are loading the file, and thus ignore some events
 };
 
 } // namespace nutcracker

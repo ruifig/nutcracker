@@ -124,15 +124,15 @@ MainWnd::MainWnd()
 
 	gWorkspace->registerListener(this, [this](const DataEvent& evt)
 	{
-		if (evt.isDebugEvent())
+		if (evt.isDebugEvent() || evt.id==DataEventID::WorkspaceDirty || evt.id==DataEventID::WorkspaceChanges)
 		{
-			wxString t;
+			wxString t = (gWorkspace->getName() + " ").widen();
+			if (gWorkspace->isDirty())
+				t = wxString("*") + t;
 			if (gWorkspace->debuggerActive())
-				t = gWorkspace->debuggerGetBreakInfo() ? "(Debugging)" : "(Running)";
-			wxString title = "Nutcracker IDE";
-			if (!t.empty())
-				title += wxString(wxT(" ")) + t;
-			SetTitle(title);
+				t += gWorkspace->debuggerGetBreakInfo() ? "(Debugging)" : "(Running)";
+			t += " - Nutcracker IDE";
+			SetTitle(t);
 		}
 	});
 
@@ -140,7 +140,9 @@ MainWnd::MainWnd()
 
 MainWnd::~MainWnd()
 {
+	gFileEditorGroupWnd->forceCloseAll();
 	gWorkspace->saveConfig();
+	gWorkspace.reset();
 	gShuttingDown = true;
 	cz::Logger::getSingleton().removeOutput(m_logger.get());
 }
@@ -166,9 +168,6 @@ void MainWnd::OnMenuClick(wxCommandEvent& event)
 		break;
 		case ID_MENU_VIEW_EOL:
 			gWorkspace->setViewEOL(val);
-		break;
-		case ID_MENU_FILE_OPENFILE:
-			showMsg("TODO", "TODO");
 		break;
 	}
 
@@ -394,7 +393,7 @@ void MainWnd::OnExitClick(wxCommandEvent& event)
 
 void MainWnd::OnCloseWindow(wxCloseEvent& event)
 {
-	if (event.CanVeto() && gFileEditorGroupWnd->hasDirtyFiles())
+	if (event.CanVeto() && (gFileEditorGroupWnd->hasDirtyFiles() || gWorkspace->isDirty()))
 	{
 		try
 		{
@@ -402,7 +401,7 @@ void MainWnd::OnCloseWindow(wxCloseEvent& event)
 			
 			if (ret==wxYES)
 			{
-				gFileEditorGroupWnd->saveAll();
+				saveWorkspace();
 			}
 			else if (ret==wxNO)
 			{
@@ -425,22 +424,93 @@ void MainWnd::OnCloseWindow(wxCloseEvent& event)
 	event.Skip();
 }
 
-void MainWnd::OnMenuOpenFile(wxCommandEvent& event)
+void MainWnd::OnMenuFileSaveWorkspace(wxCommandEvent& event)
 {
 	try
 	{
-		wxFileDialog openFileDialog(this, "Open file", wxGetCwd(), "", "Squirrel (*.nut)|*.nut",
+		saveWorkspace();
+	}
+	catch (std::exception& e)
+	{
+		showException(e);
+	}
+}
+
+void MainWnd::saveWorkspace()
+{
+	wxString path = gWorkspace->getFullPath().widen();
+	if(path=="")
+	{
+		wxFileDialog fileDlg(this, "Save workspace", wxGetCwd(), "", "Nutcracker Workspace (*.nws)|*.nws", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+		if (fileDlg.ShowModal() == wxID_CANCEL)
+			return;
+
+		path = fileDlg.GetPath();
+	}
+
+	gFileEditorGroupWnd->saveAll();
+	gWorkspace->save(path.c_str().AsWChar());
+}
+
+void MainWnd::OnMenuFileLoadWorkspace(wxCommandEvent& event)
+{
+	if (gWorkspace->debuggerActive())
+	{
+		showError("Workspace Load", "Can't load a workspace while debugging.");
+		return;
+	}
+
+	while(gWorkspace->isDirty())
+	{
+		auto res = wxMessageBox("Current workspace has been changed.\nSave changes?", wxMessageBoxCaptionStr, wxYES_NO | wxCANCEL | wxICON_WARNING);
+		if (res == wxCANCEL)
+			return;
+		else if (res == wxYES)
+			saveWorkspace();
+		else
+			break;
+	}
+
+	try
+	{
+		wxFileDialog openFileDialog(this, "Open workspace", wxGetCwd(), "", "Nutcracker Workspace (*.nws)|*.nws",
 			wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 
 		if (openFileDialog.ShowModal() == wxID_CANCEL)
 			return;
 
 		cz::UTF8String filename = wxStringToUtf8(openFileDialog.GetPath());
+		gFileEditorGroupWnd->forceCloseAll();
+		gWorkspace->load(filename);
 	}
 	catch (std::exception& e)
 	{
 		showException(e);
 	}
+
+}
+
+void MainWnd::OnMenuFileCloseWorkspace(wxCommandEvent& event)
+{
+	try
+	{
+		if (gWorkspace->isDirty())
+		{
+			auto res = wxMessageBox("Current workspace has been changed.\nSave changes?", wxMessageBoxCaptionStr, wxYES_NO | wxCANCEL | wxICON_WARNING);
+			if (res == wxCANCEL)
+				return;
+			else if (res == wxYES)
+				saveWorkspace();
+		}
+
+		gFileEditorGroupWnd->forceCloseAll();
+		gWorkspace->close();
+	}
+	catch (std::exception& e)
+	{
+		showException(e);
+	}
+
 }
 
 void MainWnd::OnSetFocus(wxFocusEvent& event)

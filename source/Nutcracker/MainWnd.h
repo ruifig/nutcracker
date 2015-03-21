@@ -31,7 +31,9 @@ private:
 	virtual void OnMenuClick(wxCommandEvent& event) override;
 	virtual void OnExitClick(wxCommandEvent& event) override;
 	virtual void OnCloseWindow(wxCloseEvent& event) override;
-	virtual void OnMenuOpenFile(wxCommandEvent& event) override;
+	virtual void OnMenuFileSaveWorkspace(wxCommandEvent& event) override;
+	virtual void OnMenuFileLoadWorkspace(wxCommandEvent& event) override;
+	virtual void OnMenuFileCloseWorkspace(wxCommandEvent& event) override;
 	virtual void OnSetFocus(wxFocusEvent& event) override;
 	virtual void OnKillFocus(wxFocusEvent& event) override;
 	void OnDropFiles(wxDropFilesEvent& event);
@@ -39,6 +41,8 @@ private:
 	void OnCharHook(wxKeyEvent& event);
 	void OnQuit(wxCommandEvent& event);
 	void OnInterpreterClick(wxCommandEvent& event);
+
+	void saveWorkspace();
 
 	std::unique_ptr<MainWndLoggerOutput> m_logger;
 	cz::AsyncCommandQueueExplicit m_asyncFuncs;

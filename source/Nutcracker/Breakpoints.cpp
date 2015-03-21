@@ -34,7 +34,7 @@ Breakpoint* Breakpoints::add(const std::shared_ptr<const File>& file, int line, 
 {
 	for (auto& b : m_all)
 	{
-		if (b->file == file && b->markerHandle == markerHandle)
+		if (b->file == file && ((markerHandle!=-1 && b->markerHandle == markerHandle) || b->line==line))
 		{
 			czDebug(ID_Log, "Breakpoint '%s:%d' already exists", file->name.c_str(), markerHandle);
 			return nullptr;
@@ -65,6 +65,18 @@ std::unique_ptr<Breakpoint> Breakpoints::remove(const std::shared_ptr<const File
 	return brk;
 }
 
+std::unique_ptr<Breakpoint> Breakpoints::removeAt(int index)
+{
+	std::unique_ptr<Breakpoint> brk;
+	if (unsigned(index) < m_all.size())
+	{
+		brk = std::move(m_all[index]);
+		m_all.erase(m_all.begin() + index);
+	}
+
+	return brk;
+}
+
 void Breakpoints::iterate(const std::shared_ptr<const File>& file, std::function<void(Breakpoint* brk)>&& func)
 {
 	for (auto& b : m_all)
@@ -90,6 +102,11 @@ Breakpoint* Breakpoints::get(const std::shared_ptr<const File>& file, int line)
 			return b.get();
 	}
 	return nullptr;
+}
+
+void Breakpoints::_clearAll()
+{
+	m_all.clear();
 }
 
 int Breakpoints::getCount() const

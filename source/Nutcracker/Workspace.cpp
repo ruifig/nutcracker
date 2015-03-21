@@ -140,11 +140,17 @@ void Workspace::fireEvent(const DataEvent& evt)
 			m_pendingFuncs.clear();
 		}
 	}
+
+	if (evt.makesWorkspaceDirty && !m_isDirty)
+	{
+		m_isDirty = true;
+		fireEvent(DataEventID::WorkspaceDirty, false);
+	}
 }
 
-void Workspace::fireEvent(const DataEventID id)
+void Workspace::fireEvent(const DataEventID id, bool makesWSDirty)
 {
-	fireEvent(DataEvent(id));
+	fireEvent(DataEvent(id, makesWSDirty));
 }
 
 std::shared_ptr<const File> Workspace::getFile(FileId fileId)
@@ -170,13 +176,13 @@ std::shared_ptr<const File> Workspace::createFile(UTF8String path)
 void Workspace::addFolder(const UTF8String& path)
 {
 	m_files.addFolder(path);
-	fireEvent(DataEventID::WorkspaceChanges);
+	fireEvent(DataEventID::WorkspaceChanges, true);
 }
 
 void Workspace::removeFolder(const UTF8String& path)
 {
 	m_files.removeFolder(path);
-	fireEvent(DataEventID::WorkspaceChanges);
+	fireEvent(DataEventID::WorkspaceChanges, true);
 }
 
 void Workspace::resyncFolders()
@@ -196,7 +202,10 @@ void Workspace::setFileDirty(FileId fileId, bool dirty)
 	bool fire = (dirty && file->dirty == false);
 	file->dirty = dirty;
 	if (fire)
+	{
 		fireEvent(FileDirty(file));
+		fireEvent(DataEventID::WorkspaceDirty, false);
+	}
 }
 
 void Workspace::setFileSaveFunc(FileId fileId, std::function<bool(const std::shared_ptr<const File>& file)> func)
@@ -229,20 +238,21 @@ bool Workspace::saveFile(FileId fileId)
 		brk->savedline = brk->line;
 	});
 	fireEvent(FileSaved(file));
+	fireEvent(DataEventID::WorkspaceDirty, false);
 
 	return true;
 }
 
-void Workspace::iterateFiles(std::function<void(const std::shared_ptr<const File>&)>&& func)
+void Workspace::iterateFiles(std::function<bool(const std::shared_ptr<const File>&)>&& func)
 {
 	m_files.iterateFiles(func);
 }
 
-const Breakpoint* Workspace::addBreakpoint(FileId fileId, int line, int markerHandler)
+const Breakpoint* Workspace::addBreakpoint(FileId fileId, int line, int markerHandler, bool enabled)
 {
 	auto file = m_files.getFile(fileId);
 	CZ_ASSERT(file);
-	auto brk = m_breakpoints.add(file, line, markerHandler);
+	auto brk = m_breakpoints.add(file, line, markerHandler, enabled);
 	if (debuggerActive())
 		m_debugSession->updateBreakpoint(brk);
 	fireEvent(BreakpointAdd(brk));
@@ -288,7 +298,10 @@ const Breakpoint* Workspace::toggleBreakpoint(Breakpoint* brk)
 const Breakpoint* Workspace::toggleBreakpoint(int index)
 {
 	auto b = m_breakpoints.getAt(index);
-	return toggleBreakpoint(b);
+	if (b)
+		return toggleBreakpoint(b);
+	else
+		return nullptr;
 }
 
 const Breakpoint* Workspace::toggleBreakpoint(FileId fileId, int line)
@@ -322,17 +335,28 @@ void Workspace::setBreakpointPos(const Breakpoint* brk, int line, int markerHand
 		fireEvent(BreakpointUpdated(brk));
 }
 
-void Workspace::removeBreakpoint(FileId fileId, int line)
+void Workspace::doRemoveBreakpoint(const std::unique_ptr<Breakpoint>& brk)
 {
-	auto file = m_files.getFile(fileId);
-	CZ_ASSERT(file);
-	auto brk = m_breakpoints.remove(file, line);
 	if (brk)
 	{
 		if (debuggerActive())
 			m_debugSession->removeBreakpoint(brk.get());
 		fireEvent(BreakpointRemoved(brk.get()));
 	}
+}
+
+void Workspace::removeBreakpoint(int index)
+{
+	auto brk = m_breakpoints.removeAt(index);
+	doRemoveBreakpoint(brk);
+}
+
+void Workspace::removeBreakpoint(FileId fileId, int line)
+{
+	auto file = m_files.getFile(fileId);
+	CZ_ASSERT(file);
+	auto brk = m_breakpoints.remove(file, line);
+	doRemoveBreakpoint(brk);
 }
 
 int Workspace::addWatch(std::string watch, int id)
@@ -380,7 +404,7 @@ int Workspace::addWatch(std::string watch, int id)
 	else
 		m_watches.push_back(std::move(w));
 
-	fireEvent(DataEventID::WatchesChanged);
+	fireEvent(DataEventID::WatchesChanged, true);
 	return ret;
 }
 
@@ -443,7 +467,7 @@ void Workspace::removeWatchByID(int id)
 					callstack.watches.erase(id);
 			}
 
-			fireEvent(DataEventID::WatchesChanged);
+			fireEvent(DataEventID::WatchesChanged, true);
 			break;
 		}
 	}
@@ -467,13 +491,13 @@ void Workspace::doDebugStop()
 {
 	m_debugSession = nullptr;
 	m_breakInfo = nullptr;
-	fireEvent(DataEventID::DebugStop);
+	fireEvent(DataEventID::DebugStop, false);
 }
 
 void Workspace::doDebugResume()
 {
 	m_breakInfo = nullptr;
-	fireEvent(DataEventID::DebugResume);
+	fireEvent(DataEventID::DebugResume, false);
 }
 
 bool Workspace::debuggerStart(FileId fileId)
@@ -495,7 +519,7 @@ bool Workspace::debuggerStart(FileId fileId)
 	m_debugSession->breakListeners.add(this, [this](const std::shared_ptr<BreakInfo>& info)
 	{
 		m_breakInfo = info;
-		fireEvent(DataEventID::DebugBreak);
+		fireEvent(DataEventID::DebugBreak, false);
 	});
 
 	m_debugSession->resumeListeners.add(this, [this]()
@@ -511,7 +535,7 @@ bool Workspace::debuggerStart(FileId fileId)
 			fireEvent(BreakpointValidated(brk));
 	});
 
-	fireEvent(DataEventID::DebugStart);
+	fireEvent(DataEventID::DebugStart, false);
 	return true;
 }
 
@@ -541,7 +565,7 @@ void Workspace::debuggerSetCallstackFrame(int index)
 		return;
 
 	m_breakInfo->currentCallstackFrame = index;
-	fireEvent(DataEventID::DebugChangedCallstackFrame);
+	fireEvent(DataEventID::DebugChangedCallstackFrame, false);
 }
 
 void Workspace::debuggerResume()
@@ -635,19 +659,19 @@ void Workspace::saveConfig()
 void Workspace::setViewIdentation(bool enabled)
 {
 	m_options.view_indentation = enabled;
-	fireEvent(DataEventID::ViewIndentation);
+	fireEvent(DataEventID::ViewIndentation, false);
 }
 
 void Workspace::setViewWhitespaces(bool enabled)
 {
 	m_options.view_whitespaces = enabled;
-	fireEvent(DataEventID::ViewWhitespaces);
+	fireEvent(DataEventID::ViewWhitespaces, false);
 }
 
 void Workspace::setViewEOL(bool enabled)
 {
 	m_options.view_eol = enabled;
-	fireEvent(DataEventID::ViewEOL);
+	fireEvent(DataEventID::ViewEOL, false);
 }
 
 const Options* Workspace::getViewOptions()
@@ -696,7 +720,222 @@ void Workspace::setCurrentInterpreter(int index)
 	CZ_ASSERT(static_cast<size_t>(index) < m_interpreters.all.size());
 	m_interpreters.current = index;
 	m_options.general_defaultInterpreter = _getCurrentInterpreter()->getName();
-	fireEvent(DataEventID::InterpreterChanged);
+	fireEvent(DataEventID::InterpreterChanged, false);
+}
+
+cz::UTF8String Workspace::getName() const
+{
+	if (m_filename.size() == 0)
+		return "untitled";
+	else
+		return m_filename.getBaseFilename();
+}
+
+cz::UTF8String Workspace::getFullPath() const
+{
+	return m_filename.getFullPath();
+}
+
+bool Workspace::isDirty()
+{
+	if (m_isDirty || m_files.hasDirtyFiles())
+		return true;
+	else
+		return false;
+}
+
+void Workspace::doSave(tinyxml2::XMLDocument& doc)
+{
+
+	auto createElement = [&](tinyxml2::XMLElement* parent, const char* name, const char* text)
+	{
+		auto ele = doc.NewElement(name);
+		if (parent)
+			parent->InsertEndChild(ele);
+		else
+			doc.InsertEndChild(ele);
+		if (text && text[0]!=0)
+			ele->SetText(text);
+		return ele;
+	};
+
+
+
+	//
+	// Files
+	{
+		auto foldersEle = createElement(nullptr, "folders", "");
+		for (auto& item : m_files.getRoot()->items)
+		{
+			if (item->type != ItemType::Folder)
+				return;
+
+			auto folderEle = createElement(foldersEle, "folder", "");
+			createElement(folderEle, "path", item->fullpath.c_str());
+		}
+	}
+
+	//
+	// Breakpoints
+	{
+		auto breakpointsEle = createElement(nullptr, "breakpoints", "");
+		m_breakpoints.iterate([&](Breakpoint* brk)
+		{
+			auto breakpointEle = createElement(breakpointsEle, "breakpoint", "");
+			createElement(breakpointEle, "file", brk->file->fullpath.c_str());
+			createElement(breakpointEle, "line", std::to_string(brk->line).c_str());
+			createElement(breakpointEle, "enabled", brk->enabled ? "1" : "0");
+		});
+	}
+
+	//
+	// Watches
+	{
+		auto watchesEle = createElement(nullptr, "watches", "");
+		for (const auto& w : m_watches)
+		{
+			createElement(watchesEle, "watch", w.name.c_str());
+		}
+	}
+
+}
+
+void iterateElements(tinyxml2::XMLElement* ele, const char* name, std::function<void(tinyxml2::XMLElement*)> func)
+{
+	auto entry = ele->FirstChildElement(name);
+	while (entry)
+	{
+		func(entry);
+		entry = entry->NextSiblingElement(name);
+	}
+}
+
+void Workspace::doLoad(tinyxml2::XMLDocument& doc)
+{
+	close();
+
+	auto doCheck = [](bool val)
+	{
+		if (!val)
+			throw std::runtime_error("Error loading workspace");
+	};
+
+	auto getSimpleElementAsText = [&](tinyxml2::XMLElement* ele, const char* name)
+	{
+		auto entry = ele->FirstChildElement(name);
+		doCheck(entry != nullptr);
+		return entry->GetText();
+	};
+	auto getSimpleElementAsInt = [&](tinyxml2::XMLElement* ele, const char* name)
+	{
+		auto entry = ele->FirstChildElement(name);
+		doCheck(entry != nullptr);
+		return std::atoi(entry->GetText());
+	};
+	auto getSimpleElementAsBool = [&](tinyxml2::XMLElement* ele, const char* name)
+	{
+		auto entry = ele->FirstChildElement(name);
+		doCheck(entry != nullptr);
+		return std::atoi(entry->GetText()) == 1 ? true : false;
+	};
+
+	//
+	// Load files
+	{
+		auto foldersEle = doc.FirstChildElement("folders");
+		doCheck(foldersEle != nullptr);
+		iterateElements(foldersEle, "folder", [&](tinyxml2::XMLElement* ele)
+		{
+			addFolder(getSimpleElementAsText(ele, "path"));
+		});
+	}
+
+	//
+	// Load breakpoints
+	{
+		auto breakpointsEle = doc.FirstChildElement("breakpoints");
+		doCheck(breakpointsEle != nullptr);
+		iterateElements(breakpointsEle, "breakpoint", [&](tinyxml2::XMLElement* ele)
+		{
+			auto path = getSimpleElementAsText(ele, "file");
+			auto line = getSimpleElementAsInt(ele, "line");
+			bool enabled = getSimpleElementAsBool(ele, "enabled");
+			auto file = createFile(path);
+			if (!file)
+			{
+				czDebug(ID_Log, "Ignore invalid breakpoint: '%s':%d", path, line);
+				return;
+			}
+			addBreakpoint(file->id, line, -1, enabled);
+		});
+	}
+
+
+	//
+	// Watches
+	{
+		auto watchesEle = doc.FirstChildElement("watches");
+		doCheck(watchesEle != nullptr);
+		iterateElements(watchesEle, "watch", [&](tinyxml2::XMLElement* ele)
+		{
+			addWatch(ele->GetText());
+		});
+	}
+
+}
+
+void Workspace::save(const UTF8String& filename)
+{
+	iterateFiles([&](const std::shared_ptr<const File>& file)
+	{
+		if (file->dirty)
+			saveFile(file->id);
+		return true;
+	});
+
+	tinyxml2::XMLDocument doc;
+	doSave(doc);
+	doc.SaveFile(filename.c_str());
+	m_filename = filename;
+	m_isDirty = false;
+	fireEvent(DataEventID::WorkspaceDirty, false);
+	fireEvent(DataEventID::WorkspaceChanges, false);
+}
+
+void Workspace::close()
+{
+	// Remove all breakpoints
+	while (m_breakpoints.getCount())
+	{
+		auto brk = m_breakpoints.getAt(m_breakpoints.getCount() - 1);
+		removeBreakpoint(brk->file->id, brk->line);
+	}
+
+	// Remove all watches
+	while (m_watches.size())
+	{
+		removeWatchByID(m_watches.front().id);
+	}
+
+	m_filename = "";
+
+	// Remove all files
+	m_files._clearAll();
+
+	m_isDirty = false;
+	fireEvent(DataEventID::WorkspaceChanges, false);
+	fireEvent(DataEventID::WorkspaceDirty, false);
+}
+
+void Workspace::load(const UTF8String& filename)
+{
+	tinyxml2::XMLDocument doc;
+	if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_NO_ERROR)
+		throw std::runtime_error("Error loading workspace file.");
+	doLoad(doc);
+	m_filename = filename;
+	m_isDirty = false;
+	fireEvent(DataEventID::WorkspaceDirty, false);
 }
 
 

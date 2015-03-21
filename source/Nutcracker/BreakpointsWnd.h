@@ -27,6 +27,7 @@ private:
 	virtual void OnCellDClick( wxGridEvent& evt ) override;
 	virtual void OnSize(wxSizeEvent& event) override;
 	void OnShow(wxShowEvent& evt);
+	void OnCharHook(wxKeyEvent& evt);
 
 	void tryUpdateState(bool force = false);
 	void updateState();
@@ -34,6 +35,7 @@ private:
 	void adjustSize(int width);
 	int m_infoColMinSize = 0;
 	bool m_pendingUpdate = false;
+	int m_selectedRow = -1;
 };
 
 } // namespace nutcracker

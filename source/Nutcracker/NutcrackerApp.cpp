@@ -83,7 +83,16 @@ bool NutcrackerApp::OnInit()
     mainWnd->Show(true);
 
 	if (gParameters->has("workspace"))
-		gWorkspace->addFolder(gParameters->get("workspace"));
+	{
+		try
+		{
+			gWorkspace->load(gParameters->get("workspace"));
+		}
+		catch (std::exception& e)
+		{
+			showException(e);
+		}
+	}
 
 	/*
 	postAppLambdaEvent([]()

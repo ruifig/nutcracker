@@ -22,7 +22,6 @@
 #include "wx/frame.h"
 #include "wx/aui/auibar.h"
 #include "wx/aui/auibook.h"
-#include "wx/treectrl.h"
 ////@end includes
 
 /*!
@@ -91,8 +90,14 @@ public:
 	/// wxEVT_KILL_FOCUS event handler for ID_MAINWND_AUTO
 	virtual void OnKillFocus( wxFocusEvent& event );
 
-	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_OPENFILE
-	virtual void OnMenuOpenFile( wxCommandEvent& event );
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_SAVEWORKSPACE
+	virtual void OnMenuFileSaveWorkspace( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_LOADWORKSPACE
+	virtual void OnMenuFileLoadWorkspace( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_CLOSEWORKSPACE
+	virtual void OnMenuFileCloseWorkspace( wxCommandEvent& event );
 
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_EXIT
 	virtual void OnExitClick( wxCommandEvent& event );
@@ -127,7 +132,9 @@ public:
 	/// Control identifiers
 	enum {
 		ID_MAINWND_AUTO = 10000,
-		ID_MENU_FILE_OPENFILE = 10002,
+		ID_MENU_FILE_SAVEWORKSPACE = 10016,
+		ID_MENU_FILE_LOADWORKSPACE = 10017,
+		ID_MENU_FILE_CLOSEWORKSPACE = 10018,
 		ID_MENU_VIEW_INDENTATION = 10003,
 		ID_MENU_VIEW_WHITESPACE = 10004,
 		ID_MENU_VIEW_EOL = 10005,
@@ -140,7 +147,6 @@ public:
 		ID_PANEL1 = 10012,
 		ID_PANEL2 = 10013,
 		ID_PANEL3 = 10014,
-		ID_TREECTRL = 10001,
 		ID_PANEL4 = 10015
 	};
 ////@end MainWnd_Auto member variables

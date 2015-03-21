@@ -351,7 +351,7 @@
               <string name="type">"dialog-control-document"</string>
               <document>
                 <string name="proxy-type">"wbMenuItemProxy"</string>
-                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuOpenFile|NONE||MainWnd_Auto"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuFileSaveWorkspace|NONE||MainWnd_Auto"</string>
                 <string name="filename">""</string>
                 <string name="icon-name">"menuitem"</string>
                 <long name="is-transient">0</long>
@@ -362,12 +362,56 @@
                 <bool name="proxy-Checked">0</bool>
                 <bool name="proxy-Enabled">1</bool>
                 <string name="proxy-Help text">""</string>
-                <string name="proxy-Id name">"ID_MENU_FILE_OPENFILE"</string>
-                <long name="proxy-Id value">10002</long>
+                <string name="proxy-Id name">"ID_MENU_FILE_SAVEWORKSPACE"</string>
+                <long name="proxy-Id value">10016</long>
                 <string name="proxy-Kind">"Normal"</string>
-                <string name="proxy-Label">"&amp;Open file"</string>
+                <string name="proxy-Label">"Save Workspace"</string>
                 <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
-                <string name="title">"&amp;Open file: ID_MENU_FILE_OPENFILE"</string>
+                <string name="title">"Save Workspace: ID_MENU_FILE_SAVEWORKSPACE"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuFileLoadWorkspace|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_FILE_LOADWORKSPACE"</string>
+                <long name="proxy-Id value">10017</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Load Workspace"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Load Workspace: ID_MENU_FILE_LOADWORKSPACE"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuFileCloseWorkspace|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_FILE_CLOSEWORKSPACE"</string>
+                <long name="proxy-Id value">10018</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Close Workspace"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Close Workspace: ID_MENU_FILE_CLOSEWORKSPACE"</string>
                 <long name="title-mode">0</long>
                 <string name="type">"dialog-control-document"</string>
               </document>
