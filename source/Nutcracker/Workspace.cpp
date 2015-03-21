@@ -319,16 +319,55 @@ void Workspace::removeBreakpoint(FileId fileId, int line)
 	}
 }
 
-void Workspace::addWatch(std::string watch)
+int Workspace::addWatch(std::string watch, int id)
 {
 	Watch w;
-	w.id = m_watchIDCounter++;
+	if (id)
+		w.id = id;
+	else
+		w.id = m_watchIDCounter++;
 	w.name = std::move(watch);
+
 	if (debuggerActive())
+	{
+		// If we are editing an existing watch, then remove the previous one, as it seems the default SQDBG protocol
+		// implementation in squirrel doesn't update existing watches
+		if (id)
+			m_debugSession->removeWatch(id);
 		m_debugSession->addWatch(w.id, w.name);
-	m_watches.push_back(std::move(w));
+	}
+
+	// Sync the watch list with the breakpoint info
+	if (m_breakInfo)
+	{
+		for (auto& callstack : m_breakInfo->callstack)
+		{
+			auto& e = callstack.watches[w.id];
+			if (e.id == 0 || e.getName()!=w.name)
+			{
+				e.key = std::make_shared<ValueString>(w.name.c_str());
+				e.id = w.id;
+				e.state = WatchState::Unknown;
+				e.val.reset();
+			}
+		}
+	}
+
+	auto it = cz::find_if(m_watches, [id](Watch& w)
+	{
+		return w.id == id;
+	});
+
+	int ret = w.id;
+	if (it != m_watches.end())
+		*it = std::move(w);
+	else
+		m_watches.push_back(std::move(w));
+
 	fireEvent(DataEventID::WatchesChanged);
+	return ret;
 }
+
 
 int Workspace::getWatchCount() const
 {
@@ -342,7 +381,9 @@ void Workspace::iterateWatches(std::function<void(const struct Watch*, const Wat
 		auto& watches = m_breakInfo->callstack[m_breakInfo->currentCallstackFrame].watches;
 		for (const auto& w : m_watches)
 		{
+			assert(w.id != 0);
 			auto& e = watches[w.id];
+			assert(e.id == w.id);
 			func(&w, &e);
 		}
 	}
@@ -378,6 +419,14 @@ void Workspace::removeWatchByID(int id)
 			m_watches.erase(it);
 			if (debuggerActive())
 				m_debugSession->removeWatch(id);
+
+			// Sync the watch list with the breakpoint info
+			if (m_breakInfo)
+			{
+				for (auto& callstack : m_breakInfo->callstack)
+					callstack.watches.erase(id);
+			}
+
 			fireEvent(DataEventID::WatchesChanged);
 			break;
 		}

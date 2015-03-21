@@ -136,10 +136,6 @@ MainWnd::MainWnd()
 		}
 	});
 
-	// TODO: Remove this
-	gWorkspace->addWatch("i");
-	gWorkspace->addWatch("pow(2,8)");
-	gWorkspace->addWatch("testWatch(\" World!\")");
 }
 
 MainWnd::~MainWnd()
