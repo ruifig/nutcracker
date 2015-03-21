@@ -23,8 +23,8 @@ FileId computeId(const UTF8String& str)
 //////////////////////////////////////////////////////////////////////////
 // BaseItem
 //////////////////////////////////////////////////////////////////////////
-BaseItem::BaseItem(Files* parent_, ItemType type_, UTF8String fullpath_)
-	: parent(parent_), type(type_), fullpath(std::move(fullpath_))
+BaseItem::BaseItem(Files* parent_, ItemType type_, UTF8String fullpath_, int level)
+	: parent(parent_), type(type_), fullpath(std::move(fullpath_)), level(level)
 {
 	id.val = FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes());
 }
@@ -51,8 +51,8 @@ void BaseItem::addToParent()
 //////////////////////////////////////////////////////////////////////////
 // File
 //////////////////////////////////////////////////////////////////////////
-File::File(Files* parent_, UTF8String fullpath_)
-	: BaseItem(parent_, ItemType::File, std::move(fullpath_))
+File::File(Files* parent_, UTF8String fullpath_, int level)
+	: BaseItem(parent_, ItemType::File, std::move(fullpath_), level)
 {
 	auto fname = Filename(fullpath);
 	name = fname.getFilename();
@@ -65,9 +65,9 @@ File::~File()
 {
 }
 
-std::shared_ptr<File> File::create(Files* parent_, UTF8String fullpath_)
+std::shared_ptr<File> File::create(Files* parent_, UTF8String fullpath_, int level)
 {
-	auto ptr = std::shared_ptr<File>(new File(parent_, std::move(fullpath_)));
+	auto ptr = std::shared_ptr<File>(new File(parent_, std::move(fullpath_), level));
 	ptr->addToParent();
 	return std::move(ptr);
 }
@@ -75,15 +75,15 @@ std::shared_ptr<File> File::create(Files* parent_, UTF8String fullpath_)
 //////////////////////////////////////////////////////////////////////////
 // Folder
 //////////////////////////////////////////////////////////////////////////
-Folder::Folder(Files* parent_, UTF8String fullpath_)
-	: BaseItem(parent_, ItemType::Folder, std::move(fullpath_))
+Folder::Folder(Files* parent_, UTF8String fullpath_, int level)
+	: BaseItem(parent_, ItemType::Folder, std::move(fullpath_), level)
 {
 	name = Filesystem::getSingleton().pathStrip(fullpath);
 }
 
-std::shared_ptr<Folder> Folder::create(Files* parent_, UTF8String fullpath_)
+std::shared_ptr<Folder> Folder::create(Files* parent_, UTF8String fullpath_, int level)
 {
-	auto ptr = std::shared_ptr<Folder>(new Folder(parent_, std::move(fullpath_)));
+	auto ptr = std::shared_ptr<Folder>(new Folder(parent_, std::move(fullpath_), level));
 	ptr->addToParent();
 	return std::move(ptr);
 }
@@ -94,7 +94,7 @@ std::shared_ptr<Folder> Folder::create(Files* parent_, UTF8String fullpath_)
 
 Files::Files(Workspace* outer) : m_outer(outer)
 {
-	m_root = Folder::create(this, "");
+	m_root = Folder::create(this, "", 0);
 }
 
 Files::~Files()
@@ -112,6 +112,25 @@ std::shared_ptr<File> Files::getFile(FileId fileId)
 		return nullptr;
 
 	return std::static_pointer_cast<File>(item);
+}
+
+std::shared_ptr<Folder> Files::getFolder(FileId folderId)
+{
+	auto it = m_all.find(folderId.val);
+	if (it == m_all.end())
+		return nullptr;
+
+	auto item = it->second.lock();
+	if (item->type != ItemType::Folder)
+		return nullptr;
+
+	return std::static_pointer_cast<Folder>(item);
+}
+
+std::shared_ptr<BaseItem> Files::getItem(FileId itemId)
+{
+	auto it = m_all.find(itemId.val);
+	return it == m_all.end() ? nullptr : it->second.lock();
 }
 
 void Files::addFolder(const UTF8String& path)
@@ -134,13 +153,35 @@ void Files::addFolder(const UTF8String& path)
 	auto existing = getFile(computeId(fullpath));
 	if (!existing)
 	{
-		auto f = Folder::create(this, fullpath);
+		auto f = Folder::create(this, fullpath, m_root->level+1);
 		m_root->items.insert(f);
 		populateFromDir(f);
 	}
 }
 
-std::shared_ptr<File> Files::createFile(UTF8String path)
+void Files::removeFolder(const UTF8String& path)
+{
+	UTF8String fullpath;
+	if (!Filesystem::getSingleton().fullPath(fullpath, Filename(path).removeBackslash()))
+	{
+		throw std::runtime_error(formatString("Error parsing folder '%s'", path.c_str()));
+	}
+
+	FileId id(FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes()));
+	if (m_all.find(id.val) == m_all.end())
+		return;
+
+	for (auto it = m_root->items.begin(); it != m_root->items.end(); it++)
+	{
+		if (it->get()->id == id)
+		{
+			m_root->items.erase(it);
+			break;
+		}
+	}
+}
+
+std::shared_ptr<File> Files::createFileImpl(UTF8String path, int level)
 {
 	UTF8String fullpath;
 	if (!Filesystem::getSingleton().fullPath(fullpath, path))
@@ -156,9 +197,13 @@ std::shared_ptr<File> Files::createFile(UTF8String path)
 	if (existing != m_all.end())
 		return std::static_pointer_cast<File>(existing->second.lock());
 
-	auto f = File::create(this, std::move(fullpath));
+	auto f = File::create(this, std::move(fullpath), level);
 	m_all[f->id.val] = f;
 	return f;
+}
+std::shared_ptr<File> Files::createFile(UTF8String path)
+{
+	return createFileImpl(std::move(path), 1);
 }
 
 void Files::populateFromDir(const std::shared_ptr<Folder>& folder)
@@ -172,7 +217,7 @@ void Files::populateFromDir(const std::shared_ptr<Folder>& folder)
 			case Filesystem::Type::Directory:
 			{
 				cz::UTF8String path = folder->fullpath + "\\" + f.name;
-				auto item = Folder::create(this, path);
+				auto item = Folder::create(this, path, folder->level+1);
 				folder->items.insert(item);
 				populateFromDir(item);
 			}
@@ -181,7 +226,7 @@ void Files::populateFromDir(const std::shared_ptr<Folder>& folder)
 			{
 				if (ansiToLower(Filename(f.name).getExtension()) == "nut")
 				{
-					auto item = createFile(folder->fullpath + "\\" + f.name);
+					auto item = createFileImpl(folder->fullpath + "\\" + f.name, folder->level+1);
 					folder->items.insert(item);
 				}
 			}
@@ -203,7 +248,7 @@ void Files::resyncFolders()
 	// but other components still keep the references to any files they are using (such as files
 	// being edited at the moment)
 	m_root.reset();
-	m_root = Folder::create(this, "");
+	m_root = Folder::create(this, "", 0);
 
 	for (auto& n : folders)
 		addFolder(n);

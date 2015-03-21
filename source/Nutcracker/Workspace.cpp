@@ -152,6 +152,16 @@ std::shared_ptr<const File> Workspace::getFile(FileId fileId)
 	return m_files.getFile(fileId);
 }
 
+std::shared_ptr<const BaseItem> Workspace::getItem(FileId itemId)
+{
+	return m_files.getItem(itemId);
+}
+
+std::shared_ptr<const Folder> Workspace::getFolder(FileId folderId)
+{
+	return m_files.getFolder(folderId);
+}
+
 std::shared_ptr<const File> Workspace::createFile(UTF8String path)
 {
 	return m_files.createFile(path);
@@ -160,6 +170,12 @@ std::shared_ptr<const File> Workspace::createFile(UTF8String path)
 void Workspace::addFolder(const UTF8String& path)
 {
 	m_files.addFolder(path);
+	fireEvent(DataEventID::WorkspaceChanges);
+}
+
+void Workspace::removeFolder(const UTF8String& path)
+{
+	m_files.removeFolder(path);
 	fireEvent(DataEventID::WorkspaceChanges);
 }
 
@@ -439,6 +455,10 @@ static Variables getVariables(File* file)
 	vars.set("%FILE%", [file]()
 	{
 		return UTF8String("\"") + file->fullpath + "\"";
+	});
+	vars.set("%NUTCRACKERDIR%", []()
+	{
+		return cz::Filesystem::getSingleton().getCWD();
 	});
 	return vars;
 }
