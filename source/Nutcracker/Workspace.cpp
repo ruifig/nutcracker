@@ -319,6 +319,71 @@ void Workspace::removeBreakpoint(FileId fileId, int line)
 	}
 }
 
+void Workspace::addWatch(std::string watch)
+{
+	Watch w;
+	w.id = m_watchIDCounter++;
+	w.name = std::move(watch);
+	if (debuggerActive())
+		m_debugSession->addWatch(w.id, w.name);
+	m_watches.push_back(std::move(w));
+	fireEvent(DataEventID::WatchesChanged);
+}
+
+int Workspace::getWatchCount() const
+{
+	return static_cast<int>(m_watches.size());
+}
+
+void Workspace::iterateWatches(std::function<void(const struct Watch*, const WatchValue*)> func)
+{
+	if (m_breakInfo)
+	{
+		auto& watches = m_breakInfo->callstack[m_breakInfo->currentCallstackFrame].watches;
+		for (const auto& w : m_watches)
+		{
+			auto& e = watches[w.id];
+			func(&w, &e);
+		}
+	}
+	else
+	{
+		WatchValue e;
+		e.key = std::make_shared<ValueString>("");
+		for (const auto& w : m_watches)
+		{
+			e.key->txt = w.name;
+			func(&w, &e);
+		}
+	}
+}
+
+const Watch* Workspace::getWatchByID(int id)
+{
+	for (auto it = m_watches.begin(); it != m_watches.end(); it++)
+	{
+		if (it->id == id)
+			return &(*it);
+	}
+
+	return nullptr;
+}
+
+void Workspace::removeWatchByID(int id)
+{
+	for (auto it = m_watches.begin(); it != m_watches.end(); it++)
+	{
+		if (it->id == id)
+		{
+			m_watches.erase(it);
+			if (debuggerActive())
+				m_debugSession->removeWatch(id);
+			fireEvent(DataEventID::WatchesChanged);
+			break;
+		}
+	}
+}
+
 static Variables getVariables(File* file)
 {
 	Variables vars;

@@ -9,9 +9,6 @@
 #pragma once
 
 #include "BaseWatchesWnd.h"
-#include "AppEvents.h"
-#include "Interpreter.h"
-#include "TreeListCtrlUtilCode.h"
 
 namespace nutcracker
 {
@@ -29,13 +26,7 @@ private:
 	virtual void OnSize(wxSizeEvent& evt) override;
 	void OnShow(wxShowEvent& evt);
 
-	void tryUpdateState(bool force = false);
-	void updateState();
-	void adjustSize(int width);
-	void LocalsWnd::addVar(const std::shared_ptr<TreeCtrlUtil::TreeListCtrlItemData>& parentItem, const TableEntry& entry, int& idcounter);
-
-	TreeCtrlUtil::TreeListCtrlData m_treeData;
-	bool m_pendingUpdate = false;
+	virtual void updateState() override;
 };
 
 } // namespace nutcracker

@@ -26,9 +26,19 @@ private:
 	// BaseWatchesWnd
 	virtual void OnSize(wxSizeEvent& evt) override;
 	void OnShow(wxShowEvent& evt);
+	virtual void OnItemActivated(wxTreeListEvent& event) override;
+	virtual void OnCharHook(wxKeyEvent& event) override;
+	void OnTextChar(wxKeyEvent& event);
+	void OnTextKillFocus(wxFocusEvent& event);
 
 	void updateState();
 	void adjustSize(int width);
+
+	int getSelectedWatchID(wxRect* rectDst=nullptr, int* colDst=nullptr);
+
+	// Edit box used to add/edit watches
+	wxTextCtrl* m_txtCtrl;
+	int m_selectedWatchID=0;
 };
 
 } // namespace nutcracker

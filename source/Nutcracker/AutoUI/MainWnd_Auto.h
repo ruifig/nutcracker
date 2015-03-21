@@ -22,6 +22,7 @@
 #include "wx/frame.h"
 #include "wx/aui/auibar.h"
 #include "wx/aui/auibook.h"
+#include "wx/treectrl.h"
 ////@end includes
 
 /*!
@@ -46,7 +47,7 @@ class wxAuiNotebook;
 #define SYMBOL_MAINWND_AUTO_STYLE wxCAPTION|wxRESIZE_BORDER|wxSYSTEM_MENU|wxMINIMIZE_BOX|wxMAXIMIZE_BOX|wxCLOSE_BOX
 #define SYMBOL_MAINWND_AUTO_TITLE _("Nutcracker")
 #define SYMBOL_MAINWND_AUTO_IDNAME ID_MAINWND_AUTO
-#define SYMBOL_MAINWND_AUTO_SIZE wxSize(640, 480)
+#define SYMBOL_MAINWND_AUTO_SIZE wxSize(1024, 768)
 #define SYMBOL_MAINWND_AUTO_POSITION wxDefaultPosition
 ////@end control identifiers
 
@@ -139,6 +140,7 @@ public:
 		ID_PANEL1 = 10012,
 		ID_PANEL2 = 10013,
 		ID_PANEL3 = 10014,
+		ID_TREECTRL = 10001,
 		ID_PANEL4 = 10015
 	};
 ////@end MainWnd_Auto member variables

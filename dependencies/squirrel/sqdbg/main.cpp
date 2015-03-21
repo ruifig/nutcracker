@@ -16,7 +16,9 @@
 #include "sqrdbg.h"
 #include "sqdbgserver.h"
 
-
+#include "sqstdmath.h"
+#include "sqstdsystem.h"
+#include "sqstdstring.h"
 
 #ifdef SQUNICODE
 #define scfprintf fwprintf
@@ -91,6 +93,9 @@ int main(int argc, char *argv[])
 			sq_pushroottable(v);
 			sqstd_register_bloblib(v);
 			sqstd_register_iolib(v);
+			sqstd_register_systemlib(v);
+			sqstd_register_mathlib(v);
+			sqstd_register_stringlib(v);
 			//!!EXECUTE A SCTIPT
 			if(SQ_FAILED(sqstd_dofile(v,fname,SQFalse,SQTrue))) {
 				PrintError(v);

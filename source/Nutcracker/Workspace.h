@@ -32,9 +32,11 @@ enum class DataEventID
 {
 	// Workspace
 	WorkspaceChanges,
+
 	// Files
 	FileDirty,
 	FileSaved,
+
 	// Breakpoints
 	BreakpointFIRST,
 	BreakpointAdd=BreakpointFIRST,
@@ -44,6 +46,9 @@ enum class DataEventID
 	BreakpointValidated,
 	BreakpointRemoved,
 	BreakpointLAST = BreakpointRemoved,
+
+	// Watches
+	WatchesChanged,
 
 	//
 	DebugFIRST,
@@ -138,10 +143,11 @@ struct BreakpointValidated : public BreakpointEvent
 	BreakpointValidated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointValidated, brk) {}
 };
 
-
-//////////////////////////////////////////////////////////////////////////
-//	Debugger events
-//////////////////////////////////////////////////////////////////////////
+struct Watch
+{
+	std::string name;
+	int id;
+};
 
 //////////////////////////////////////////////////////////////////////////
 //	Workspace
@@ -192,6 +198,16 @@ public:
 	// This is used to update the breakpoint line when we are editing a file
 	void setBreakpointPos(const Breakpoint* brk, int line, int markerHandler);
 	void removeBreakpoint(FileId fileId, int line);
+
+
+	//
+	// Watches
+	//
+	void addWatch(std::string watch);
+	int getWatchCount() const;
+	void iterateWatches(std::function<void(const struct Watch*, const struct WatchValue*)> func);
+	const Watch* getWatchByID(int id);
+	void removeWatchByID(int id);
 
 	//
 	//
@@ -251,7 +267,8 @@ private:
 	std::shared_ptr<DebugSession> m_debugSession;
 	std::shared_ptr<BreakInfo> m_breakInfo;
 	Options m_options;
-
+	std::vector<Watch> m_watches;
+	int m_watchIDCounter = 1;
 
 	//
 	// Interpreters

@@ -29,6 +29,7 @@
 #include "wx/grid.h"
 #include "wx/treectrl.h"
 #include "wx/treelist.h"
+#include "wx/listctrl.h"
 #include "wx/dataview.h"
 #include "wx/spinctrl.h"
 #include "wx/artprov.h"

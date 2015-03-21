@@ -1,5 +1,16 @@
+local i=0;
+local anotherArray = [10,20,30]
+
+function testWatch(a)
+{
+	return "Hello " + a;
+}
+
+
 function foo1(a)
 {
+	local localArray = [1,2,3,4];
+	print(pow(2,8) + "\n");
 	return a;
 }
 
@@ -33,7 +44,6 @@ function bar3(a)
 
 foo3(0);
 bar3(0);
-local i=0;
 while(1)
 {
 	print("Hello " + i + "\n");

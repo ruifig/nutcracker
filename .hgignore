@@ -41,3 +41,6 @@ dependencies/wxWidgets/*
 # Visual Paradigm
 VisualParadigm/*
 
+#
+source/Nutcracker/AutoUI/Nutcracker-autosave.pjd
+
