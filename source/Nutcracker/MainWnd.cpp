@@ -69,7 +69,7 @@ static wxIconBundle gAppIcons;
 
 
 MainWnd::MainWnd()
-	: MainWnd_Auto((wxFrame*)nullptr, wxID_ANY, "Nutcracker IDE", wxDefaultPosition, wxSize(1024,768))
+	: MainWnd_Auto((wxFrame*)nullptr, wxID_ANY, "Nutcracker IDE", wxDefaultPosition)
 {
 	gMainWnd = this;
 
@@ -136,6 +136,10 @@ MainWnd::MainWnd()
 		}
 	});
 
+	// TODO: Remove this
+	gWorkspace->addWatch("i");
+	gWorkspace->addWatch("pow(2,8)");
+	gWorkspace->addWatch("testWatch(\" World!\")");
 }
 
 MainWnd::~MainWnd()

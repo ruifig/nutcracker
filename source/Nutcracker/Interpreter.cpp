@@ -47,6 +47,16 @@ void DebugSession::removeBreakpoint(Breakpoint* brk)
 	m_messenger->send(cz::formatString("rb:%x:%s\n", brk->line, brk->file->fullpath.c_str()));
 }
 
+void DebugSession::removeWatch(int id)
+{
+	m_messenger->send(cz::formatString("rw:%d\n", id));
+}
+
+void DebugSession::addWatch(int id, const std::string& exp)
+{
+	m_messenger->send(cz::formatString("aw:%d:%s\n", id, exp.c_str()));
+}
+
 void DebugSession::updateBreakpoint(Breakpoint* brk)
 {
 	if (brk->enabled)
@@ -73,10 +83,10 @@ bool DebugSession::start(const std::string& ip, int port)
 			});
 		});
 
-		m_messenger->send("aw:0:unusedGlobalVariable\n");
-		m_messenger->send("aw:1:unusedFunctionVariable\n");
-		m_messenger->send("aw:2:someArray\n");
-		m_messenger->send("aw:3:someClass\n");
+		gWorkspace->iterateWatches([&](const Watch* watch, const WatchValue* value)
+		{
+			addWatch(watch->id, watch->name);
+		});
 
 		// Setup existing breakpoints
 		gWorkspace->_iterateBreakpoints([&](Breakpoint* brk)
@@ -349,14 +359,35 @@ void DebugSession::processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info
 	CZ_CHECK(ele->QueryAttribute("line", &e.line) == tinyxml2::XML_SUCCESS);
 
 	// Local variables
-	auto l = ele->FirstChildElement("l");
-	while (l)
 	{
-		TableEntry v;
-		v.key = std::make_shared<ValueString>(getString(l, "name"));
-		v.val = processValue(l, info, "type", "val");
-		e.vars.push_back(std::move(v));
-		l = l->NextSiblingElement("l");
+		auto l = ele->FirstChildElement("l");
+		while (l)
+		{
+			TableEntry v;
+			v.key = std::make_shared<ValueString>(getString(l, "name"));
+			v.val = processValue(l, info, "type", "val");
+			e.locals.push_back(std::move(v));
+			l = l->NextSiblingElement("l");
+		}
+	}
+
+	// Watches
+	{
+		auto w = ele->FirstChildElement("w");
+		while (w)
+		{
+			WatchValue v;
+			v.key = std::make_shared<ValueString>(getString(w, "exp"));
+			v.id = std::stoi( getString(w, "id") );
+			std::string status = getString(w, "status");
+			v.state = status == "ok" ? WatchState::Valid : WatchState::Invalid;
+
+			if (v.state==WatchState::Valid)
+				v.val = processValue(w, info, "type", "val");
+
+			e.watches[v.id] = std::move(v);
+			w = w->NextSiblingElement("w");
+		}
 	}
 
 	info.callstack.push_back(std::move(e));

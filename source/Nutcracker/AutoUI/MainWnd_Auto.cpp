@@ -148,7 +148,7 @@ void MainWnd_Auto::CreateControls()
 
 	m_workspaceWnd = new nutcracker::WorkspaceWnd( itemFrame1, ID_FOREIGN, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
-		.Name(wxT("Pane2")).Caption(_("Workspace")).MinSize(wxSize(80, 120)).CloseButton(false).DestroyOnClose(false).Resizable(true));
+		.Name(wxT("Pane2")).Caption(_("Workspace")).MinSize(wxSize(80, 80)).BestSize(wxSize(180, -1)).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
 	nutcracker::FileEditorGroupWnd* itemWindow14 = new nutcracker::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(itemWindow14, wxAuiPaneInfo()
@@ -174,12 +174,13 @@ void MainWnd_Auto::CreateControls()
 	m_notebook->AddPage(itemPanel20, _("Callstack"), false);
 
 	nutcracker::LocalsWnd* itemPanel21 = new nutcracker::LocalsWnd( m_notebook, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	wxTreeCtrl* itemTreeCtrl22 = new wxTreeCtrl( itemPanel21, ID_TREECTRL, wxDefaultPosition, wxSize(100, 100), wxTR_SINGLE );
 
 	m_notebook->AddPage(itemPanel21, _("Locals"), false);
 
-	nutcracker::WatchesWnd* itemPanel22 = new nutcracker::WatchesWnd( m_notebook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::WatchesWnd* itemPanel23 = new nutcracker::WatchesWnd( m_notebook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel22, _("Watches"), false);
+	m_notebook->AddPage(itemPanel23, _("Watches"), false);
 
 	itemFrame1->GetAuiManager().AddPane(m_notebook, wxAuiPaneInfo()
 		.Name(wxT("Pane3")).Bottom().MinSize(wxSize(80, 80)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));

@@ -245,12 +245,27 @@ struct Variable
 	std::shared_ptr<ValueBase> val;
 };
 
+enum class WatchState
+{
+	Unknown,
+	Valid,
+	Invalid
+};
+
+struct WatchValue : public TableEntry
+{
+	int id;
+	WatchState state;
+	WatchValue() : state(WatchState::Unknown){}
+};
+
 struct CallstackEntry
 {
 	std::string func;
 	std::shared_ptr<const File> file;
 	int line;
-	std::vector<TableEntry> vars;
+	std::vector<TableEntry> locals;
+	std::map<int, WatchValue> watches;
 };
 
 struct BreakInfo
@@ -298,6 +313,9 @@ public:
 
 	void removeBreakpoint(Breakpoint* brk);
 	void updateBreakpoint(Breakpoint* brk);
+
+	void removeWatch(int id);
+	void addWatch(int id, const std::string& exp);
 
 private:
 	void processIncoming();
