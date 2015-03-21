@@ -324,7 +324,7 @@ std::shared_ptr<ValueBase> DebugSession::processValue(tinyxml2::XMLElement* ele,
 
 void DebugSession::processObjElement(tinyxml2::XMLElement* ele, BreakInfo& info)
 {
-	czDebug(ID_Log, "obj: type=\"%s\" ref=\"%s\"", getString(ele, "type"), getString(ele, "ref"));
+	//czDebug(ID_Log, "obj: type=\"%s\" ref=\"%s\"", getString(ele, "type"), getString(ele, "ref"));
 	
 	// Because the "obj" entries dependencies are not necessarly ordered (an "e" entry might reference an obj that is further
 	// down the document), it means those forward references were created when reading the "e" entry that references it.
@@ -334,7 +334,7 @@ void DebugSession::processObjElement(tinyxml2::XMLElement* ele, BreakInfo& info)
 	if (!obj)
 	{
 		obj = processValue(ele, info, "type");
-		czDebug(ID_Log, "objs[%d] = %s", ref, obj->txt.c_str());
+		//czDebug(ID_Log, "objs[%d] = %s", ref, obj->txt.c_str());
 	}
 	CZ_ASSERT_F(obj->isTable(), "'obj' element needs to some kind of table.");
 	auto tbl = std::static_pointer_cast<ValueBaseTable>(obj);
