@@ -3,8 +3,6 @@ call SetVars.bat
 if %ERRORLEVEL% NEQ 0 exit /b
 
 rem wxWidgets
-call:wxwidgets_get
-if %ERRORLEVEL% NEQ 0 exit /b
 call:wxwidgets_build
 if %ERRORLEVEL% NEQ 0 exit /b
 
@@ -14,12 +12,6 @@ goto :EOF
 rem ****************************************
 rem * wxWidgets
 rem ****************************************
-
-
-:wxwidgets_get
-	if exist wxWidgets exit /b
-	svn checkout https://svn.wxwidgets.org/svn/wx/wxWidgets/tags/WX_3_0_2 wxWidgets
-	exit /b
 
 :wxwidgets_build
 	copy wxWidgets\include\wx\msw\setup0.h wxWidgets\include\wx\msw\setup.h
