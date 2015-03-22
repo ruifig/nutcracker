@@ -458,6 +458,43 @@
               <long name="locked">0</long>
               <long name="owns-file">1</long>
               <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Label">"Edit"</string>
+              <string name="proxy-Member variable name">"m_menuEdit"</string>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <string name="title">"Edit"</string>
+              <long name="title-mode">0</long>
+              <string name="type">"dialog-control-document"</string>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuEditFindFileInWorkspace|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_EDIT_FINDFILE"</string>
+                <long name="proxy-Id value">10026</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Find File in Workspace\tShift+Alt+O"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Find File in Workspace\tShift+Alt+O: ID_MENU_EDIT_FINDFILE"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+            </document>
+            <document>
+              <string name="proxy-type">"wbMenuProxy"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"menu"</string>
+              <long name="is-transient">0</long>
+              <long name="locked">0</long>
+              <long name="owns-file">1</long>
+              <bool name="proxy-Enabled">1</bool>
               <string name="proxy-Label">"&amp;View"</string>
               <string name="proxy-Member variable name">"m_menuView"</string>
               <string name="proxy-Platform">"&lt;Any platform&gt;"</string>

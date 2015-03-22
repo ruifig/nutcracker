@@ -37,6 +37,9 @@ private:
 	virtual void OnMenuFileLoadWorkspace(wxCommandEvent& event) override;
 	virtual void OnMenuFileCloseWorkspace(wxCommandEvent& event) override;
 
+	// Edit Menu
+	virtual void OnMenuEditFindFileInWorkspace(wxCommandEvent& event) override;
+
 	// Debug Menu
 	void updateDebugMenu();
 	virtual void OnMenuDebugStartOrContinue(wxCommandEvent& event) override;
@@ -46,6 +49,7 @@ private:
 	virtual void OnMenuDebugStepOver(wxCommandEvent& event) override;
 	virtual void OnMenuDebugStepInto(wxCommandEvent& event) override;
 	virtual void OnMenuDebugStepOut(wxCommandEvent& event) override;
+
 
 	virtual void OnSetFocus(wxFocusEvent& event) override;
 	virtual void OnKillFocus(wxFocusEvent& event) override;
