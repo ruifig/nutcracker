@@ -20,7 +20,6 @@
 ////@begin includes
 #include "wx/aui/framemanager.h"
 #include "wx/frame.h"
-#include "wx/aui/auibar.h"
 #include "wx/aui/auibook.h"
 ////@end includes
 
@@ -177,7 +176,6 @@ public:
 		ID_MENU_DEBUG_STEPOVER = 10023,
 		ID_MENU_DEBUG_STEPINTO = 10024,
 		ID_MENU_DEBUG_STEPOUT = 10025,
-		ID_TOOLBAR = 10006,
 		ID_FOREIGN = 10007,
 		ID_WINDOW = 10008,
 		ID_AUINOTEBOOK = 10009,
