@@ -13,6 +13,7 @@ namespace nutcracker
 	extern bool gShuttingDown;
 	extern class WorkspaceWnd* gWorkspaceWnd;
 	extern class FileEditorGroupWnd* gFileEditorGroupWnd;
+	extern class FindResultsWnd* gFindResultsWnd;
 	extern wxImageList gImageListSmall;
 	extern wxImageList gImageList32x32;
 	extern std::shared_ptr<Workspace> gWorkspace;

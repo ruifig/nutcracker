@@ -11,6 +11,7 @@ class MainWnd* gMainWnd;
 bool gShuttingDown;
 class WorkspaceWnd* gWorkspaceWnd;
 class FileEditorGroupWnd* gFileEditorGroupWnd;
+class FindResultsWnd* gFindResultsWnd;
 std::shared_ptr<Workspace> gWorkspace;
 
 std::unique_ptr<cz::Parameters> gParameters;

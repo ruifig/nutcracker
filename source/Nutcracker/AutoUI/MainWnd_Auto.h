@@ -102,6 +102,9 @@ public:
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_EXIT
 	virtual void OnExitClick( wxCommandEvent& event );
 
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_EDIT_FIND_IN_CURRENTFILE
+	virtual void OnMenuEditFind( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_EDIT_FINDFILE
 	virtual void OnMenuEditFindFileInWorkspace( wxCommandEvent& event );
 
@@ -161,6 +164,8 @@ public:
 		ID_MENU_FILE_SAVEWORKSPACE = 10016,
 		ID_MENU_FILE_LOADWORKSPACE = 10017,
 		ID_MENU_FILE_CLOSEWORKSPACE = 10018,
+		ID_MENU_EDIT_FIND_IN_CURRENTFILE = 10027,
+		ID_MENU_FIND_INWORKSPACE = 10028,
 		ID_MENU_EDIT_FINDFILE = 10026,
 		ID_MENU_VIEW_INDENTATION = 10003,
 		ID_MENU_VIEW_WHITESPACE = 10004,
@@ -181,7 +186,8 @@ public:
 		ID_PANEL1 = 10012,
 		ID_PANEL2 = 10013,
 		ID_PANEL3 = 10014,
-		ID_PANEL4 = 10015
+		ID_PANEL4 = 10015,
+		ID_FindResultsWnd = 10001
 	};
 ////@end MainWnd_Auto member variables
 };

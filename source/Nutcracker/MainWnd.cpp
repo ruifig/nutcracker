@@ -15,6 +15,8 @@
 #include "FileEditorGroupWnd.h"
 #include "Workspace.h"
 #include "FindFileDlg.h"
+#include "FindDlg.h"
+#include "FileEditorWnd.h"
 
 namespace nutcracker
 {
@@ -510,6 +512,18 @@ void MainWnd::OnMenuEditFindFileInWorkspace(wxCommandEvent& event)
 		gFileEditorGroupWnd->gotoFile(file);
 }
 
+void MainWnd::OnMenuEditFind(wxCommandEvent& event)
+{
+	FileEditorWnd* editorRefocus = gFileEditorGroupWnd->getEditorWithFocus();
+	FindDlg dlg(this, event.GetId()==ID_MENU_EDIT_FIND_IN_CURRENTFILE ? kLook_CurrentFile : kLook_Workspace, editorRefocus ? editorRefocus->getWordUnderCursor() : "");
+	dlg.ShowModal();
+	if (editorRefocus)
+	{
+		editorRefocus->setFocusToEditor();
+		editorRefocus = nullptr;
+	}
+}
+
 void MainWnd::updateDebugMenu()
 {
 	wxMenuItem* item;
@@ -526,6 +540,16 @@ void MainWnd::updateDebugMenu()
 
 		item = m_menuDebug->FindItem(ID_MENU_DEBUG_BREAK);
 		item->Enable(gWorkspace->debuggerActive() && gWorkspace->debuggerGetBreakInfo()==nullptr);
+// For compilers that support precompilation, includes "wx/wx.h".
+#include "wx/wxprec.h"
+
+#ifdef __BORLANDC__
+#pragma hdrstop
+#endif
+
+#ifndef WX_PRECOMP
+#include "wx/wx.h"
+#endif
 
 		item = m_menuDebug->FindItem(ID_MENU_DEBUG_STEPOVER);
 		item->Enable(gWorkspace->debuggerActive() && gWorkspace->debuggerGetBreakInfo());
@@ -623,5 +647,17 @@ void MainWnd::OnDropFiles(wxDropFilesEvent& event)
 
 }
 
+void MainWnd::showFindResultsWnd()
+{
+	for (int page=0; page<(int)m_notebook->GetPageCount(); page++)
+	{
+		wxWindow* wnd = m_notebook->GetPage(page);
+		if (wnd->GetId()==ID_FindResultsWnd)
+		{
+			m_notebook->ChangeSelection(page);
+			return;
+		}
+	}
+}
 
 } // namespace nutcracker
