@@ -1,0 +1,57 @@
+/*
+============================================================================
+ Name		: czPlatformUnitTests.mmp
+ Author	  : Rui Figueira
+ Copyright   : 
+ Description : This is the project specification file for czPlatformUnitTests.
+============================================================================
+*/
+
+TARGET		  czPlatformUnitTests_eeb45eb9.exe
+TARGETTYPE	  STDEXE
+UID			 0 0xeeb45eb9
+
+MACRO __SYMBIAN__
+
+#ifdef GCCXML
+	MACRO __wchar_t_defined
+#endif //GCCXM
+
+
+//The STDCPP keyword specifies Standard C++ 
+//STDCPP
+
+USERINCLUDE ..\..\..\source
+USERINCLUDE ..\..\..\source\detail\SFMT
+USERINCLUDE ..\..\..\utfcpp\source
+USERINCLUDE ..\..\..\utfcpp\source\utf8
+USERINCLUDE ..\..\..\UnitTest++\src\tests
+USERINCLUDE ..\..\..\UnitTest++\src
+
+SYSTEMINCLUDE \epoc32\include\stdapis\stlportv5
+SYSTEMINCLUDE \epoc32\include\stdapis
+SYSTEMINCLUDE . \epoc32\include  
+SYSTEMINCLUDE \epoc32\include\stdapis\glib-2.0
+APP_LAYER_SYSTEMINCLUDE
+
+// PIPS
+LIBRARY libc.lib libm.lib libpthread.lib
+STATICLIBRARY libcrt0.lib
+// Other symbian libraries
+LIBRARY libstdcppv5.lib libglib.lib euser.lib efsrv.lib charconv.lib
+// User libraries
+STATICLIBRARY UnitTest.lib czPlatform.lib
+
+
+
+SOURCEPATH ..\..\..\unittests
+SOURCE czPlatformUnitTests.cpp TestArray.cpp TestFilesystem.cpp TestFuture.cpp TestMemoryTracker.cpp TestRandom.cpp TestSTLCompliance.cpp TestString.cpp TestThreading.cpp
+
+SOURCEPATH ..\data
+START RESOURCE czPlatformUnitTests_eeb45eb9_reg.rss
+	TARGETPATH \private\10003a3f\apps
+END
+
+DEBUGGABLE_UDEBONLY
+//Capability        all -tcb
+

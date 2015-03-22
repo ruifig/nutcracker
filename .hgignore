@@ -29,7 +29,9 @@ dependencies/squirrel/sqstdlib/Debug
 dependencies/squirrel/sqstdlib/Release
 dependencies/squirrel/sqstdlib/Template
 dependencies/squirrel/sqdbg/Debug
+dependencies/squirrel/sqdbg/Debug Unicode
 dependencies/squirrel/sqdbg/Release
+dependencies/squirrel/sqdbg/Release Unicode
 dependencies/squirrel/doc/squirrel3.chw
 
 # CppDepend

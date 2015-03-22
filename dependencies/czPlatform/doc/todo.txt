@@ -1,0 +1,5 @@
+X - Copy and refactor my strings classes from czEngine
+X - Document Random
+
+- Refactor/implement logging from czEngine
+- Remove COW from UTF8String, or make it optional.

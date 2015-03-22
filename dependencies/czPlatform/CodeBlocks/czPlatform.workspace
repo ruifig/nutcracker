@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Workspace">
+		<Project filename="czPlatform.cbp" active="1" />
+		<Project filename="UnitTest++.cbp" />
+		<Project filename="UnitTest++Tests.cbp" />
+		<Project filename="czPlatformUnitTests.cbp" />
+	</Workspace>
+</CodeBlocks_workspace_file>
