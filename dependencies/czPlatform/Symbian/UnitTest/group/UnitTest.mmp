@@ -1,0 +1,29 @@
+/*
+============================================================================
+ Name		: UnitTest.mmp
+ Author	  : 
+ Copyright   : 
+ Description : This is the project specification file for UnitTest.
+============================================================================
+*/
+
+TARGET		  UnitTest.lib
+TARGETTYPE	  lib
+UID			 0
+
+MACRO __SYMBIAN__
+
+//The STDCPP keyword specifies Standard C++ 
+STDCPP
+
+SYSTEMINCLUDE \epoc32\include\stdapis\stlportv5
+SYSTEMINCLUDE \epoc32\include\stdapis
+//SYSTEMINCLUDE \epoc32\include\libc
+SYSTEMINCLUDE \epoc32\include  
+
+DEBUGGABLE_UDEBONLY
+
+SOURCEPATH ..\..\..\UnitTest++\src\Posix
+SOURCE SignalTranslator.cpp TimeHelpers.cpp
+SOURCEPATH ..\..\..\UnitTest++\src
+SOURCE AssertException.cpp Checks.cpp CurrentTest.cpp DeferredTestReporter.cpp DeferredTestResult.cpp MemoryOutStream.cpp ReportAssert.cpp Test.cpp TestDetails.cpp TestList.cpp TestReporter.cpp TestReporterStdout.cpp TestResults.cpp TestRunner.cpp TimeConstraint.cpp XmlTestReporter.cpp

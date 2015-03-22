@@ -1,0 +1,11 @@
+Bits and pieces of information related to several platforms, so I don't forget:
+
+-------------
+SYMBIAN
+-------------
+
+To use GLib:
+
+Include GLib headers as system include files:
+SYSTEMINCLUDE \epoc32\include\stdapis\glib-2.0
+Add the libraries libc.lib and libglib.lib. The application does not link in the absence of the libc.lib library. 

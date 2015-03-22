@@ -1,0 +1,9 @@
+#include <appinfo.rh>
+ 
+UID2 KUidAppRegistrationResourceFile
+UID3 0xe5dbac38              // Replace this with the UID3 of your application
+ 
+RESOURCE APP_REGISTRATION_INFO
+  {
+  app_file="HelloWorld_e5dbac38";    // The filename of your executable, without .exe
+  }

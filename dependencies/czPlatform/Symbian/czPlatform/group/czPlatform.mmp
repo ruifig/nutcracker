@@ -1,0 +1,36 @@
+/*
+============================================================================
+ Name		: czPlatform.mmp
+ Author	  : Rui Figueira
+ Copyright   : 
+ Description : This is the project specification file for czPlatform.
+============================================================================
+*/
+
+TARGET		  czPlatform.lib
+TARGETTYPE	  STDLIB
+UID			 0
+
+MACRO __SYMBIAN__
+#ifdef GCCXML
+MACRO __wchar_t_defined
+#endif //GCCXM
+
+//The STDCPP keyword specifies Standard C++ 
+//STDCPP
+
+USERINCLUDE ..\..\..\source
+USERINCLUDE ..\..\..\source\detail
+USERINCLUDE ..\..\..\source\detail\SFMT
+USERINCLUDE ..\..\..\utfcpp\source
+USERINCLUDE ..\..\..\utfcpp\source\utf8
+SYSTEMINCLUDE \epoc32\include\stdapis\stlportv5
+SYSTEMINCLUDE \epoc32\include\stdapis
+SYSTEMINCLUDE \epoc32\include
+SYSTEMINCLUDE \epoc32\include\stdapis\glib-2.0
+APP_LAYER_SYSTEMINCLUDE
+
+DEBUGGABLE_UDEBONLY
+
+SOURCEPATH ..\..\..\source
+SOURCE czCallStackWalker.cpp czFile.cpp czFileSystem.cpp czFilename.cpp czFuture.cpp czLogger.cpp czMemory.cpp czMemoryTracker.cpp czPlatform.cpp czPlatformPrecompiledHeaders.cpp czPlatformRoot.cpp czRandom.cpp czStandardC.cpp czStringID.cpp czThread.cpp czUTF8String.cpp czWindowsConsole.cpp

@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="czPlatform" />
+		<Option pch_mode="2" />
+		<Option compiler="mingw32__gcc_412_compiler" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\lib\libczPlatform_mingw_Debug" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="..\..\tmp\czPlatform.mingw\win32\Debug\" />
+				<Option type="2" />
+				<Option compiler="mingw32__gcc_412_compiler" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-DDEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\lib\libczPlatform_mingw_Release" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option object_output="..\..\tmp\czPlatform.mingw\win32\Release\" />
+				<Option type="2" />
+				<Option compiler="mingw32__gcc_412_compiler" />
+				<Option createDefFile="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-D_WIN32_WINNT=0x0501" />
+			<Add directory="..\source" />
+		</Compiler>
+		<Unit filename="..\source\config\czMemoryCustom.h" />
+		<Unit filename="..\source\config\czPlatformConfigCustom.h" />
+		<Unit filename="..\source\config\czStringIDsCustom.h" />
+		<Unit filename="..\source\czArray.h" />
+		<Unit filename="..\source\czAtomicCount.h" />
+		<Unit filename="..\source\czCallStackWalker.cpp" />
+		<Unit filename="..\source\czCallStackWalker.h" />
+		<Unit filename="..\source\czCallTraits.h" />
+		<Unit filename="..\source\czCallableTraits.h" />
+		<Unit filename="..\source\czConditionVariable.h" />
+		<Unit filename="..\source\czFNVHash.h" />
+		<Unit filename="..\source\czFile.cpp" />
+		<Unit filename="..\source\czFile.h" />
+		<Unit filename="..\source\czFileSystem.cpp" />
+		<Unit filename="..\source\czFileSystem.h" />
+		<Unit filename="..\source\czFilename.cpp" />
+		<Unit filename="..\source\czFilename.h" />
+		<Unit filename="..\source\czFunction.h" />
+		<Unit filename="..\source\czFunctional.h" />
+		<Unit filename="..\source\czFuture.cpp" />
+		<Unit filename="..\source\czFuture.h" />
+		<Unit filename="..\source\czHelperMacros.h" />
+		<Unit filename="..\source\czLogger.cpp" />
+		<Unit filename="..\source\czLogger.h" />
+		<Unit filename="..\source\czMemory.cpp" />
+		<Unit filename="..\source\czMemory.h" />
+		<Unit filename="..\source\czMemoryTracker.cpp" />
+		<Unit filename="..\source\czMemoryTracker.h" />
+		<Unit filename="..\source\czMutex.h" />
+		<Unit filename="..\source\czPlatform.cpp" />
+		<Unit filename="..\source\czPlatform.h" />
+		<Unit filename="..\source\czPlatformConfig.h" />
+		<Unit filename="..\source\czPlatformPrecompiledHeaders.cpp" />
+		<Unit filename="..\source\czPlatformPrerequisites.h" />
+		<Unit filename="..\source\czPlatformRoot.cpp" />
+		<Unit filename="..\source\czPlatformRoot.h" />
+		<Unit filename="..\source\czPlatformStableHeaders.h" />
+		<Unit filename="..\source\czRandom.cpp" />
+		<Unit filename="..\source\czRandom.h" />
+		<Unit filename="..\source\czSingleton.h" />
+		<Unit filename="..\source\czStandardC.cpp" />
+		<Unit filename="..\source\czStandardC.h" />
+		<Unit filename="..\source\czString.h" />
+		<Unit filename="..\source\czStringID.cpp" />
+		<Unit filename="..\source\czStringID.h" />
+		<Unit filename="..\source\czStringIDs.h" />
+		<Unit filename="..\source\czThread.cpp" />
+		<Unit filename="..\source\czThread.h" />
+		<Unit filename="..\source\czThreadCommon.h" />
+		<Unit filename="..\source\czTuple.h" />
+		<Unit filename="..\source\czTypeTraits.h" />
+		<Unit filename="..\source\czUTF8String.cpp" />
+		<Unit filename="..\source\czUTF8String.h" />
+		<Unit filename="..\source\czWindowsConsole.cpp" />
+		<Unit filename="..\source\czWindowsConsole.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-alti.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params11213.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params1279.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params132049.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params19937.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params216091.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params2281.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params4253.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params44497.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params607.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-params86243.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT-sse2.h" />
+		<Unit filename="..\source\detail\SFMT\SFMT.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\source\detail\SFMT\SFMT.h" />
+		<Unit filename="..\source\detail\SFMT\test.c">
+			<Option compilerVar="CC" />
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\source\detail\czAtomicCount_glib.h" />
+		<Unit filename="..\source\detail\czAtomicCount_win32.h" />
+		<Unit filename="..\source\detail\czConditionVariable_pthreads.h" />
+		<Unit filename="..\source\detail\czConditionVariable_win32.h" />
+		<Unit filename="..\source\detail\czMutex_pthreads.h" />
+		<Unit filename="..\source\detail\czMutex_win32.h" />
+		<Unit filename="..\source\detail\czThread_pthreads.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\source\detail\czThread_pthreads.h" />
+		<Unit filename="..\source\detail\czThread_win32.cpp">
+			<Option compile="0" />
+			<Option link="0" />
+		</Unit>
+		<Unit filename="..\source\detail\czThread_win32.h" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

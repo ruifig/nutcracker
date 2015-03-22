@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="UnitTest++Tests" />
+		<Option pch_mode="2" />
+		<Option compiler="mingw32__gcc_412_compiler" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\bin\UnitTest++Tests_mingw_Win32_Debug" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\bin" />
+				<Option object_output="..\..\tmp\UnitTest++Tests.mingw\win32\Debug\" />
+				<Option type="1" />
+				<Option compiler="mingw32__gcc_412_compiler" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="..\..\lib\libUnitTest++_mingw_Debug.a" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\bin\UnitTest++Tests_mingw_Win32_Release" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\bin" />
+				<Option object_output="..\..\tmp\UnitTest++Tests.mingw\win32\Release\" />
+				<Option type="1" />
+				<Option compiler="mingw32__gcc_412_compiler" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="..\..\lib\libUnitTest++_mingw_Release.a" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+		</Compiler>
+		<Unit filename="..\UnitTest++\src\tests\Main.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\RecordingReporter.h" />
+		<Unit filename="..\UnitTest++\src\tests\ScopedCurrentTest.h" />
+		<Unit filename="..\UnitTest++\src\tests\TestAssertHandler.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestCheckMacros.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestChecks.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestCurrentTest.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestDeferredTestReporter.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestMemoryOutStream.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestTest.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestTestList.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestTestMacros.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestTestResults.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestTestRunner.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestTestSuite.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestTimeConstraint.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestTimeConstraintMacro.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestUnitTest++.cpp" />
+		<Unit filename="..\UnitTest++\src\tests\TestXmlTestReporter.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -1,0 +1,429 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Generated">
+      <UniqueIdentifier>{8189ab81-ca65-4d17-a697-1f63b79ef656}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\config">
+      <UniqueIdentifier>{4092461a-0aee-4e15-894e-e7621f438fb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail">
+      <UniqueIdentifier>{61a2cadb-2c80-4200-bf28-7c1bcbf46c06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\detail\SFMT">
+      <UniqueIdentifier>{2cad1d0f-740d-4cd8-af7e-ca22ef48741e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\source\config\_czStringIDsCustom.h">
+      <Filter>Header Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\config\czMemoryCustom.h">
+      <Filter>Header Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\config\czPlatformConfigCustom.h">
+      <Filter>Header Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\config\_czMemoryCategoriesCustom.h">
+      <Filter>Header Files\config</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czAtomicCount_glib.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czAtomicCount_win32.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czConditionVariable_pthreads.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czConditionVariable_win32.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czMutex_pthreads.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czMutex_win32.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czThread_pthreads_cpp.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czThread_pthreads_hpp.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czThread_win32_cpp.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\czThread_win32_hpp.h">
+      <Filter>Header Files\detail</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-alti.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params607.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params1279.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params2281.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params4253.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params11213.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params19937.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params44497.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params86243.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params132049.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-params216091.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\detail\SFMT\SFMT-sse2.h">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czHelperMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czIniFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czLogger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czMemory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czMemoryCategories.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czMemoryTracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czMutex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czPlatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czPlatformConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czPlatformPrerequisites.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czPlatformRoot.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czPlatformStableHeaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czRandom.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czRefCounted.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czRingBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czRtti.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czSharedFlag.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czSingleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czStandardC.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czStringID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czStringIDs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czTCPSocket.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czThreadCommon.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czTicker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czTuple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czTypeTraits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czUTF8String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czWindowsConsole.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czAlgorithm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czArray.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czAtomicCount.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czCallableTraits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czCallStackWalker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czCallTraits.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czConditionVariable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czFilename.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czFileSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czFNVHash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czFunction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czFunctional.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czFuture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czGuid.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\generated\dependencies.h">
+      <Filter>Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\generated\generated_serialization.h">
+      <Filter>Generated</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czFileTime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czAny.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czScopeGuard.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czSharedQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czParameters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\source\czPlatform\czAsyncCommandQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.1279.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.2281.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.4253.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.11213.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.19937.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.44497.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.86243.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.132049.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.216091.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\CHANGE-LOG.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\FILES.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\LICENSE.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\README.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+    <Text Include="..\source\czPlatform\detail\SFMT\SFMT.607.out.txt">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\source\czPlatform\detail\SFMT\check.sh">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </None>
+    <None Include="..\source\czPlatform\detail\SFMT\Makefile">
+      <Filter>Header Files\detail\SFMT</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\source\czPlatform\czCallStackWalker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czFilename.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czFileSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czFuture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czGuid.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czIniFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czMemory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czMemoryTracker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czPlatform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czPlatformPrecompiledHeaders.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czPlatformRoot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czRandom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czRingBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czRtti.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czSharedFlag.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czSingleton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czStandardC.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czStringID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czTCPSocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czThread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czUTF8String.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czWindowsConsole.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\generated\generated_serialization.cpp">
+      <Filter>Generated</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czFileTime.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czAny.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czParameters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\source\czPlatform\czAsyncCommandQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

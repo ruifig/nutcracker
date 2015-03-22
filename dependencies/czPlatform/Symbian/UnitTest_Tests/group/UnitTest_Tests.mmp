@@ -1,0 +1,36 @@
+/*
+============================================================================
+ Name		: UnitTest_Tests.mmp
+ Author	  : 
+ Copyright   : 
+ Description : This is the project specification file for UnitTest_Tests.
+============================================================================
+*/
+
+TARGET		  UnitTest_Tests.exe
+TARGETTYPE	  exe
+UID			 0 0xeedd08fc
+
+// Custom macro to detect we're building for symbian
+MACRO __SYMBIAN__
+
+//The STDCPP keyword specifies Standard C++ 
+STDCPP
+
+USERINCLUDE ..\..\..\UnitTest++\src\tests
+USERINCLUDE ..\..\..\UnitTest++\src
+
+SYSTEMINCLUDE \epoc32\include\stdapis\stlportv5
+SYSTEMINCLUDE \epoc32\include\stdapis
+//SYSTEMINCLUDE \epoc32\include\libc
+SYSTEMINCLUDE \epoc32\include  
+
+SOURCEPATH	  ..\..\..\UnitTest++\src\tests
+SOURCE Main.cpp TestAssertHandler.cpp TestCheckMacros.cpp TestChecks.cpp TestCurrentTest.cpp TestDeferredTestReporter.cpp TestMemoryOutStream.cpp TestTest.cpp TestTestList.cpp TestTestMacros.cpp TestTestResults.cpp TestTestRunner.cpp TestTestSuite.cpp TestTimeConstraint.cpp TestTimeConstraintMacro.cpp TestUnitTest++.cpp TestXmlTestReporter.cpp
+
+STATICLIBRARY UnitTest.lib
+LIBRARY libstdcppv5.lib libc.lib euser.lib
+STATICLIBRARY   ecrt0.lib
+
+DEBUGGABLE_UDEBONLY
+Capability        all -tcb

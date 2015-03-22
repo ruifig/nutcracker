@@ -1,0 +1,9 @@
+#include <appinfo.rh>
+ 
+UID2 KUidAppRegistrationResourceFile
+UID3 0xeeb45eb9              // Replace this with the UID3 of your application
+ 
+RESOURCE APP_REGISTRATION_INFO
+  {
+  app_file="czPlatformUnitTests_eeb45eb9";    // The filename of your executable, without .exe
+  }

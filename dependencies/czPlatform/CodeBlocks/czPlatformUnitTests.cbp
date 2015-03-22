@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="czPlatformUnitTests" />
+		<Option pch_mode="2" />
+		<Option compiler="mingw32__gcc_412_compiler" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\bin\czPlatformUnitTests_mingw_Debug" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\bin" />
+				<Option object_output="..\..\tmp\czPlatformUnitTests.mingw\win32\Debug\" />
+				<Option type="1" />
+				<Option compiler="mingw32__gcc_412_compiler" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add library="..\..\lib\libczPlatform_mingw_Debug.a" />
+					<Add library="..\..\lib\libUnitTest++_mingw_Debug.a" />
+					<Add library="Psapi" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\bin\czPlatformUnitTests_mingw_Release" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="..\..\bin" />
+				<Option object_output="..\..\tmp\czPlatformUnitTests.mingw\win32\Release\" />
+				<Option type="1" />
+				<Option compiler="mingw32__gcc_412_compiler" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add library="..\..\lib\libczPlatform_mingw_Release.a" />
+					<Add library="..\..\lib\libUnitTest++_mingw_Release.a" />
+					<Add library="Psapi" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-fexceptions" />
+			<Add option="-D_WIN32_WINNT=0x0501" />
+			<Add directory="..\source" />
+			<Add directory="..\UnitTest++\src" />
+		</Compiler>
+		<Unit filename="..\unittests\TestArray.cpp" />
+		<Unit filename="..\unittests\TestFilesystem.cpp" />
+		<Unit filename="..\unittests\TestFuture.cpp" />
+		<Unit filename="..\unittests\TestMemoryTracker.cpp" />
+		<Unit filename="..\unittests\TestRandom.cpp" />
+		<Unit filename="..\unittests\TestSTLCompliance.cpp" />
+		<Unit filename="..\unittests\TestString.cpp" />
+		<Unit filename="..\unittests\TestThreading.cpp" />
+		<Unit filename="..\unittests\czPlatformUnitTests.cpp" />
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
