@@ -92,7 +92,9 @@
     <ClCompile Include="AutoUI\CallstackWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\FileEditorGroupWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\FileEditorWnd_Auto.cpp" />
+    <ClCompile Include="AutoUI\FindDlg_Auto.cpp" />
     <ClCompile Include="AutoUI\FindFileDlg_Auto.cpp" />
+    <ClCompile Include="AutoUI\FindResultsWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\MainWnd_Auto.cpp" />
     <ClCompile Include="AppEvents.cpp" />
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
@@ -105,7 +107,9 @@
     <ClCompile Include="FileEditorStyles.cpp" />
     <ClCompile Include="FileEditorWnd.cpp" />
     <ClCompile Include="Files.cpp" />
+    <ClCompile Include="FindDlg.cpp" />
     <ClCompile Include="FindFileDlg.cpp" />
+    <ClCompile Include="FindResultsWnd.cpp" />
     <ClCompile Include="GridCellImageRenderer.cpp" />
     <ClCompile Include="Interpreter.cpp" />
     <ClCompile Include="LocalsWnd.cpp" />
@@ -129,7 +133,9 @@
     <ClInclude Include="AutoUI\CallstackWnd_Auto.h" />
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h" />
     <ClInclude Include="AutoUI\FileEditorWnd_Auto.h" />
+    <ClInclude Include="AutoUI\FindDlg_Auto.h" />
     <ClInclude Include="AutoUI\FindFileDlg_Auto.h" />
+    <ClInclude Include="AutoUI\FindResultsWnd_Auto.h" />
     <ClInclude Include="AutoUI\MainWnd_Auto.h" />
     <ClInclude Include="AppEvents.h" />
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
@@ -142,7 +148,9 @@
     <ClInclude Include="FileEditorStyles.h" />
     <ClInclude Include="FileEditorWnd.h" />
     <ClInclude Include="Files.h" />
+    <ClInclude Include="FindDlg.h" />
     <ClInclude Include="FindFileDlg.h" />
+    <ClInclude Include="FindResultsWnd.h" />
     <ClInclude Include="GridCellImageRenderer.h" />
     <ClInclude Include="Interpreter.h" />
     <ClInclude Include="LocalsWnd.h" />

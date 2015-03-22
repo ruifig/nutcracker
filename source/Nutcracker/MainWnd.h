@@ -24,6 +24,8 @@ public:
 
 	// Adds a function to be called on the next tick
 	int getInterpreterIndex();
+	void showFindResultsWnd();
+
 private:
 	DECLARE_EVENT_TABLE()
 
@@ -39,6 +41,7 @@ private:
 
 	// Edit Menu
 	virtual void OnMenuEditFindFileInWorkspace(wxCommandEvent& event) override;
+	virtual void OnMenuEditFind(wxCommandEvent& event) override;
 
 	// Debug Menu
 	void updateDebugMenu();
