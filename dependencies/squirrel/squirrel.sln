@@ -10,6 +10,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "squirrel", "squirrel\squirrel.vcxproj", "{252F650F-3056-4C2B-97A5-0A77ABC25C29}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sqdbg", "sqdbg\sqdbg.vcxproj", "{B31D0390-C9F7-4D1C-9DBA-0AE6B7357E75}"
+	ProjectSection(ProjectDependencies) = postProject
+		{252F650F-3056-4C2B-97A5-0A77ABC25C29} = {252F650F-3056-4C2B-97A5-0A77ABC25C29}
+		{0AAD2E70-75C9-40F8-82FC-D13D899BDD48} = {0AAD2E70-75C9-40F8-82FC-D13D899BDD48}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
