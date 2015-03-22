@@ -258,11 +258,18 @@ void FileEditorWnd::setFile(const std::shared_ptr<const File>& file, int line, i
 			m_textCtrl->GotoPos(pos + col);
 		} else{
 			// Column is a visual offset into the text (takes into account tab width)
-			m_textCtrl->GotoPos(m_textCtrl->FindColumn(TO_TXTLINE(line), col));
+			int pos = m_textCtrl->FindColumn(TO_TXTLINE(line), col);
+			m_textCtrl->GotoPos(pos);
+			// There seems to be a bug with GotoPos, where the Horizontal scrolling gets out of sync, so I'm
+			// just resetting it.
+			// Maybe this bug: http://sourceforge.net/p/scintilla/bugs/1467/
+			//This will of course mean that it will not scroll at all to show the desired column,
+			// but (although the caret will still be at the desired column)
+			m_textCtrl->SetXOffset(0);
 		}
 	}
 
-	m_textCtrl->VerticalCentreCaret();
+	//m_textCtrl->VerticalCentreCaret();
 }
 
 void FileEditorWnd::checkReload()
