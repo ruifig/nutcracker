@@ -20,6 +20,24 @@ struct BreakInfo;
 class Interpreter;
 
 
+struct FindResult
+{
+	FindResult(wxString t_, const std::shared_ptr<const File>& f_, int l_, int c_);
+
+	wxString text;
+	std::shared_ptr<const File> file;
+
+	struct Pos
+	{
+		int line;
+		int col;
+	} pos;
+
+	// Position of this result at the last time the file was saved.
+	// Whenever we close a file without saving, the find result position will revert to this
+	Pos savedPos; 
+};
+
 struct Options
 {
 	UTF8String general_defaultInterpreter;
@@ -68,8 +86,14 @@ enum class DataEventID
 	ViewLAST = ViewEOL,
 
 	// Interpreters
-	InterpreterChanged
+	InterpreterChanged,
 
+	// Find results
+	FindResultsFIRST,
+	FindResultsClear = FindResultsFIRST,
+	FindResultsAdd,
+	FindResultsUpdated,
+	FindResultLAST = FindResultsUpdated
 };
 
 struct DataEvent
@@ -96,6 +120,10 @@ struct DataEvent
 		return id >= DataEventID::DebugFIRST && id <= DataEventID::DebugLAST;
 	}
 
+	bool isFindResultsEvent() const
+	{
+		return id >= DataEventID::FindResultsFIRST && id <= DataEventID::FindResultLAST;
+	}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -146,6 +174,29 @@ struct BreakpointUpdated : public BreakpointEvent
 struct BreakpointValidated : public BreakpointEvent
 {
 	BreakpointValidated(const Breakpoint* brk) : BreakpointEvent(DataEventID::BreakpointValidated, brk, false) {}
+};
+
+struct FindResultsEvent : public DataEvent
+{
+	FindResultsEvent(DataEventID id, const FindResult* res = nullptr) : DataEvent(id, false), res(res)
+	{
+	}
+	const FindResult* res;
+};
+
+struct FindResultsClear : public FindResultsEvent
+{
+	FindResultsClear() : FindResultsEvent(DataEventID::FindResultsClear) {}
+};
+
+struct FindResultsAdd : public FindResultsEvent
+{
+	FindResultsAdd(const FindResult* res) : FindResultsEvent(DataEventID::FindResultsAdd, res) {}
+};
+
+struct FindResultsUpdated : public FindResultsEvent
+{
+	FindResultsUpdated(const FindResult* res) : FindResultsEvent(DataEventID::FindResultsUpdated, res) {}
 };
 
 struct Watch
@@ -263,6 +314,16 @@ public:
 	const Interpreter* getCurrentInterpreter();
 	void setCurrentInterpreter(int index);
 
+
+	//
+	// Find results
+	//
+	void clearFindResults();
+	int getFindResultsCount();
+	void addFindResult(wxString txt, std::shared_ptr<const File> file, int line, int col);
+	//void updateFindResultPos(const FindResult* result, int line, int col, int markerHandler);
+	void iterateFindResult(std::function<void(const FindResult*)> func);
+
 protected:
 	friend class DebugSession;
 	void _iterateBreakpoints(std::function<void(Breakpoint* brk)> func);
@@ -302,6 +363,8 @@ private:
 		std::vector<std::unique_ptr<Interpreter>> all;
 		int current=0; // index of the current interpreter
 	} m_interpreters;
+
+	std::vector<FindResult> m_findResults;
 
 };
 

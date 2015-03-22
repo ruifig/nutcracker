@@ -15,6 +15,14 @@
 namespace nutcracker
 {
 
+FindResult::FindResult(wxString t_, const std::shared_ptr<const File>& f_, int l_, int c_)
+	: text(std::move(t_)), file(std::move(f_))
+{
+	pos.line = l_;
+	pos.col = c_;
+	savedPos = pos;
+}
+
 static bool getConfigEntry(IniFile& file, const char* section, const char* entry, UTF8String& dst)
 {
 	UTF8String val = file.getValue(section, entry, "");
@@ -237,6 +245,14 @@ bool Workspace::saveFile(FileId fileId)
 	{
 		brk->savedline = brk->line;
 	});
+
+	for (auto& f : m_findResults)
+	{
+		if (f.file!=file)
+			continue;
+		f.savedPos = f.pos;
+	}
+
 	fireEvent(FileSaved(file));
 	fireEvent(DataEventID::WorkspaceDirty, false);
 
@@ -744,6 +760,42 @@ bool Workspace::isDirty()
 		return false;
 }
 
+void Workspace::clearFindResults()
+{
+	m_findResults.clear();
+	fireEvent(FindResultsClear());
+}
+
+int Workspace::getFindResultsCount()
+{
+	return static_cast<int>(m_findResults.size());
+}
+
+void Workspace::addFindResult(wxString txt, std::shared_ptr<const File> file, int line, int col)
+{
+	m_findResults.push_back(FindResult(std::move(txt), std::move(file), line, col));
+	fireEvent(FindResultsAdd(&m_findResults.back()));
+}
+
+/*
+void Workspace::updateFindResultPos(const FindResult* result, int line, int col, int markerHandler)
+{
+	auto res = const_cast<FindResult*>(result);
+	bool fire = res->pos.line != line || res->pos.col != col;
+	res->pos.line = line;
+	res->pos.col = col;
+	res->markerHandle = markerHandler;
+	if (fire)
+		fireEvent(FindResultsUpdated(result));
+}
+*/
+
+void Workspace::iterateFindResult(std::function<void(const FindResult*)> func)
+{
+	for (auto& f : m_findResults)
+		func(&f);
+}
+
 void Workspace::doSave(tinyxml2::XMLDocument& doc)
 {
 
@@ -758,8 +810,6 @@ void Workspace::doSave(tinyxml2::XMLDocument& doc)
 			ele->SetText(text);
 		return ele;
 	};
-
-
 
 	//
 	// Files
