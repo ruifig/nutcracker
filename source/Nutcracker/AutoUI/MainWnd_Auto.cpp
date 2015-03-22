@@ -52,6 +52,13 @@ BEGIN_EVENT_TABLE( MainWnd_Auto, wxFrame )
 	EVT_MENU( ID_MENU_VIEW_INDENTATION, MainWnd_Auto::OnMenuClick )
 	EVT_MENU( ID_MENU_VIEW_WHITESPACE, MainWnd_Auto::OnMenuClick )
 	EVT_MENU( ID_MENU_VIEW_EOL, MainWnd_Auto::OnMenuClick )
+	EVT_MENU( ID_MENU_DEBUG_START_OR_CONTINUE, MainWnd_Auto::OnMenuDebugStartOrContinue )
+	EVT_MENU( ID_MENU_DEBUG_START_NODEBUG, MainWnd_Auto::OnMenuDebugStartWithoutDebugging )
+	EVT_MENU( ID_MENU_DEBUG_STOP_DEBUGGING, MainWnd_Auto::OnMenuDebugStopDebugging )
+	EVT_MENU( ID_MENU_DEBUG_BREAK, MainWnd_Auto::OnMenuDebugBreak )
+	EVT_MENU( ID_MENU_DEBUG_STEPOVER, MainWnd_Auto::OnMenuDebugStepOver )
+	EVT_MENU( ID_MENU_DEBUG_STEPINTO, MainWnd_Auto::OnMenuDebugStepInto )
+	EVT_MENU( ID_MENU_DEBUG_STEPOUT, MainWnd_Auto::OnMenuDebugStepOut )
 ////@end MainWnd_Auto event table entries
 
 END_EVENT_TABLE()
@@ -109,6 +116,7 @@ void MainWnd_Auto::Init()
 {
 ////@begin MainWnd_Auto member initialisation
 	m_menuView = NULL;
+	m_menuDebug = NULL;
 	m_menuInterpreters = NULL;
 	m_workspaceWnd = NULL;
 	m_notebook = NULL;
@@ -141,49 +149,59 @@ void MainWnd_Auto::CreateControls()
 	m_menuView->Append(ID_MENU_VIEW_WHITESPACE, _("&Whitespaces"), wxEmptyString, wxITEM_CHECK);
 	m_menuView->Append(ID_MENU_VIEW_EOL, _("&End of line"), wxEmptyString, wxITEM_CHECK);
 	menuBar->Append(m_menuView, _("&View"));
+	m_menuDebug = new wxMenu;
+	m_menuDebug->Append(ID_MENU_DEBUG_START_OR_CONTINUE, _("Start Debugging\tF5"), wxEmptyString, wxITEM_NORMAL);
+	m_menuDebug->Append(ID_MENU_DEBUG_START_NODEBUG, _("Start Without Debugging\tCtrl+F5"), wxEmptyString, wxITEM_NORMAL);
+	m_menuDebug->Append(ID_MENU_DEBUG_STOP_DEBUGGING, _("Stop Debugging\tShift+F5"), wxEmptyString, wxITEM_NORMAL);
+	m_menuDebug->Append(ID_MENU_DEBUG_BREAK, _("Break\tCtrl+Alt+Break"), wxEmptyString, wxITEM_NORMAL);
+	m_menuDebug->AppendSeparator();
+	m_menuDebug->Append(ID_MENU_DEBUG_STEPOVER, _("Step Over\tF10"), wxEmptyString, wxITEM_NORMAL);
+	m_menuDebug->Append(ID_MENU_DEBUG_STEPINTO, _("Step Into\tF11"), wxEmptyString, wxITEM_NORMAL);
+	m_menuDebug->Append(ID_MENU_DEBUG_STEPOUT, _("Step Out\tShift+F11"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(m_menuDebug, _("Debug"));
 	m_menuInterpreters = new wxMenu;
 	menuBar->Append(m_menuInterpreters, _("&Interpreter"));
 	itemFrame1->SetMenuBar(menuBar);
 
-	wxAuiToolBar* itemAuiToolBar14 = new wxAuiToolBar( itemFrame1, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_GRIPPER );
-	itemAuiToolBar14->Realize();
-	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar14, wxAuiPaneInfo()
+	wxAuiToolBar* itemAuiToolBar23 = new wxAuiToolBar( itemFrame1, ID_TOOLBAR, wxDefaultPosition, wxDefaultSize, wxAUI_TB_GRIPPER );
+	itemAuiToolBar23->Realize();
+	itemFrame1->GetAuiManager().AddPane(itemAuiToolBar23, wxAuiPaneInfo()
 		.ToolbarPane().Name(wxT("Pane1")).Top().Layer(10).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(false).Floatable(false).Gripper(true));
 
 	m_workspaceWnd = new nutcracker::WorkspaceWnd( itemFrame1, ID_FOREIGN, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
 		.Name(wxT("Pane2")).Caption(_("Workspace")).MinSize(wxSize(80, 80)).BestSize(wxSize(180, -1)).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
-	nutcracker::FileEditorGroupWnd* itemWindow16 = new nutcracker::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
-	itemFrame1->GetAuiManager().AddPane(itemWindow16, wxAuiPaneInfo()
+	nutcracker::FileEditorGroupWnd* itemWindow25 = new nutcracker::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
+	itemFrame1->GetAuiManager().AddPane(itemWindow25, wxAuiPaneInfo()
 		.Name(wxT("Pane4")).Centre().MinSize(wxSize(100, -1)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
 	m_notebook = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_BOTTOM|wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_TAB_EXTERNAL_MOVE|wxNO_BORDER );
 
-	wxPanel* itemPanel18 = new wxPanel( m_notebook, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	wxBoxSizer* itemBoxSizer19 = new wxBoxSizer(wxVERTICAL);
-	itemPanel18->SetSizer(itemBoxSizer19);
+	wxPanel* itemPanel27 = new wxPanel( m_notebook, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	wxBoxSizer* itemBoxSizer28 = new wxBoxSizer(wxVERTICAL);
+	itemPanel27->SetSizer(itemBoxSizer28);
 
-	m_logTextCtrl = new wxTextCtrl( itemPanel18, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
-	itemBoxSizer19->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
+	m_logTextCtrl = new wxTextCtrl( itemPanel27, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
+	itemBoxSizer28->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
 
-	m_notebook->AddPage(itemPanel18, _("Log"), false);
+	m_notebook->AddPage(itemPanel27, _("Log"), false);
 
-	nutcracker::BreakpointsWnd* itemPanel21 = new nutcracker::BreakpointsWnd( m_notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::BreakpointsWnd* itemPanel30 = new nutcracker::BreakpointsWnd( m_notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel21, _("Breakpoints"), false);
+	m_notebook->AddPage(itemPanel30, _("Breakpoints"), false);
 
-	nutcracker::CallstackWnd* itemPanel22 = new nutcracker::CallstackWnd( m_notebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::CallstackWnd* itemPanel31 = new nutcracker::CallstackWnd( m_notebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel22, _("Callstack"), false);
+	m_notebook->AddPage(itemPanel31, _("Callstack"), false);
 
-	nutcracker::LocalsWnd* itemPanel23 = new nutcracker::LocalsWnd( m_notebook, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::LocalsWnd* itemPanel32 = new nutcracker::LocalsWnd( m_notebook, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel23, _("Locals"), false);
+	m_notebook->AddPage(itemPanel32, _("Locals"), false);
 
-	nutcracker::WatchesWnd* itemPanel24 = new nutcracker::WatchesWnd( m_notebook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::WatchesWnd* itemPanel33 = new nutcracker::WatchesWnd( m_notebook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel24, _("Watches"), false);
+	m_notebook->AddPage(itemPanel33, _("Watches"), false);
 
 	itemFrame1->GetAuiManager().AddPane(m_notebook, wxAuiPaneInfo()
 		.Name(wxT("Pane3")).Bottom().MinSize(wxSize(80, 80)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));
@@ -343,5 +361,96 @@ void MainWnd_Auto::OnMenuFileCloseWorkspace( wxCommandEvent& event )
 	// Before editing this code, remove the block markers.
 	event.Skip();
 ////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_FILE_CLOSEWORKSPACE in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_START_OR_CONTINUE
+ */
+
+void MainWnd_Auto::OnMenuDebugStartOrContinue( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_START_OR_CONTINUE in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_START_OR_CONTINUE in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_START_OR_CONTINUE
+ */
+
+void MainWnd_Auto::OnMenuDebugStartWithoutDebugging( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_START_OR_CONTINUE in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_START_OR_CONTINUE in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STOP_DEBUGGING
+ */
+
+void MainWnd_Auto::OnMenuDebugStopDebugging( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STOP_DEBUGGING in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STOP_DEBUGGING in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_BREAK
+ */
+
+void MainWnd_Auto::OnMenuDebugBreak( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_BREAK in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_BREAK in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOVER
+ */
+
+void MainWnd_Auto::OnMenuDebugStepOver( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOVER in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOVER in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPINTO
+ */
+
+void MainWnd_Auto::OnMenuDebugStepInto( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPINTO in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPINTO in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOUT
+ */
+
+void MainWnd_Auto::OnMenuDebugStepOut( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOUT in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOUT in MainWnd_Auto. 
 }
 

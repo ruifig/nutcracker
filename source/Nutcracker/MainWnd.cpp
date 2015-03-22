@@ -133,8 +133,14 @@ MainWnd::MainWnd()
 				t += gWorkspace->debuggerGetBreakInfo() ? "(Debugging)" : "(Running)";
 			t += " - Nutcracker IDE";
 			SetTitle(t);
+			if (evt.isDebugEvent())
+			{
+				updateDebugMenu();
+			}
 		}
 	});
+
+	updateDebugMenu();
 
 }
 
@@ -190,53 +196,38 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 	const int modifiers = event.GetModifiers();
 	const auto keycode = event.GetKeyCode();
 
+	//
+	// Debug Menu
 	if (modifiers == wxMOD_NONE && keycode==WXK_F5)
 	{
-		if (gWorkspace->debuggerActive())
-			gWorkspace->debuggerResume();
-		else
-		{
-			auto file = gFileEditorGroupWnd->getCurrentFile();
-			if (!file)
-				showError("No file selected","No file selected to start debugger!\nOpen a file first");
-			else
-				gWorkspace->debuggerStart(file->id);
-		}
+		OnMenuDebugStartOrContinue(wxCommandEvent());
 	}
 	else if (modifiers == wxMOD_CONTROL && keycode == WXK_F5)
 	{
-		if (gWorkspace->debuggerActive())
-			return;
-		auto file = gFileEditorGroupWnd->getCurrentFile();
-		if (!file)
-			showError("No file selected", "No file selected to start execution!\nOpen a file first");
-		else
-			gWorkspace->run(file->id);
+		OnMenuDebugStartWithoutDebugging(wxCommandEvent());
 	}
 	else if (modifiers == wxMOD_SHIFT && keycode == WXK_F5)
 	{
-		if (!gWorkspace->debuggerActive())
-			return;
-		gWorkspace->debuggerTerminate();
+		OnMenuDebugStopDebugging(wxCommandEvent());
 	}
 	else if (modifiers == (wxMOD_CONTROL|wxMOD_ALT) && keycode==WXK_CANCEL /*CANCEL is BREAK */)
 	{
-		if (!gWorkspace->debuggerActive())
-			return;
-		gWorkspace->debuggerSuspend();
+		OnMenuDebugBreak(wxCommandEvent());
 	}
 	else if (modifiers == wxMOD_NONE && keycode == WXK_F10)
 	{
-		gWorkspace->debuggerStepOver();
+		OnMenuDebugStepOver(wxCommandEvent());
 	}
 	else if (modifiers == wxMOD_NONE && keycode == WXK_F11)
 	{
-		gWorkspace->debuggerStepInto();
+		OnMenuDebugStepInto(wxCommandEvent());
 	}
 	else if (modifiers == wxMOD_SHIFT && keycode == WXK_F11)
 	{
-		gWorkspace->debuggerStepReturn();
+		OnMenuDebugStepOut(wxCommandEvent());
 	}
+	//
+	// Other
 	else if (modifiers == (wxMOD_SHIFT | wxMOD_ALT) && keycode == 'O' )
 	{
 		FindFileDlg dlg(this);
@@ -511,6 +502,87 @@ void MainWnd::OnMenuFileCloseWorkspace(wxCommandEvent& event)
 		showException(e);
 	}
 
+}
+
+void MainWnd::updateDebugMenu()
+{
+	wxMenuItem* item;
+
+		item = m_menuDebug->FindItem(ID_MENU_DEBUG_START_OR_CONTINUE);
+		item->SetItemLabel(wxString(gWorkspace->debuggerActive() ? wxT("Continue\t") : wxT("Start Debugging")) + "\tF5");
+		item->Enable(!(gWorkspace->debuggerActive() && gWorkspace->debuggerGetBreakInfo() == nullptr));
+
+		item = m_menuDebug->FindItem(ID_MENU_DEBUG_START_NODEBUG);
+		item->Enable(!gWorkspace->debuggerActive());
+
+		item = m_menuDebug->FindItem(ID_MENU_DEBUG_STOP_DEBUGGING);
+		item->Enable(gWorkspace->debuggerActive());
+
+		item = m_menuDebug->FindItem(ID_MENU_DEBUG_BREAK);
+		item->Enable(gWorkspace->debuggerActive() && gWorkspace->debuggerGetBreakInfo()==nullptr);
+
+		item = m_menuDebug->FindItem(ID_MENU_DEBUG_STEPOVER);
+		item->Enable(gWorkspace->debuggerActive() && gWorkspace->debuggerGetBreakInfo());
+
+		item = m_menuDebug->FindItem(ID_MENU_DEBUG_STEPINTO);
+		item->Enable(gWorkspace->debuggerActive() && gWorkspace->debuggerGetBreakInfo());
+
+		item = m_menuDebug->FindItem(ID_MENU_DEBUG_STEPOUT);
+		item->Enable(gWorkspace->debuggerActive() && gWorkspace->debuggerGetBreakInfo());
+}
+
+void MainWnd::OnMenuDebugStartOrContinue(wxCommandEvent& event)
+{
+	if (gWorkspace->debuggerActive())
+		gWorkspace->debuggerResume();
+	else
+	{
+		auto file = gFileEditorGroupWnd->getCurrentFile();
+		if (!file)
+			showError("No file selected", "No file selected to start debugger!\nOpen a file first");
+		else
+			gWorkspace->debuggerStart(file->id);
+	}
+}
+
+void MainWnd::OnMenuDebugStartWithoutDebugging(wxCommandEvent& event)
+{
+	if (gWorkspace->debuggerActive())
+		return;
+	auto file = gFileEditorGroupWnd->getCurrentFile();
+	if (!file)
+		showError("No file selected", "No file selected to start execution!\nOpen a file first");
+	else
+		gWorkspace->run(file->id);
+}
+
+void MainWnd::OnMenuDebugStopDebugging(wxCommandEvent& event)
+{
+	if (!gWorkspace->debuggerActive())
+		return;
+	gWorkspace->debuggerTerminate();
+}
+
+void MainWnd::OnMenuDebugBreak(wxCommandEvent& event)
+{
+	if (!gWorkspace->debuggerActive())
+		return;
+	gWorkspace->debuggerSuspend();
+}
+
+void MainWnd::OnMenuDebugStepOver(wxCommandEvent& event)
+{
+	gWorkspace->debuggerStepOver();
+}
+
+void MainWnd::OnMenuDebugStepInto(wxCommandEvent& event)
+{
+	gWorkspace->debuggerStepInto();
+}
+
+void MainWnd::OnMenuDebugStepOut(wxCommandEvent& event)
+{
+	gWorkspace->debuggerStepReturn();
 }
 
 void MainWnd::OnSetFocus(wxFocusEvent& event)
