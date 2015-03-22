@@ -102,6 +102,9 @@ public:
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_EXIT
 	virtual void OnExitClick( wxCommandEvent& event );
 
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_EDIT_FINDFILE
+	virtual void OnMenuEditFindFileInWorkspace( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_INDENTATION
 	virtual void OnMenuClick( wxCommandEvent& event );
 
@@ -145,6 +148,7 @@ public:
 
 ////@begin MainWnd_Auto member variables
 	wxAuiManager m_auiManager;
+	wxMenu* m_menuEdit;
 	wxMenu* m_menuView;
 	wxMenu* m_menuDebug;
 	wxMenu* m_menuInterpreters;
@@ -157,6 +161,7 @@ public:
 		ID_MENU_FILE_SAVEWORKSPACE = 10016,
 		ID_MENU_FILE_LOADWORKSPACE = 10017,
 		ID_MENU_FILE_CLOSEWORKSPACE = 10018,
+		ID_MENU_EDIT_FINDFILE = 10026,
 		ID_MENU_VIEW_INDENTATION = 10003,
 		ID_MENU_VIEW_WHITESPACE = 10004,
 		ID_MENU_VIEW_EOL = 10005,

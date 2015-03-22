@@ -197,6 +197,12 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 	const auto keycode = event.GetKeyCode();
 
 	//
+	// Edit Menu
+	if (modifiers == (wxMOD_SHIFT | wxMOD_ALT) && keycode == 'O' )
+	{
+		OnMenuEditFindFileInWorkspace(wxCommandEvent());
+	}
+	//
 	// Debug Menu
 	if (modifiers == wxMOD_NONE && keycode==WXK_F5)
 	{
@@ -227,15 +233,7 @@ void MainWnd::OnCharHook(wxKeyEvent& event)
 		OnMenuDebugStepOut(wxCommandEvent());
 	}
 	//
-	// Other
-	else if (modifiers == (wxMOD_SHIFT | wxMOD_ALT) && keycode == 'O' )
-	{
-		FindFileDlg dlg(this);
-		dlg.ShowModal();
-		if (auto file = dlg.getResult())
-			gFileEditorGroupWnd->gotoFile(file);
-		return;
-	}
+	// Unknown
 	else
 	{
 		event.Skip();
@@ -504,6 +502,14 @@ void MainWnd::OnMenuFileCloseWorkspace(wxCommandEvent& event)
 
 }
 
+void MainWnd::OnMenuEditFindFileInWorkspace(wxCommandEvent& event)
+{
+	FindFileDlg dlg(this);
+	dlg.ShowModal();
+	if (auto file = dlg.getResult())
+		gFileEditorGroupWnd->gotoFile(file);
+}
+
 void MainWnd::updateDebugMenu()
 {
 	wxMenuItem* item;
@@ -584,6 +590,7 @@ void MainWnd::OnMenuDebugStepOut(wxCommandEvent& event)
 {
 	gWorkspace->debuggerStepReturn();
 }
+
 
 void MainWnd::OnSetFocus(wxFocusEvent& event)
 {
