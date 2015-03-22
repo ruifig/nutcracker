@@ -35,10 +35,27 @@ dependencies/squirrel/doc/squirrel3.chw
 # CppDepend
 CppDepend/CppDependOut
 
+#
 # wxWidgets
-dependencies/wxWidgets/*
+#
+# Libraries/dlls
+dependencies/wxWidgets/lib/vc_dll
+dependencies/wxWidgets/lib/vc_lib
+dependencies/wxWidgets/lib/vc_x64_dll
+dependencies/wxWidgets/lib/vc_x64_lib
+# Library object files
+dependencies/wxWidgets/build/msw/vc_mswu
+dependencies/wxWidgets/build/msw/vc_mswud
+dependencies/wxWidgets/build/msw/vc_mswudll
+dependencies/wxWidgets/build/msw/vc_mswuddll
+dependencies/wxWidgets/build/msw/vc_x64_mswu
+dependencies/wxWidgets/build/msw/vc_x64_mswud
+dependencies/wxWidgets/build/msw/vc_x64_mswudll
+dependencies/wxWidgets/build/msw/vc_x64_mswuddll
 
+#
 # Visual Paradigm
+#
 VisualParadigm/*
 
 #
