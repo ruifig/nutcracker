@@ -82,6 +82,10 @@ FileEditorWnd::FileEditorWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos
 		{
 			updateViewOptions();
 		}
+		else if (evt.id == DataEventID::FindResultsClear)
+		{
+
+		}
 	});
 }
 
@@ -268,6 +272,7 @@ void FileEditorWnd::setFile(const std::shared_ptr<const File>& file, int line, i
 			m_textCtrl->SetXOffset(0);
 		}
 	}
+
 
 	//m_textCtrl->VerticalCentreCaret();
 }

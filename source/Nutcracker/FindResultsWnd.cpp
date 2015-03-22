@@ -24,18 +24,6 @@ enum FindGridCol
 	kFC_FileFullPath,
 };
 
-struct FindResult
-{
-	FindResult(const wxString& t_, const std::shared_ptr<const File>& f_, int l_, int c_)
-	: text(t_), file(f_), line(l_), col(c_)
-	{
-	}
-	wxString text;
-	std::shared_ptr<const File> file;
-	int line;
-	int col;
-};
-
 FindResultsWnd::FindResultsWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
 	: FindResultsWnd_Auto(parent, id, pos, size, style)
 {
@@ -46,12 +34,63 @@ FindResultsWnd::FindResultsWnd(wxWindow* parent, wxWindowID id, const wxPoint& p
 	m_grid->SetColLabelValue(kFC_Line, "Line");
 	m_grid->SetColLabelValue(kFC_Col, "Col");
 	m_grid->SetColLabelValue(kFC_FileFullPath, "Full path");
+
+	gWorkspace->registerListener(this, [this](const DataEvent& evt)
+	{
+		if (evt.isFindResultsEvent())
+		{
+			tryUpdateState();
+		}
+	});
+}
+
+void FindResultsWnd::tryUpdateState(bool force)
+{
+	if (m_pendingUpdate && !force)
+		return;
+
+	m_pendingUpdate = true;
+	postAppLambdaEvent([this, force]()
+	{
+		if (IsShownOnScreen() || force)
+			updateState();
+		m_pendingUpdate = false;
+	});
+}
+
+void FindResultsWnd::updateState()
+{
+	//
+	// Setup the grid with the results
+	m_grid->Freeze();
+	if (m_grid->GetNumberRows())
+		m_grid->DeleteRows(0, m_grid->GetNumberRows());
+
+	gWorkspace->iterateFindResult([&](const FindResult* res)
+	{
+		m_grid->AppendRows();
+		int r = m_grid->GetNumberRows() - 1;
+		m_grid->SetCellValue(r, kFC_Text, res->text);
+		m_grid->SetCellValue(r, kFC_File, res->file->name.widen());
+		m_grid->SetCellValue(r, kFC_Line, wxString::Format("%d", res->pos.line));
+		m_grid->SetCellValue(r, kFC_Col, wxString::Format("%d", res->pos.col));
+		m_grid->SetCellValue(r, kFC_FileFullPath, res->file->fullpath.widen());
+
+		for (int c = 0; c < m_grid->GetNumberCols(); c++)
+			m_grid->SetReadOnly(r, c, true);
+	});
+
+	m_grid->AutoSize();
+	m_grid->Thaw();
+	this->Layout();
 }
 
 void FindResultsWnd::find(const wxString& what, LookWhere lookWhere, bool matchCase, bool matchWholeWord)
 {
 	if (!gWorkspace || wxString(what).Trim()=="")
 		return;
+
+	gWorkspace->clearFindResults();
 
 	//
 	// Determine in what files we want to look
@@ -90,7 +129,6 @@ void FindResultsWnd::find(const wxString& what, LookWhere lookWhere, bool matchC
 	//
     wxStyledTextCtrl* tmptxtctrl = new wxStyledTextCtrl( this );
 	tmptxtctrl->Hide();
-	std::vector<FindResult> results;
 
 	try
 	{
@@ -116,7 +154,7 @@ void FindResultsWnd::find(const wxString& what, LookWhere lookWhere, bool matchC
 				tmptxtctrl->GotoPos(pos);
 				// GetCurrentLine returns the line text with the newline characters, which causes the grid rows to grow,
 				// so we need to remove the newline characters at the end
-				results.emplace_back(wxString(tmptxtctrl->GetLine(tmptxtctrl->GetCurrentLine())).Trim(), f, tmptxtctrl->GetCurrentLine()+1, tmptxtctrl->GetColumn(pos));
+				gWorkspace->addFindResult(wxString(tmptxtctrl->GetLine(tmptxtctrl->GetCurrentLine())).Trim(), f, tmptxtctrl->GetCurrentLine()+1, tmptxtctrl->GetColumn(pos));
 				tmptxtctrl->SetTargetStart(pos+1);
 				tmptxtctrl->SetTargetEnd(tmptxtctrl->GetLength()-1);
 			}
@@ -131,31 +169,6 @@ void FindResultsWnd::find(const wxString& what, LookWhere lookWhere, bool matchC
 	tmptxtctrl->Destroy();
 
 
-	//
-	// Setup the grid with the results
-	m_grid->Freeze();
-	if (m_grid->GetNumberRows())
-		m_grid->DeleteRows(0, m_grid->GetNumberRows());
-
-	for(auto &i : results)
-	{
-		m_grid->AppendRows();
-		int r = m_grid->GetNumberRows() - 1;
-		m_grid->SetCellValue(r, kFC_Text, i.text);
-		m_grid->SetCellValue(r, kFC_File, i.file->name.widen());
-		m_grid->SetCellValue(r, kFC_Line, wxString::Format("%d", i.line));
-		m_grid->SetCellValue(r, kFC_Col, wxString::Format("%d", i.col));
-		m_grid->SetCellValue(r, kFC_FileFullPath, i.file->fullpath.widen());
-
-		for (int c=0; c<m_grid->GetNumberCols(); c++)
-			m_grid->SetReadOnly(r, c, true);
-	}
-
-	m_grid->AutoSize();
-	m_grid->Thaw();
-	//this->Fit();
-	this->Layout();
-	//this->Refresh();
 }
 
 void FindResultsWnd::OnGridCellDClick(wxGridEvent& event)

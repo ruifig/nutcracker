@@ -2,7 +2,6 @@
 local i=0;
 local anotherArray = [10,20,30]
 
-
 function testWatch(a)
 {
 	return "Hello " + a;
