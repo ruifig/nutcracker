@@ -539,6 +539,187 @@
               <long name="locked">0</long>
               <long name="owns-file">1</long>
               <bool name="proxy-Enabled">1</bool>
+              <string name="proxy-Label">"Debug"</string>
+              <string name="proxy-Member variable name">"m_menuDebug"</string>
+              <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+              <string name="title">"Debug"</string>
+              <long name="title-mode">0</long>
+              <string name="type">"dialog-control-document"</string>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuDebugStartOrContinue|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_DEBUG_START_OR_CONTINUE"</string>
+                <long name="proxy-Id value">10019</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Start Debugging\tF5"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Start Debugging\tF5: ID_MENU_DEBUG_START_OR_CONTINUE"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuDebugStartWithoutDebugging|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_DEBUG_START_NODEBUG"</string>
+                <long name="proxy-Id value">10020</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Start Without Debugging\tCtrl+F5"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Start Without Debugging\tCtrl+F5: ID_MENU_DEBUG_START_NODEBUG"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuDebugStopDebugging|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_DEBUG_STOP_DEBUGGING"</string>
+                <long name="proxy-Id value">10021</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Stop Debugging\tShift+F5"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Stop Debugging\tShift+F5: ID_MENU_DEBUG_STOP_DEBUGGING"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuDebugBreak|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_DEBUG_BREAK"</string>
+                <long name="proxy-Id value">10022</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Break\tCtrl+Alt+Break"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Break\tCtrl+Alt+Break: ID_MENU_DEBUG_BREAK"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuSeparatorProxy"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"------------"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuDebugStepOver|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_DEBUG_STEPOVER"</string>
+                <long name="proxy-Id value">10023</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Step Over\tF10"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Step Over\tF10: ID_MENU_DEBUG_STEPOVER"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuDebugStepInto|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_DEBUG_STEPINTO"</string>
+                <long name="proxy-Id value">10024</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Step Into\tF11"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Step Into\tF11: ID_MENU_DEBUG_STEPINTO"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+              <document>
+                <string name="proxy-type">"wbMenuItemProxy"</string>
+                <string name="event-handler-0">"wxEVT_COMMAND_MENU_SELECTED|OnMenuDebugStepOut|NONE||MainWnd_Auto"</string>
+                <string name="filename">""</string>
+                <string name="icon-name">"menuitem"</string>
+                <long name="is-transient">0</long>
+                <long name="locked">0</long>
+                <long name="owns-file">1</long>
+                <string name="proxy-Bitmap">""</string>
+                <string name="proxy-Bitmap unchecked">""</string>
+                <bool name="proxy-Checked">0</bool>
+                <bool name="proxy-Enabled">1</bool>
+                <string name="proxy-Help text">""</string>
+                <string name="proxy-Id name">"ID_MENU_DEBUG_STEPOUT"</string>
+                <long name="proxy-Id value">10025</long>
+                <string name="proxy-Kind">"Normal"</string>
+                <string name="proxy-Label">"Step Out\tShift+F11"</string>
+                <string name="proxy-Platform">"&lt;Any platform&gt;"</string>
+                <string name="title">"Step Out\tShift+F11: ID_MENU_DEBUG_STEPOUT"</string>
+                <long name="title-mode">0</long>
+                <string name="type">"dialog-control-document"</string>
+              </document>
+            </document>
+            <document>
+              <string name="proxy-type">"wbMenuProxy"</string>
+              <string name="filename">""</string>
+              <string name="icon-name">"menu"</string>
+              <long name="is-transient">0</long>
+              <long name="locked">0</long>
+              <long name="owns-file">1</long>
+              <bool name="proxy-Enabled">1</bool>
               <string name="proxy-Label">"&amp;Interpreter"</string>
               <string name="proxy-Member variable name">"m_menuInterpreters"</string>
               <string name="proxy-Platform">"&lt;Any platform&gt;"</string>

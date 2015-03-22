@@ -105,6 +105,27 @@ public:
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_VIEW_INDENTATION
 	virtual void OnMenuClick( wxCommandEvent& event );
 
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_START_OR_CONTINUE
+	virtual void OnMenuDebugStartOrContinue( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_START_NODEBUG
+	virtual void OnMenuDebugStartWithoutDebugging( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STOP_DEBUGGING
+	virtual void OnMenuDebugStopDebugging( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_BREAK
+	virtual void OnMenuDebugBreak( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOVER
+	virtual void OnMenuDebugStepOver( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPINTO
+	virtual void OnMenuDebugStepInto( wxCommandEvent& event );
+
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOUT
+	virtual void OnMenuDebugStepOut( wxCommandEvent& event );
+
 ////@end MainWnd_Auto event handler declarations
 
 ////@begin MainWnd_Auto member function declarations
@@ -125,6 +146,7 @@ public:
 ////@begin MainWnd_Auto member variables
 	wxAuiManager m_auiManager;
 	wxMenu* m_menuView;
+	wxMenu* m_menuDebug;
 	wxMenu* m_menuInterpreters;
 	nutcracker::WorkspaceWnd* m_workspaceWnd;
 	wxAuiNotebook* m_notebook;
@@ -138,6 +160,13 @@ public:
 		ID_MENU_VIEW_INDENTATION = 10003,
 		ID_MENU_VIEW_WHITESPACE = 10004,
 		ID_MENU_VIEW_EOL = 10005,
+		ID_MENU_DEBUG_START_OR_CONTINUE = 10019,
+		ID_MENU_DEBUG_START_NODEBUG = 10020,
+		ID_MENU_DEBUG_STOP_DEBUGGING = 10021,
+		ID_MENU_DEBUG_BREAK = 10022,
+		ID_MENU_DEBUG_STEPOVER = 10023,
+		ID_MENU_DEBUG_STEPINTO = 10024,
+		ID_MENU_DEBUG_STEPOUT = 10025,
 		ID_TOOLBAR = 10006,
 		ID_FOREIGN = 10007,
 		ID_WINDOW = 10008,
