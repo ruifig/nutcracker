@@ -154,6 +154,18 @@ void AboutDlg_Auto::CreateControls()
 	wxHyperlinkCtrl* itemHyperlinkCtrl15 = new wxHyperlinkCtrl( itemPanel3, ID_HYPERLINKCTRL2, _("http://www.crazygaze.com"), wxT("http://www.crazygaze.com"), wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
 	itemGridSizer9->Add(itemHyperlinkCtrl15, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
+	wxStaticLine* itemStaticLine16 = new wxStaticLine( itemPanel3, wxID_STATIC, wxDefaultPosition, wxDefaultSize, 0 );
+	itemGridBagSizer4->Add(itemStaticLine16, wxGBPosition(4, 1), wxGBSpan(1, 1), wxGROW|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxGridSizer* itemGridSizer17 = new wxGridSizer(0, 2, 0, 0);
+	itemGridBagSizer4->Add(itemGridSizer17, wxGBPosition(5, 1), wxGBSpan(1, 1), wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxStaticText* itemStaticText18 = new wxStaticText( itemPanel3, wxID_STATIC, _("Squirrel programming language:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemGridSizer17->Add(itemStaticText18, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxHyperlinkCtrl* itemHyperlinkCtrl19 = new wxHyperlinkCtrl( itemPanel3, ID_HYPERLINKCTRL3, _("http://www.squirrel-lang.org/"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	itemGridSizer17->Add(itemHyperlinkCtrl19, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
 	itemGridBagSizer4->AddGrowableRow(1);
 	itemGridBagSizer4->AddGrowableCol(1);
 
