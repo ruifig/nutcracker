@@ -63,6 +63,7 @@ BEGIN_EVENT_TABLE( MainWnd_Auto, wxFrame )
 	EVT_MENU( ID_MENU_DEBUG_STEPOVER, MainWnd_Auto::OnMenuDebugStepOver )
 	EVT_MENU( ID_MENU_DEBUG_STEPINTO, MainWnd_Auto::OnMenuDebugStepInto )
 	EVT_MENU( ID_MENU_DEBUG_STEPOUT, MainWnd_Auto::OnMenuDebugStepOut )
+	EVT_MENU( wxID_ABOUT, MainWnd_Auto::OnMenuHelpAbout )
 ////@end MainWnd_Auto event table entries
 
 END_EVENT_TABLE()
@@ -171,46 +172,49 @@ void MainWnd_Auto::CreateControls()
 	menuBar->Append(m_menuDebug, _("Debug"));
 	m_menuInterpreters = new wxMenu;
 	menuBar->Append(m_menuInterpreters, _("&Interpreter"));
+	wxMenu* itemMenu27 = new wxMenu;
+	itemMenu27->Append(wxID_ABOUT, _("&About"), wxEmptyString, wxITEM_NORMAL);
+	menuBar->Append(itemMenu27, _("&Help"));
 	itemFrame1->SetMenuBar(menuBar);
 
 	m_workspaceWnd = new nutcracker::WorkspaceWnd( itemFrame1, ID_FOREIGN, wxDefaultPosition, wxSize(100, 100), wxSIMPLE_BORDER );
 	itemFrame1->GetAuiManager().AddPane(m_workspaceWnd, wxAuiPaneInfo()
 		.Name(wxT("Pane2")).Caption(_("Workspace")).MinSize(wxSize(80, 80)).BestSize(wxSize(180, -1)).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
-	nutcracker::FileEditorGroupWnd* itemWindow28 = new nutcracker::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
-	itemFrame1->GetAuiManager().AddPane(itemWindow28, wxAuiPaneInfo()
+	nutcracker::FileEditorGroupWnd* itemWindow30 = new nutcracker::FileEditorGroupWnd( itemFrame1, ID_WINDOW, wxDefaultPosition, wxSize(200, 100), wxSIMPLE_BORDER );
+	itemFrame1->GetAuiManager().AddPane(itemWindow30, wxAuiPaneInfo()
 		.Name(wxT("Pane4")).Centre().MinSize(wxSize(100, -1)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true));
 
 	m_notebook = new wxAuiNotebook( itemFrame1, ID_AUINOTEBOOK, wxDefaultPosition, wxSize(-1, 200), wxAUI_NB_BOTTOM|wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_TAB_EXTERNAL_MOVE|wxNO_BORDER );
 
-	wxPanel* itemPanel30 = new wxPanel( m_notebook, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
-	wxBoxSizer* itemBoxSizer31 = new wxBoxSizer(wxVERTICAL);
-	itemPanel30->SetSizer(itemBoxSizer31);
+	wxPanel* itemPanel32 = new wxPanel( m_notebook, ID_PANEL, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	wxBoxSizer* itemBoxSizer33 = new wxBoxSizer(wxVERTICAL);
+	itemPanel32->SetSizer(itemBoxSizer33);
 
-	m_logTextCtrl = new wxTextCtrl( itemPanel30, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
-	itemBoxSizer31->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
+	m_logTextCtrl = new wxTextCtrl( itemPanel32, ID_TEXTCTRL, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY|wxTE_RICH|wxTE_AUTO_URL|wxNO_BORDER );
+	itemBoxSizer33->Add(m_logTextCtrl, 1, wxGROW|wxALL, 5);
 
-	m_notebook->AddPage(itemPanel30, _("Log"), false);
+	m_notebook->AddPage(itemPanel32, _("Log"), false);
 
-	nutcracker::BreakpointsWnd* itemPanel33 = new nutcracker::BreakpointsWnd( m_notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::BreakpointsWnd* itemPanel35 = new nutcracker::BreakpointsWnd( m_notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel33, _("Breakpoints"), false);
+	m_notebook->AddPage(itemPanel35, _("Breakpoints"), false);
 
-	nutcracker::CallstackWnd* itemPanel34 = new nutcracker::CallstackWnd( m_notebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::CallstackWnd* itemPanel36 = new nutcracker::CallstackWnd( m_notebook, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel34, _("Callstack"), false);
+	m_notebook->AddPage(itemPanel36, _("Callstack"), false);
 
-	nutcracker::LocalsWnd* itemPanel35 = new nutcracker::LocalsWnd( m_notebook, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::LocalsWnd* itemPanel37 = new nutcracker::LocalsWnd( m_notebook, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel35, _("Locals"), false);
+	m_notebook->AddPage(itemPanel37, _("Locals"), false);
 
-	nutcracker::WatchesWnd* itemPanel36 = new nutcracker::WatchesWnd( m_notebook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::WatchesWnd* itemPanel38 = new nutcracker::WatchesWnd( m_notebook, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel36, _("Watches"), false);
+	m_notebook->AddPage(itemPanel38, _("Watches"), false);
 
-	nutcracker::FindResultsWnd* itemPanel37 = new nutcracker::FindResultsWnd( m_notebook, ID_FindResultsWnd, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
+	nutcracker::FindResultsWnd* itemPanel39 = new nutcracker::FindResultsWnd( m_notebook, ID_FindResultsWnd, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL );
 
-	m_notebook->AddPage(itemPanel37, _("Find Results"), false);
+	m_notebook->AddPage(itemPanel39, _("Find Results"), false);
 
 	itemFrame1->GetAuiManager().AddPane(m_notebook, wxAuiPaneInfo()
 		.Name(wxT("Pane3")).Bottom().MinSize(wxSize(80, 80)).CaptionVisible(false).CloseButton(false).DestroyOnClose(false).Resizable(true).PaneBorder(false));
@@ -486,5 +490,18 @@ void MainWnd_Auto::OnMenuEditFind( wxCommandEvent& event )
 	// Before editing this code, remove the block markers.
 	event.Skip();
 ////@end wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_EDIT_FIND_IN_CURRENTFILE in MainWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_MENU_SELECTED event handler for wxID_ABOUT
+ */
+
+void MainWnd_Auto::OnMenuHelpAbout( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_MENU_SELECTED event handler for wxID_ABOUT in MainWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_MENU_SELECTED event handler for wxID_ABOUT in MainWnd_Auto. 
 }
 
