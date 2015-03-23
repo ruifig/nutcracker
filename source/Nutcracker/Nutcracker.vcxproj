@@ -88,6 +88,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="AboutDlg.cpp" />
+    <ClCompile Include="AutoUI\AboutDlg_Auto.cpp" />
     <ClCompile Include="AutoUI\BreakpointsWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\CallstackWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\FileEditorGroupWnd_Auto.cpp" />
@@ -129,6 +131,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\dependencies\tinyxml2\tinyxml2.h" />
+    <ClInclude Include="AboutDlg.h" />
+    <ClInclude Include="AutoUI\AboutDlg_Auto.h" />
     <ClInclude Include="AutoUI\BreakpointsWnd_Auto.h" />
     <ClInclude Include="AutoUI\CallstackWnd_Auto.h" />
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h" />

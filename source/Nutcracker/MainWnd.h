@@ -53,6 +53,9 @@ private:
 	virtual void OnMenuDebugStepInto(wxCommandEvent& event) override;
 	virtual void OnMenuDebugStepOut(wxCommandEvent& event) override;
 
+	// Help menu
+	virtual void OnMenuHelpAbout(wxCommandEvent& event) override;
+
 
 	virtual void OnSetFocus(wxFocusEvent& event) override;
 	virtual void OnKillFocus(wxFocusEvent& event) override;

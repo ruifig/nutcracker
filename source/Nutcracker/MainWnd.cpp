@@ -16,6 +16,7 @@
 #include "Workspace.h"
 #include "FindFileDlg.h"
 #include "FindDlg.h"
+#include "AboutDlg.h"
 #include "FileEditorWnd.h"
 
 namespace nutcracker
@@ -615,6 +616,13 @@ void MainWnd::OnMenuDebugStepOut(wxCommandEvent& event)
 	gWorkspace->debuggerStepReturn();
 }
 
+
+void MainWnd::OnMenuHelpAbout(wxCommandEvent& event)
+{
+	auto dlg = new AboutDlg(this);
+	dlg->ShowModal();
+	delete dlg;
+}
 
 void MainWnd::OnSetFocus(wxFocusEvent& event)
 {

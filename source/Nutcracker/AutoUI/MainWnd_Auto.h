@@ -131,6 +131,9 @@ public:
 	/// wxEVT_COMMAND_MENU_SELECTED event handler for ID_MENU_DEBUG_STEPOUT
 	virtual void OnMenuDebugStepOut( wxCommandEvent& event );
 
+	/// wxEVT_COMMAND_MENU_SELECTED event handler for wxID_ABOUT
+	virtual void OnMenuHelpAbout( wxCommandEvent& event );
+
 ////@end MainWnd_Auto event handler declarations
 
 ////@begin MainWnd_Auto member function declarations
