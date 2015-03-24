@@ -51,6 +51,15 @@ namespace
 		dest += '\\';
 	}
 
+	void _getExecutableDirectory(Filename& dest)
+	{
+		const int bufferLength = MAX_PATH;
+		wchar_t buf[bufferLength+1];
+		// Change Current directory to where the executable is
+		CZ_CHECK( GetModuleFileNameExW(GetCurrentProcess(), NULL, buf, bufferLength) !=0 );
+		dest = Filename(std::wstring(buf)).getDirectory();
+	}
+
 	bool _isExistingDirectory(const cz::UTF8String& path)
 	{
 		return PathIsDirectoryW(path.widen().c_str()) ? true : false;
@@ -93,6 +102,15 @@ const Filename& Filesystem::getCWD() const
 const Filename& Filesystem::getOriginalCWD() const
 {
 	return mOriginalCWD;
+}
+
+Filename Filesystem::getExecutableDirectory()
+{
+	Filename dir;
+	Filename canonicalized;
+	_getExecutableDirectory(dir);
+	fullPath(canonicalized, dir);
+	return canonicalized.size() ? canonicalized : dir;
 }
 
 void Filesystem::setCWD(const UTF8String& path)

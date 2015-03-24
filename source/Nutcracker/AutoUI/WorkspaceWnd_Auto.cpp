@@ -35,6 +35,7 @@ IMPLEMENT_DYNAMIC_CLASS( WorkspaceWnd_Auto, wxPanel )
 BEGIN_EVENT_TABLE( WorkspaceWnd_Auto, wxPanel )
 
 ////@begin WorkspaceWnd_Auto event table entries
+	EVT_BUTTON( ID_BITMAPBUTTON1, WorkspaceWnd_Auto::OnAddFolderClick )
 	EVT_BUTTON( ID_BITMAPBUTTON, WorkspaceWnd_Auto::OnRefreshClick )
 	EVT_TREE_ITEM_ACTIVATED( ID_TREECTRL, WorkspaceWnd_Auto::OnTreeItemActivated )
 	EVT_TREE_ITEM_MENU( ID_TREECTRL, WorkspaceWnd_Auto::OnTreeItemMenu )
@@ -97,6 +98,7 @@ WorkspaceWnd_Auto::~WorkspaceWnd_Auto()
 void WorkspaceWnd_Auto::Init()
 {
 ////@begin WorkspaceWnd_Auto member initialisation
+	m_addFolderBtn = NULL;
 	m_refreshBtn = NULL;
 	m_treeCtrl = NULL;
 ////@end WorkspaceWnd_Auto member initialisation
@@ -118,7 +120,14 @@ void WorkspaceWnd_Auto::CreateControls()
 	wxBoxSizer* itemBoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
 	itemBoxSizer2->Add(itemBoxSizer3, 0, wxGROW|wxALL, 1);
 
+	m_addFolderBtn = new wxBitmapButton( itemPanel1, ID_BITMAPBUTTON1, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	if (WorkspaceWnd_Auto::ShowToolTips())
+		m_addFolderBtn->SetToolTip(_("Add a new source folder to the workspace"));
+	itemBoxSizer3->Add(m_addFolderBtn, 1, wxGROW|wxALL, 0);
+
 	m_refreshBtn = new wxBitmapButton( itemPanel1, ID_BITMAPBUTTON, wxNullBitmap, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW );
+	if (WorkspaceWnd_Auto::ShowToolTips())
+		m_refreshBtn->SetToolTip(_("Refresh to find any new files"));
 	itemBoxSizer3->Add(m_refreshBtn, 1, wxGROW|wxALL, 0);
 
 	m_treeCtrl = new wxTreeCtrl( itemPanel1, ID_TREECTRL, wxDefaultPosition, wxDefaultSize, wxTR_HAS_BUTTONS |wxTR_LINES_AT_ROOT|wxTR_HIDE_ROOT|wxTR_SINGLE|wxNO_BORDER );
@@ -200,5 +209,18 @@ void WorkspaceWnd_Auto::OnRefreshClick( wxCommandEvent& event )
 	// Before editing this code, remove the block markers.
 	event.Skip();
 ////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON in WorkspaceWnd_Auto. 
+}
+
+
+/*
+ * wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON1
+ */
+
+void WorkspaceWnd_Auto::OnAddFolderClick( wxCommandEvent& event )
+{
+////@begin wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON1 in WorkspaceWnd_Auto.
+	// Before editing this code, remove the block markers.
+	event.Skip();
+////@end wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON1 in WorkspaceWnd_Auto. 
 }
 
