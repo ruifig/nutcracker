@@ -1,0 +1,25 @@
+<folders>
+    <folder>
+        <path>C:\Work\crazygaze\Nutcracker\samples</path>
+    </folder>
+</folders>
+
+<breakpoints>
+    <breakpoint>
+        <file>C:\Work\crazygaze\Nutcracker\samples\Utils.nut</file>
+        <line>5</line>
+        <enabled>1</enabled>
+    </breakpoint>
+    <breakpoint>
+        <file>C:\Work\crazygaze\Nutcracker\samples\Utils.nut</file>
+        <line>4</line>
+        <enabled>1</enabled>
+    </breakpoint>
+    <breakpoint>
+        <file>C:\Work\crazygaze\Nutcracker\samples\HelloWorld.nut</file>
+        <line>5</line>
+        <enabled>1</enabled>
+    </breakpoint>
+</breakpoints>
+
+<watches/>

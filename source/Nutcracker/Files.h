@@ -28,6 +28,8 @@ struct BaseItem : std::enable_shared_from_this<BaseItem>
 	virtual ~BaseItem();
 	UTF8String fullpath;
 	UTF8String name;
+	UTF8String name_lower; // lower case name
+	UTF8String fullpath_lower; // lower case path
 	ItemType type;
 	FileId id;
 	UTF8String getDirectory() const;

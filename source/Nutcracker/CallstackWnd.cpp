@@ -45,7 +45,8 @@ CallstackWnd::CallstackWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 			auto info = gWorkspace->debuggerGetBreakInfo();
 			updateFrameMarker(m_currentIndex, info->currentCallstackFrame);
 			auto& entry = info->callstack[info->currentCallstackFrame];
-			gFileEditorGroupWnd->gotoFile(entry.file, entry.line);
+			if (entry.file)
+				gFileEditorGroupWnd->gotoFile(entry.file, entry.line);
 		}
 
 		if (tryUpdate && !m_pendingUpdate)
@@ -93,8 +94,20 @@ void CallstackWnd::updateState()
 		m_grid->SetCellRenderer(r, 0, new GridCellImageRenderer);
 		m_grid->SetCellAlignment(r, 0, wxALIGN_CENTER, wxALIGN_CENTER);
 
+		wxString fname;
+		if (c.file)
+			fname = c.file->name.widen();
+		else if (c.filename.size())
+			fname = c.filename.widen();
+		else if (c.line == -1)
+			fname = "NATIVE";
+
+		wxString linestr;
+		if (c.line != -1)
+			linestr = wxString::Format("line %d", c.line);
+
 		m_grid->SetCellValue(r, 1,
-			wxString::Format(wxT("%s!%s() line %d"), c.file->name.c_str(), c.func.c_str(), c.line));
+			wxString::Format(wxT("%s!%s() %s"), fname, c.func.c_str(), linestr));
 
 		r++;
 	}

@@ -353,10 +353,15 @@ void DebugSession::processObjElement(tinyxml2::XMLElement* ele, BreakInfo& info)
 
 void DebugSession::processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info)
 {
-	CallstackEntry e;
+	info.callstack.push_back(CallstackEntry());
+	CallstackEntry& e = info.callstack.back();
 	e.func = getString(ele, "fnc");
-	e.file = gWorkspace->createFile(getString(ele, "src"));
 	CZ_CHECK(ele->QueryAttribute("line", &e.line) == tinyxml2::XML_SUCCESS);
+	if (e.line != -1)
+	{
+		e.filename = getString(ele, "src");
+		e.file = gWorkspace->createFile(e.filename);
+	}
 
 	// Local variables
 	{
@@ -390,7 +395,6 @@ void DebugSession::processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info
 		}
 	}
 
-	info.callstack.push_back(std::move(e));
 }
 
 struct TypeInfo 
