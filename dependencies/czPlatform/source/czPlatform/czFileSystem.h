@@ -52,6 +52,8 @@ namespace cz
 		*/
 		void setCWDToDefault();
 
+		Filename getExecutableDirectory();
+
 		static bool isExistingDirectory(const UTF8String& path);
 		static bool isExistingFile(const UTF8String& filename);
 		static bool createRelativePath(UTF8String& dst, const UTF8String& from, const UTF8String& to);

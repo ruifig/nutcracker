@@ -36,6 +36,11 @@ static bool getConfigEntry(IniFile& file, const char* section, const char* entry
 }
 
 
+static UTF8String getConfigFilePath()
+{
+	return cz::Filesystem::getSingleton().getExecutableDirectory() + "config.ini";
+}
+
 typedef std::map<std::string, std::vector<std::string>> ConfigSaveInfo;
 
 struct ConfigEntry
@@ -632,9 +637,9 @@ void Workspace::debuggerSuspend()
 void Workspace::loadConfig()
 {
 	IniFile file;
-	auto cfgFile = "config.ini";
-	if (!file.open("config.ini"))
-		showError("Error loading config file '%s'", cfgFile);
+	auto cfgFile = getConfigFilePath();
+	if (!file.open(cfgFile.c_str()))
+		showError("Error loading config file '%s'", cfgFile.c_str());
 
 	Options options;
 	auto cfg = getConfig(options);
@@ -657,7 +662,8 @@ void Workspace::saveConfig()
 		i.save(saveInfo);
 
 	cz::File file;
-	if (!file.try_open("config.ini", cz::File::FILEMODE_WRITE))
+	auto cfgFile = getConfigFilePath();
+	if (!file.try_open(cfgFile.c_str(), cz::File::FILEMODE_WRITE))
 		return;
 	auto write = [&file](const char* str)
 	{

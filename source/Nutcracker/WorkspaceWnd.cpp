@@ -45,6 +45,7 @@ WorkspaceWnd::WorkspaceWnd(wxWindow* parent, wxWindowID id, const wxPoint& pos, 
 	// other controls
 	m_treeCtrl->SetImageList(&gImageListSmall);
 	m_refreshBtn->SetBitmap(gImageListSmall.GetBitmap(SMALLIMG_IDX_REFRESH), wxLEFT);
+	m_addFolderBtn->SetBitmap(gImageListSmall.GetBitmap(SMALLIMG_IDX_FOLDER_ADD), wxLEFT);
 
 	gWorkspaceWnd = this;
 
@@ -236,6 +237,19 @@ void WorkspaceWnd::locateFile(FileId fileId)
 void WorkspaceWnd::OnRefreshClick(wxCommandEvent& event)
 {
 	gWorkspace->resyncFolders();
+	updateState();
+}
+
+void WorkspaceWnd::OnAddFolderClick(wxCommandEvent& event)
+{
+	wxString cwd1 = wxFileName::GetCwd();
+
+	wxDirDialog dlg(this, "Pick a folder to add to the workspace", wxEmptyString, wxDD_DIR_MUST_EXIST | wxDD_NEW_DIR_BUTTON);
+	if (dlg.ShowModal() == wxID_CANCEL)
+		return;
+
+	wxString cwd2 = wxFileName::GetCwd();
+	gWorkspace->addFolder(wxStringToUtf8(dlg.GetPath()));
 	updateState();
 }
 

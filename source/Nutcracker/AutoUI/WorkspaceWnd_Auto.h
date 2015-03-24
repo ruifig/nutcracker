@@ -70,6 +70,9 @@ public:
 
 ////@begin WorkspaceWnd_Auto event handler declarations
 
+	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON1
+	virtual void OnAddFolderClick( wxCommandEvent& event );
+
 	/// wxEVT_COMMAND_BUTTON_CLICKED event handler for ID_BITMAPBUTTON
 	virtual void OnRefreshClick( wxCommandEvent& event );
 
@@ -94,11 +97,13 @@ public:
 	static bool ShowToolTips();
 
 ////@begin WorkspaceWnd_Auto member variables
+	wxBitmapButton* m_addFolderBtn;
 	wxBitmapButton* m_refreshBtn;
 	wxTreeCtrl* m_treeCtrl;
 	/// Control identifiers
 	enum {
 		ID_WORKSPACEWND_AUTO = 10000,
+		ID_BITMAPBUTTON1 = 10003,
 		ID_BITMAPBUTTON = 10002,
 		ID_TREECTRL = 10001
 	};

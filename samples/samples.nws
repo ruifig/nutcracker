@@ -22,4 +22,6 @@
     </breakpoint>
 </breakpoints>
 
-<watches/>
+<watches>
+    <watch>clock()</watch>
+</watches>
