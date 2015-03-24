@@ -262,6 +262,7 @@ struct CallstackEntry
 {
 	std::string func;
 	std::shared_ptr<const File> file;
+	UTF8String filename;
 	int line;
 	std::vector<TableEntry> locals;
 	std::map<int, WatchValue> watches;

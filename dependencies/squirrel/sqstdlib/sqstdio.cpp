@@ -288,8 +288,129 @@ SQInteger file_write(SQUserPointer file,SQUserPointer p,SQInteger size)
 	return sqstd_fwrite(p,1,size,(SQFILE)file);
 }
 
+
+// RVF +
+#include <string>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <Shlwapi.h>
+#include <cwctype>
+#include <assert.h>
+
+// Convert a wide Unicode string to an UTF8 string
+std::string utf8_encode(const std::wstring &wstr)
+{
+    if( wstr.empty() ) return std::string();
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &wstr[0], (int)wstr.size(), NULL, 0, NULL, NULL);
+    std::string strTo( size_needed, 0 );
+    WideCharToMultiByte                  (CP_UTF8, 0, &wstr[0], (int)wstr.size(), &strTo[0], size_needed, NULL, NULL);
+    return strTo;
+}
+
+// Convert an UTF8 string to a wide Unicode String
+std::wstring utf8_decode(const std::string &str)
+{
+    if( str.empty() ) return std::wstring();
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &str[0], (int)str.size(), NULL, 0);
+    std::wstring wstrTo( size_needed, 0 );
+    MultiByteToWideChar                  (CP_UTF8, 0, &str[0], (int)str.size(), &wstrTo[0], size_needed);
+    return wstrTo;
+}
+
+static bool isPathSeparator(unsigned int codepoint)
+{
+	return (codepoint == '/' || codepoint == '\\');
+}
+static bool notPathSeparator(unsigned int codepoint)
+{
+	return !isPathSeparator(codepoint);
+}
+
+static bool isRelativePath(const std::wstring& path)
+{
+	if (path.empty())
+		return true;
+	auto it = path.begin();
+	if (isPathSeparator(*it))
+		return false; // absolute path
+	else if (*it == '.')
+		return true; // relative path
+
+	*it++;
+	if (it == path.end())
+		return true; // relative path. It's a single letter filename (e.g: "f")
+	else if (*it == ':')
+		return false; // absolute path. It starts with a drive letter (e.g: "C:\xxx")
+	else
+		return true; // relative path
+}
+
+
+std::wstring getCWD()
+{
+	std::wstring dest;
+	const int bufferLength = MAX_PATH;
+	wchar_t buf[bufferLength + 1];
+	buf[0] = 0;
+	int res = GetCurrentDirectoryW(bufferLength, buf);
+	assert(res != 0);
+	dest = buf;
+	dest += L'\\';
+	return dest;
+}
+static bool fullPath(std::wstring& dst, const std::wstring& path, const std::wstring& root)
+{
+	wchar_t fullpathbuf[MAX_PATH + 1];
+	wchar_t srcfullpath[MAX_PATH + 1];
+	std::wstring tmp = isRelativePath(path) ? root + path : path;
+	wcscpy(srcfullpath, tmp.c_str());
+	wchar_t* d = srcfullpath;
+	wchar_t* s = srcfullpath;
+	while (*s)
+	{
+		if (*s == '/')
+			*s = '\\';
+		*d++ = *s;
+
+		// Skip any repeated separator
+		if (*s == '\\')
+		{
+			s++;
+			while (*s && (*s == '\\' || *s == '/'))
+				s++;
+		}
+		else
+		{
+			s++;
+		}
+	}
+	*d = 0;
+
+	bool res = PathCanonicalizeW(fullpathbuf, srcfullpath) ? true : false;
+	if (res)
+		dst = fullpathbuf;
+	return res;
+}
+
+std::string prepareFilename(const SQChar* filename)
+{
+	std::wstring canonicalizedFilenameW;
+	fullPath(canonicalizedFilenameW, utf8_decode(filename), getCWD());
+	for (auto& c : canonicalizedFilenameW)
+		c = std::towlower(c);
+	std::string canonicalizedFilename = utf8_encode(canonicalizedFilenameW);
+	return canonicalizedFilename;
+}
+
+// RVF -
+
 SQRESULT sqstd_loadfile(HSQUIRRELVM v,const SQChar *filename,SQBool printerror)
 {
+	// RVF +
+	auto fname = prepareFilename(filename);
+	filename = fname.c_str();
+	// RVF -
+
 	SQFILE file = sqstd_fopen(filename,_SC("rb"));
 	SQInteger ret;
 	unsigned short us;

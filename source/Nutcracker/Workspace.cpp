@@ -546,9 +546,11 @@ bool Workspace::debuggerStart(FileId fileId)
 	m_debugSession->addBreakpointListeners.add(this, [this](int line, std::shared_ptr<const File> file)
 	{
 		auto brk = m_breakpoints.get(file, line);
-		brk->valid = true;
 		if (brk)
+		{
+			brk->valid = true;
 			fireEvent(BreakpointValidated(brk));
+		}
 	});
 
 	fireEvent(DataEventID::DebugStart, false);
@@ -913,7 +915,7 @@ void Workspace::doLoad(tinyxml2::XMLDocument& doc)
 			auto file = createFile(path);
 			if (!file)
 			{
-				czDebug(ID_Log, "Ignore invalid breakpoint: '%s':%d", path, line);
+				czDebug(ID_Log, "Ignoring invalid breakpoint: '%s':%d", path, line);
 				return;
 			}
 			addBreakpoint(file->id, line, -1, enabled);

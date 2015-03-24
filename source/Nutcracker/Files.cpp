@@ -26,7 +26,8 @@ FileId computeId(const UTF8String& str)
 BaseItem::BaseItem(Files* parent_, ItemType type_, UTF8String fullpath_, int level)
 	: parent(parent_), type(type_), fullpath(std::move(fullpath_)), level(level)
 {
-	id.val = FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes());
+	fullpath_lower = ansiToLower(fullpath);
+	id.val = FNVHash32::compute(fullpath_lower.c_str(), fullpath_lower.sizeBytes());
 }
 
 BaseItem::~BaseItem()
@@ -56,6 +57,7 @@ File::File(Files* parent_, UTF8String fullpath_, int level)
 {
 	auto fname = Filename(fullpath);
 	name = fname.getFilename();
+	name_lower = ansiToLower(name);
 	extension = ansiToLower(fname.getExtension());
 	filetime = cz::FileTime::get(fullpath, FileTime::kModified);
 	//czDebug(ID_Log, "%s (%s) : %u", fullpath.c_str(), name.c_str(), id.val);
@@ -79,6 +81,7 @@ Folder::Folder(Files* parent_, UTF8String fullpath_, int level)
 	: BaseItem(parent_, ItemType::Folder, std::move(fullpath_), level)
 {
 	name = Filesystem::getSingleton().pathStrip(fullpath);
+	name_lower = ansiToLower(name);
 }
 
 std::shared_ptr<Folder> Folder::create(Files* parent_, UTF8String fullpath_, int level)
@@ -153,7 +156,8 @@ void Files::addFolder(const UTF8String& path)
 		return;
 	}
 
-	FileId id(FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes()));
+	UTF8String fullpath_lower = ansiToLower(fullpath);
+	FileId id(FNVHash32::compute(fullpath_lower.c_str(), fullpath_lower.sizeBytes()));
 	if (m_all.find(id.val) != m_all.end())
 		return;
 
@@ -174,7 +178,8 @@ void Files::removeFolder(const UTF8String& path)
 		throw std::runtime_error(formatString("Error parsing folder '%s'", path.c_str()));
 	}
 
-	FileId id(FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes()));
+	UTF8String fullpath_lower = ansiToLower(fullpath);
+	FileId id(FNVHash32::compute(fullpath_lower.c_str(), fullpath_lower.sizeBytes()));
 	if (m_all.find(id.val) == m_all.end())
 		return;
 
@@ -194,19 +199,36 @@ std::shared_ptr<File> Files::createFileImpl(UTF8String path, int level)
 	if (!Filesystem::getSingleton().fullPath(fullpath, path))
 		throw std::runtime_error(formatString("Error parsing path '%s'", path.c_str()));
 
-	if (!Filesystem::getSingleton().isExistingFile(fullpath))
-		return nullptr;
 
-	// If this file is references somewhere (as for example a file editor window has it open, then use that
-	// object)
-	u32 id = FNVHash32::compute(fullpath.c_str(), fullpath.sizeBytes());
-	auto existing = m_all.find(id);
-	if (existing != m_all.end())
-		return std::static_pointer_cast<File>(existing->second.lock());
+	if (cz::Filename(fullpath).getDirectory() == "")
+	{
+		auto lower = ansiToLower(fullpath);
+		std::shared_ptr<const File> f;
+		iterateFiles([&](const std::shared_ptr<const File>& file)
+		{
+			if (file->name_lower == lower)
+				f = file;
+			return f == nullptr;
+		});
+		return std::const_pointer_cast<File>(f);
+	}
+	else
+	{
+		if (!Filesystem::getSingleton().isExistingFile(fullpath))
+			return nullptr;
 
-	auto f = File::create(this, std::move(fullpath), level);
-	m_all[f->id.val] = f;
-	return f;
+		// If this file is references somewhere (as for example a file editor window has it open, then use that
+		// object)
+		UTF8String fullpath_lower = ansiToLower(fullpath);
+		u32 id = FNVHash32::compute(fullpath_lower.c_str(), fullpath_lower.sizeBytes());
+		auto existing = m_all.find(id);
+		if (existing != m_all.end())
+			return std::static_pointer_cast<File>(existing->second.lock());
+
+		auto f = File::create(this, std::move(fullpath), level);
+		m_all[f->id.val] = f;
+		return f;
+	}
 }
 std::shared_ptr<File> Files::createFile(UTF8String path)
 {

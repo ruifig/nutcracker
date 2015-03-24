@@ -400,10 +400,7 @@ bool SQDbgServer::ParseBreakpoint(const char *msg,BreakPoint &out)
 	ep++;
 	while((*ep)!='\n' && (*ep)!='\0')
 	{
-		//*dest=tolower(*ep);
-		// RVF + : Preserve case
-		*dest = *ep;
-		// RVF -
+		*dest=tolower(*ep);
 		*dest++;*ep++;
 	}
 	*dest='\0';

@@ -49,9 +49,12 @@ FileEditorGroupWnd::FileEditorGroupWnd(wxWindow* parent, wxWindowID id, const wx
 		else if (evt.id == DataEventID::DebugBreak)
 		{
 			auto info = gWorkspace->debuggerGetBreakInfo();
-			gotoFile(info->file);
-			auto fwnd = findFileWnd(info->file, nullptr);
-			fwnd->syncBreakInfo(*info);
+			if (info->file)
+			{
+				gotoFile(info->file);
+				auto fwnd = findFileWnd(info->file, nullptr);
+				fwnd->syncBreakInfo(*info);
+			}
 		}
 	});
 }
@@ -152,9 +155,11 @@ void FileEditorGroupWnd::gotoFile(const std::shared_ptr<const File>& file, int l
 
 		//
 		// Not found, so create a new page
+		if (!cz::Filesystem::getSingleton().isExistingFile(file->fullpath))
+			throw std::runtime_error(cz::formatString("File '%s' not found", file->fullpath.c_str()));
+
 		w = new FileEditorWnd(m_notebook);
 		auto guard = cz::scopeGuard([w]{delete w; });
-
 		w->setFile(file, line, col);
 		m_notebook->AddPage(w, file->name.c_str(), true, -1);
 		auto pageIndex = m_notebook->GetPageIndex(w);
