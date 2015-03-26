@@ -1,0 +1,28 @@
+sources=sqapi.cpp \
+        sqbaselib.cpp \
+        sqclass.cpp \
+        sqcompiler.cpp \
+        sqdebug.cpp \
+        sqfuncstate.cpp \
+        sqlexer.cpp \
+        sqmem.cpp \
+        sqobject.cpp \
+        sqstate.cpp \
+        sqtable.cpp \
+        sqvm.cpp
+objects=$(sources:.cpp=.obj)
+target_dir=..\lib
+target=$(target_dir)\squirrel.lib
+
+!include ..\build\msvc.inc
+
+all:
+	$(mkoutdir)
+	$(CC) $(CFLAGS) $(DEFINES) $(sources) $(INCLUDES)
+	$(AR) $(ARFLAGS) /OUT:"$(target)" $(objects)
+
+clean:
+	$(RM) $(objects)
+
+distclean: clean
+	$(RM) "$(target)"

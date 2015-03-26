@@ -1,0 +1,31 @@
+sources=base.cpp \
+        file.cpp \
+        hash.cpp \
+        hash_adler32.cpp \
+        hash_crc32.cpp \
+        hash_md5.cpp \
+        io.cpp \
+        main.cpp \
+        math.cpp \
+        regexp.cpp \
+        util.cpp
+objects=$(sources:.cpp=.obj) shell.res
+target_dir=..\bin
+target=$(target_dir)\squirrelsh.exe
+manifestfile=shell.manifest
+rcname=shell.rc
+
+!include ..\build\msvc.inc
+
+all:
+	$(mkoutdir)
+	$(CXX) $(CXXFLAGS) $(DEFINES) $(sources) $(INCLUDES)
+	$(RC) $(RCFLAGS) $(DEFINES) /fo shell.res $(rcname)
+	$(LINK) $(LFLAGS) /OUT:"$(target)" $(objects) $(LIBS)
+	$(EMBED_MANIFEST)
+
+clean:
+	$(RM) $(objects) $(manifestfile)
+
+distclean: clean
+	$(RM) "$(target)"

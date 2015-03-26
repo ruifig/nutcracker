@@ -1,0 +1,58 @@
+sources=pcre_byte_order.c \
+        pcre_chartables.c \
+        pcre_compile.c \
+        pcre_config.c \
+        pcre_dfa_exec.c \
+        pcre_exec.c \
+        pcre_fullinfo.c \
+        pcre_get.c \
+        pcre_globals.c \
+        pcre_jit_compile.c \
+        pcre_maketables.c \
+        pcre_newline.c \
+        pcre_ord2utf8.c \
+        pcre_refcount.c \
+        pcre_study.c \
+        pcre_tables.c \
+        pcre_ucd.c \
+        pcre_valid_utf8.c \
+        pcre_version.c \
+        pcre_xclass.c
+objects=$(sources:.c=.o)
+target_dir=../lib
+target=$(target_dir)/libpcre.a
+
+include ../build/mingw.inc
+
+DEFINES:=$(DEFINES) -DHAVE_CONFIG_H
+
+all: $(objects)
+	$(mkoutdir)
+	$(AR) "$(target)" $(objects)
+
+clean:
+	$(RM) $(objects)
+
+distclean: clean
+	$(RM) "$(target)"
+
+pcre_byte_order.o: pcre_byte_order.c pcre_internal.h config.h pcre.h ucp.h
+pcre_chartables.o: pcre_chartables.c pcre_internal.h config.h pcre.h ucp.h
+pcre_compile.o: pcre_compile.c pcre_internal.h config.h pcre.h ucp.h
+pcre_config.o: pcre_config.c pcre_internal.h config.h pcre.h ucp.h
+pcre_dfa_exec.o: pcre_dfa_exec.c pcre_internal.h config.h pcre.h ucp.h
+pcre_exec.o: pcre_exec.c pcre_internal.h config.h pcre.h ucp.h
+pcre_fullinfo.o: pcre_fullinfo.c pcre_internal.h config.h pcre.h ucp.h
+pcre_get.o: pcre_get.c pcre_internal.h config.h pcre.h ucp.h
+pcre_globals.o: pcre_globals.c pcre_internal.h config.h pcre.h ucp.h
+pcre_jit_compile.o: pcre_jit_compile.c pcre_internal.h config.h pcre.h ucp.h
+pcre_maketables.o: pcre_maketables.c pcre_internal.h config.h pcre.h ucp.h
+pcre_newline.o: pcre_newline.c pcre_internal.h config.h pcre.h ucp.h
+pcre_ord2utf8.o: pcre_ord2utf8.c pcre_internal.h config.h pcre.h ucp.h
+pcre_refcount.o: pcre_refcount.c pcre_internal.h config.h pcre.h ucp.h
+pcre_study.o: pcre_study.c pcre_internal.h config.h pcre.h ucp.h
+pcre_tables.o: pcre_tables.c pcre_internal.h config.h pcre.h ucp.h
+pcre_ucd.o: pcre_ucd.c pcre_internal.h config.h pcre.h ucp.h
+pcre_valid_utf8.o: pcre_valid_utf8.c pcre_internal.h config.h pcre.h ucp.h
+pcre_version.o: pcre_version.c pcre_internal.h config.h pcre.h ucp.h
+pcre_xclass.o: pcre_xclass.c pcre_internal.h config.h pcre.h ucp.h

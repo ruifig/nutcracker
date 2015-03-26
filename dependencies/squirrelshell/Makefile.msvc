@@ -1,0 +1,35 @@
+bindir=$(MAKEDIR:\=\\)\\bin
+regfile=squirrelsh-install.reg
+
+!include build\msvc.inc
+
+all:
+	@cd pcre && $(MAKE) -nologo -f Makefile.msvc DEBUG="$(DEBUG)" X64="$(X64)"
+	@cd squirrel && $(MAKE) -nologo -f Makefile.msvc DEBUG="$(DEBUG)" X64="$(X64)"
+	@cd shell && $(MAKE) -nologo -f Makefile.msvc DEBUG="$(DEBUG)" X64="$(X64)"
+
+clean:
+	@cd pcre && $(MAKE) -nologo -f Makefile.msvc $@
+	@cd squirrel && $(MAKE) -nologo -f Makefile.msvc $@
+	@cd shell && $(MAKE) -nologo -f Makefile.msvc $@
+
+distclean:
+	@cd pcre && $(MAKE) -nologo -f Makefile.msvc $@
+	@cd squirrel && $(MAKE) -nologo -f Makefile.msvc $@
+	@cd shell && $(MAKE) -nologo -f Makefile.msvc $@
+
+install: .FORCE
+	@echo Windows Registry Editor Version 5.00 >$(regfile)
+	@echo [HKEY_CLASSES_ROOT\.nut] >>$(regfile)
+	@echo @="Squirrel.Script" >>$(regfile)
+	@echo [HKEY_CLASSES_ROOT\Squirrel.Script] >>$(regfile)
+	@echo @="Squirrel Script" >>$(regfile)
+	@echo [HKEY_CLASSES_ROOT\Squirrel.Script\shell\open\command] >>$(regfile)
+	@echo @="\"$(bindir)\\squirrelsh.exe\" \"%1\" %*" >>$(regfile)
+	@echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\squirrelsh.exe] >>$(regfile)
+	@echo @="$(bindir)\\squirrelsh.exe" >>$(regfile)
+	@echo Path="$(bindir)" >>$(regfile)
+	@regedit $(regfile)
+	@$(RM) $(regfile)
+
+.FORCE:

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+DATE_AND_TIME=`date -R`
+
+sed "s/DATE_AND_TIME/${DATE_AND_TIME}/" debian/changelog.in >debian/changelog
+sed "s/DATE_AND_TIME/${DATE_AND_TIME}/" debian/copyright.in >debian/copyright
+
+if [ "`dpkg --print-architecture`" = "alpha" ]; then
+	if [ -f Makefile ]; then make distclean; fi
+	dh_clean
+	dpkg-buildpackage -b -tc -rfakeroot
+else
+	[ -f Makefile ] && make distclean
+	dh_clean
+	dpkg-buildpackage -b -tc -rfakeroot -ai386
+
+	[ -f Makefile ] && make distclean
+	dh_clean
+	dpkg-buildpackage -b -tc -rfakeroot -aamd64
+fi
+
+#rm -f debian/changelog debian/copyright

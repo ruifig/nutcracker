@@ -1,0 +1,198 @@
+Squirrel Shell Version History
+==============================
+
+* 1.2.7, Oct 24, 2012:
+  - Changed: Updated PCRE to version 8.31.
+  - Changed: Updated Squirrel to version 3.0.3.
+
+* 1.2.6, Dec 17, 2011:
+  - Changed: Updated PCRE to version 8.20.
+  - Changed: Updated Squirrel to version 3.0.2.
+
+* 1.2.5, Sep 26, 2010:
+  - Added:   Path to the current working directory is printed in the
+             interactive mode command prompt.
+  - Fixed:   (Windows version only)
+             run() function no longer hangs when the child process produces a
+             lot of output with stream redirection being enabled (thanks to
+             Alexander Yakshin for the bug report).
+  - Changed: run() function now accepts 'null' and string values in the 'args'
+             parameter.
+  - Removed old unused code.
+
+* 1.2.4, Aug 30, 2010:
+  - Added:   Support of dynamic (DLL) version of Visual C++ run-time library.
+  - Added:   Support of system-wide Squirrel library.
+  - Fixed:   "--with-libraries" option of the configuration script was useless
+             due to a typo (bug #2985071).
+  - Fixed:   configure-mime no longer causes unnecessary errors.
+  - Changed: Finally removed functions that were marked as deprecated in
+             previous versions.
+  - Changed: Updated PCRE to version 8.02.
+  - Changed: Updated Squirrel to version 2.2.4.
+  - Changed: Moved to Visual Studio 2010.
+
+* 1.2.3, Feb 26, 2009:
+  - Added:   regmatch() function now supports uncompiled regular expressions.
+  - Fixed:   Squirrel Shell can now be compiled on Mac OS X (thanks to Michal
+             Tomlein).
+  - Fixed:   run() function doesn't modify the arguments array anymore
+             (bug was reported by Michal Tomlein).
+  - Changed: Squirrel Shell will not close if any of its
+             constants/variables/functions couldn't be created.
+
+* 1.2.2, Oct 11, 2008:
+  - Fixed:   Removed broken calls to configure-mime from shell/Makefile.
+  - Changed: Updated PCRE to version 7.8.
+  - Changed: Updated Squirrel to version 2.2.2.
+  - Changed: Documentation is now using Liberation fonts.
+
+* 1.2.1, Apr 1, 2008:
+  - Added:   More descriptive parameter values for scan() and fscan()
+             functions:
+             TEXT, CHAR, INT, UINT, FLOAT.
+  - Changed: Updated PCRE to version 7.6.
+  - Changed: Updated Squirrel to version 2.2.
+  - Changed: Constants are now read-only.
+  - Changed: setenv() function doesn't change variables permanently anymore.
+             This is safer and more "standard" behavior.
+  - Changed: Marked some functions and values as deprecated in the documentation.
+  - Changed: Squirrel Shell is now distributed under GPL version 3.
+  - Made the source code a bit cleaner and better formatted.
+
+* 1.2, Jun 18, 2007:
+  - Added:   fprintl() function.
+  - Added:   regcompile(), regmatch(), regfree(), regfreeall() and regerror()
+             functions.
+  - Fixed:   Passing null as 'redirIn' parameter for run() function.
+  - Fixed:   readdir() function truncated path at the first slash.
+  - Fixed:   Floating point numbers staring with integer part equal to zero
+             (for example, 0.123) were treated as octal integers.
+  - Fixed:   Documentation for printl() function.
+  - Fixed:   Potential buffer overflow in scan() and fscan() functions.
+  - Fixed:   substr() returned one redundant character.
+  - Changed: Leading and trailing spaces in paths are removed.
+  - Changed: SQUIRREL_VERSION is now "2.1.3.1".
+  - Changed: Internal buffer for scan() and fscan() functions has size of
+             4 KiB.
+  - Changed: Removed .dummy files.
+  - Changed: Source code is no longer included in the installer.
+
+* 1.1.2007, Dec 31, 2006:
+  - Added:   Copying of file timestamps and permissions.
+  - Added:   Recursive removing of directories.
+  - Added:   setfiletime() function.
+  - Fixed:   Incorrect behavior of rmdir() function with path without trailing
+             (back)slash.
+  - Fixed:   Better date validation.
+  - Changed: Error messages are displayed in red color.
+  - Changed: chown() and chgrp() functions don't display error messages.
+
+* 1.1.2, Dec 26, 2006:
+  - Added: cpuarch() function and CPU_ARCH global variable.
+  - Added: More platforms and CPU architectures.
+  - Fixed: mkdir() with omitted mode argument created directories with
+           permissions set to 000.
+  - Fixed: filepath() returns "." when path does not contain directories
+           (for example, filepath("foo")).
+
+* 1.1, Dec 25, 2006:
+  - Added:   Octal integer numbers are now supported.
+  - Added:   chmod() and mkdir() functions with numerical mode parameter;
+             filetime(), strtime(), utctolocal(), localtoutc(), mktime(),
+             systime() and localtime() functions.
+  - Changed: An exception is thrown if number of function parameters or their
+             types are invalid.
+  - Changed: SQUIRREL_VERSION is now "2.1.3".
+
+* 1.0, Nov 28, 2006:
+  - Added:   Icon.
+  - Fixed:   tanh() function is now available on all platforms.
+  - Changed: Changed compilation options to balance code speed and size.
+  - Changed: Moved to Visual Studio 2005.
+
+* 1.0rc2, Nov 1, 2006:
+  - Added:   Ability to exit from the script with "return x;", where x is exit
+             code.
+  - Added:   Mathematical constants PI, E, RADIANS_IN_DEGREE,
+             DEGREES_IN_RADIAN.
+  - Added:   Input/output/error streams redirection for child processes.
+  - Added:   64-bit Linux support.
+  - Changed: Updated Squirrel to version 2.1.1.
+
+* 1.0rc1, Jun 28, 2006:
+  - Added:   md5(), crc32(), adler32() and exit() functions.
+  - Added:   Interactive mode.
+  - Fixed:   (Windows version only)
+             Changed method for retrieving the path to user's home directory,
+             so the shell now should work on Windows NT 4.0 SP6. Don't know if
+             this has broken Windows 9x compatibility.
+  - Fixed:   (Windows version only)
+             If failed to get the path to user's home directory, "c:" will be
+             used instead.
+
+* 0.9.4b, May 29, 2006:
+  - Added:   printl() function.
+  - Added:   "-s" command line option.
+  - Fixed:   Source tarball missed math.cpp.
+  - Fixed:   "-v" command line option now doesn't cause no-file-specified
+             error.
+  - Changed: Updated Squirrel to version 2.1.
+  - Changed: Better OS detection, not just "win32" and "linux".
+  - Changed: "-d" command line option is now deprecated and silently ignored.
+  - Changed: archive.nut now creates source .tar.bz2 by default.
+
+* 0.9b, Apr 8, 2006:
+  - Fixed:   (Windows version only)
+             run() function couldn't execute programs from 'PATH' environment
+             variable.
+  - Fixed:   copy() function in *nix version of shell now works correctly.
+  - Changed: move() now uses native OS's file moving function instead of old
+             copy-and-delete method. This should resolve problem when there's
+             no free space for another instance of the file.
+
+* 0.8b, Jan 28, 2006:
+  - Added:   'PLATFORM' constant. Values are the same as ones returned by the
+             platform() function.
+  - Added:   Symbolic access modes for fopen() function.
+  - Added:   readdir() function.
+  - Added:   filetype() function.
+  - Added:   Mathematical functions (deg2rad(), rad2deg(), sin(), sinh(),
+             cos(), cosh(), tan(), tanh(), asin(), acos(), atan(), floor(),
+             ceil(), pow(), exp(), sqrt(), rsqrt(), log(), log10()).
+  - Added:   Added some examples.
+
+* 0.7a, Jan 22, 2006:
+  - Added:   In Windows tilde as the first character in path is replaced with
+             current user's directory ("c:\Documents and Settings\*" in
+             WinNT).
+  - Added:   strchar() function.
+  - Added:   substr() function.
+  - Added:   filepath() function.
+  - Added:   filename() function.
+  - Added:   fileext() function.
+  - Added:   Wrote documentation (doc/squirrelsh.pdf).
+
+* 0.6.1a, Jan 18, 2006:
+  - Added:   Provided shell and Squirrel version numbers to scripts. These
+             values are in 'SHELL_VERSION' and 'SQUIRREL_VERSION' variables,
+             respectively.
+  - Added:   chmod() function.
+  - Added:   chown() function.
+  - Added:   chgrp() function.
+  - Fixed:   (Windows version only)
+             run() function added ".exe" to path even if path already
+             contained file extension.
+  - Fixed:   Function "platform" was mentioned in functions.txt, but in the
+             code it had old name "getos".
+  - Changed: Parameter 'mode' in mkdir() and chmod() is a string due to lack
+             of octal numbers in Squirrel. This parameter still must contain
+             octal permissions, but in text representation:
+             mkdir("somedir", "755"),
+             chmod("somefile", "664").
+
+* 0.5.2a, Jan 17 2006:
+  - First public release.
+
+======================================================
+Copyright (c) 2006-2012, Constantin Makshin

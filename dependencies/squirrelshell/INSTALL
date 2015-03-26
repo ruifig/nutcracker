@@ -1,0 +1,73 @@
+Squirrel Shell 1.2.7 Installation Instructions
+==============================================
+
+This version of Squirrel Shell was tested on these systems:
+Linux   - Debian GNU/Linux x86_64 (gcc 4.7.1)
+Windows - Windows 7 Professional x64 (Visual C++ 2010 Express)
+
+Unix
+----
+For pre-compiled version of the shell:
+1. Run "sh squirrelsh-1.2.7.run". All required actions will be performed
+   automatically.
+
+For pre-compiled distribution-specific packages:
+1. Follow instructions for your distribution packages manager.
+
+For source code archive:
+1. Unpack archive to a directory accessible during compilation.
+   Make sure that directories structure is preserved.
+2. Run "./configure" to create makefiles. Run "./configure --help" to see
+   information about supported compilation options.
+3. If configuration process completed successfully, run "make" to compile
+   Squirrel Shell.
+4. Run "make install" to install Squirrel Shell on your computer. You may need
+   root privileges to perform this step.
+
+Microsoft Windows
+-----------------
+For pre-compiled version of the shell:
+1. Run the installer and follow its instructions.
+
+For source code archive:
+1. Unpack archive to a directory accessible during compilation.
+   Make sure that directories structure is preserved.
+2. Using MinGW makefiles:
+   1. Run "mingw32-make -f Makefile.mingw" to compile release version of
+      Squirrel Shell or "mingw32-make -f Makefile.mingw DEBUG=y" to compile
+      debug version.
+   2. Run "mingw32-make -f Makefile.mingw install" to associate "nut" file
+      extension with Squirrel Shell.
+      Note: mingw32-make returns current directory with forward slashes as
+      path separator and does not allow substitution in the middle of
+      variable, so created association may not work as intended.
+
+   Using Visual Studio makefiles:
+   1. Run "nmake -f Makefile.msvc" to compile 32-bit release version of
+      Squirrel Shell or "nmake -f Makefile.msvc DEBUG=y" to compile 32-bit
+      debug version.
+      If you have 64-bit AMD or Intel processor and your compiler supports it,
+      you can also specify "X64=y" to compile 64-bit version of the shell.
+      If you want to use dynamic (DLL) version of run-time library, use the
+      "DYNAMIC_CRT=y" option.
+   2. Run "nmake -f Makefile.msvc install" to associate "nut" file extension
+      with Squirrel Shell.
+
+   Using Visual Studio 2003 project files:
+   1. Open "squirrelsh_vs71.sln", select build target and click
+      "Build Solution" item in "Build" menu.
+
+   Using Visual Studio 2005 project files:
+   1. Open "squirrelsh_vs8.sln", select build target and CPU architecture and click
+      "Build Solution" item in "Build" menu.
+
+   Using Visual Studio 2008 project files:
+   1. Open "squirrelsh_vs9.sln", select build target and CPU architecture and click
+      "Build Solution" item in "Build" menu.
+
+   Using Visual C++ 2010 Express project files:
+   1. Open "squirrelsh.sln", select build target and CPU architecture and click
+      "Build Solution" item in "Build" menu.
+
+===========================================
+Copyright (c) 2006-2012, Constantin Makshin

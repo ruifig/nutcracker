@@ -1,0 +1,1934 @@
+\documentclass[a4paper, 10pt, titlepage]{article}
+\usepackage[left=2cm, right=1cm, top=1cm, bottom=2cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\usepackage{mdwlist}
+\usepackage{parskip}
+\renewcommand{\familydefault}{\sfdefault}
+
+\title{Squirrel Shell 1.2.7 \\ User Manual}
+\author{Constantin Makshin}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\pagebreak
+
+\section{Overview}
+
+Squirrel Shell (shorter name --- squirrelsh) is a cross-platform alternative to system shells like bash in *nix and cmd.exe (command.com) in Microsoft Windows. It is based on Squirrel scripting language.
+
+Cross-platform nature of Squirrel Shell lets users write one script and use it everywhere instead of writing several scripts for doing the same thing, but in different OSes.
+
+Squirrel is a general-purpose scripting language with the following features:
+\begin{itemize*}
+\item object-oriented programming;
+\item C++-like syntax;
+\item dynamic typing;
+\item delegation;
+\item generators;
+\item exception handling;
+\item weak references;
+\item more on \url{http://www.squirrel-lang.org}.
+\end{itemize*}
+
+Starting with version 1.0rc1, this shell supports interactive mode. Squirrel Shell 1.0rc2 and newer support input, output and error streams redirection for child processes. Squirrel Shell 1.2.6 is based on version 3 of the Squirrel language.
+
+\section{License Agreement}
+
+Squirrel Shell is distributed under the terms of GNU GPLv3 license. Look file ``COPYING'' for details.
+
+MD5 hash calculation code \copyright Colin Plumb
+
+PCRE is distributed under the terms of BSD license. See file ``COPYING-pcre'' for details.
+
+Squirrel is distributed under the terms of zlib license. See file ``COPYING-squirrel'' for details.
+
+Parts of zlib library are distributed under the terms of zlib license. See file ``COPYING-zlib'' for details.
+
+\section{Installation}
+
+\subsection{GNU/Linux and other Unix-like systems}
+
+If you have downloaded the self-executable installer (i.e. ``squirrelsh-1.2.7.run''), then just do \\
+\texttt{sh ./squirrelsh-1.2.7.run}.
+
+For source archive unpack its contents to some temporary directory and do \\
+\texttt{./configure \&\& make} \\
+You can run \\
+\texttt{./configure {-}{-}help} \\
+to see available compilation options. If compilation process completes without any errors, run \\
+\texttt{make install}
+
+You may need root privileges to install Squirrel Shell.
+
+\subsection{Microsoft Windows}
+
+If you have downloaded the self-executable installer (i.e. ``squirrelsh-1.2.7.exe''), then just run it and follow its instructions. You may need admin privileges to perform this operation.
+
+If you have downloaded source archive and want to compile shell by yourself, there are:
+\begin{itemize*}
+\item Visual C++ 2010 Express solution ``squirrelsh.sln'';
+\item Visual Studio 2008 solution ``squirrelsh\_vs9.sln'';
+\item Visual Studio 2005 solution ``squirrelsh\_vs8.sln'';
+\item Visual Studio 2003 solution ``squirrelsh\_vs71.sln'';
+\item MinGW makefile ``Makefile.mingw'';
+\item NMake makefile ``Makefile.msvc''.
+\end{itemize*}
+
+\section{Scripting Reference}
+
+\subsection{Notes}
+
+Squirrel is language with dynamic typing, but the following types are used within this document to describe type of data to be passed as function parameters:
+\begin{itemize*}
+\item \texttt{array} --- array of valued of specified type;
+\item \texttt{bool} --- boolean value;
+\item \texttt{handle} --- handle of opened file or compiled regular expression;
+\item \texttt{integer} --- integer number;
+\item \texttt{float} --- floating point number;
+\item \texttt{string} --- text string;
+\item \texttt{string\_array} --- array of string values;
+\item \texttt{variant} --- value whose type depends on some circumstances.
+\end{itemize*}
+
+Detailed description of types mentioned above (except \texttt{string\_array}) can be found in \textbf{Squirrel Reference Manual}.
+
+All functions that expect paths as their parameters accept them both in *nix format (with slashes as delimiters) and in DOS format (with backslashes as delimiters). But paths that are returned by functions are in *nix format unless format is specified explicitly.
+
+Long file names are supported, but full paths cannot be longer than 260 characters. This number is the limit for most file-related functions in Windows API.
+
+In *nix systems, if you're running script directly from your shell, line feeds must be in *nix format (LF). This is a limitation of the OS. Else your system will complain that it cannot find the script interpreter.
+
+Use of functions and values marked as deprecated is not recommended since they may be removed at any time. Consider updating your scripts.
+
+\subsection{Functions}
+
+\subsubsection{acos}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float acos (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculate arccosine of \texttt{x}.
+
+\textbf{Return Values}
+
+The function returns arccosine of \texttt{x}. The returned angle is in radians.
+
+\subsubsection{adler32}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string adler32 (string path, integer from = 0, integer to = -1);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates Adler32 checksum of a block of file \texttt{path}. This block begins at \texttt{from} and ends at \texttt{to}.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to file whose block's checksum should be calculated.
+
+\item \texttt{from}
+
+First byte (offset) of block for checksum calculation. If this parameter is less than or equal to zero, data is read from the file beginning.
+
+\item \texttt{to}
+
+Last byte (offset) of block for checksum calculation. If this parameter is less than zero or greater than size of the file, data is read until end of file is reached. If this parameter is greater than zero, but less than or equal to \texttt{from}, the function fails.
+\end{itemize}
+
+\textbf{Return Values}
+
+If the function succeeds, it returns string representation of the calculated checksum in hexadecimal. Else ``\texttt{00000000}'' (string of zeroes) is returned.
+
+\subsubsection{asin}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float asin (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates arc sine of \texttt{x}.
+
+\textbf{Return Values}
+
+The return value is the arc sine of \texttt{x}. The returned angle is in radians.
+
+\subsubsection{atan}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float atan (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates arc tangent of \texttt{x}.
+
+\textbf{Return Values}
+
+The return value is arc tangent of \texttt{x} measured in radians.
+
+\subsubsection{ceil}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float ceil (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Finds the smallest integer greater than or equal to \texttt{x}.
+
+\textbf{Return Values}
+
+The function returns the smallest integer greater than or equal to \texttt{x}.
+
+\subsubsection{chdir}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+bool chdir (string path);
+\end{verbatim}
+
+\textbf{Description}
+
+Sets current working directory. This function is an equivalent to the ``\texttt{cd}'' command in other shells.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to directory that should be made current.
+\end{itemize}
+
+\textbf{Return Values}
+
+If the function succeeds, it returns \texttt{true}. Else the return value is \texttt{false}.
+
+\subsubsection{chgrp}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+chgrp (string path, string group);
+\end{verbatim}
+
+\textbf{Description}
+
+Changes group of a file or directory. This function is an equivalent to the ``\texttt{chgrp}'' command in *nix and has no effect on other systems.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the file or directory whose group should be changed.
+
+\item \texttt{group}
+
+Name of the group that will own \texttt{path}.
+\end{itemize}
+
+\subsubsection{chmod}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+chmod (string path, integer mode);
+\end{verbatim}
+
+\textbf{Description}
+
+Changes access permissions of a file or directory. This function is an equivalent to the ``\texttt{chmod}'' command in *nix and has no effect on other systems.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the file or directory whose permissions should be changed.
+
+\item \texttt{mode}
+
+New access permissions that should be set to \texttt{path}.
+\end{itemize}
+
+\subsubsection{chown}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+chown (string path, string owner);
+\end{verbatim}
+
+\textbf{Description}
+
+Changes owner of a file or directory. This function is an equivalent to the ``\texttt{chown}'' command in *nix and has no effect on other systems.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the file or directory whose owner should be changed.
+
+\item \texttt{owner}
+
+New owner of \texttt{path}.
+\end{itemize}
+
+\subsubsection{clear}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+clear ();
+\end{verbatim}
+
+\textbf{Description}
+
+Clears console. This is an equivalent to the ``\texttt{clear}'' command in *nix and ``\texttt{cls}'' in Microsoft Windows.
+
+\subsubsection{convpath}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string convpath (string path, bool toNative);
+\end{verbatim}
+
+\textbf{Description}
+
+Converts path to either OS's native or *nix format.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path that should be converted.
+
+\item \texttt{toNative}
+
+If this parameter is \texttt{true}, path should be converted to OS's native format. Else path should be converted to *nix format.
+\end{itemize}
+
+\textbf{Return Values}
+
+If the function succeeds, the return value contains converted path.
+
+If the function fails, the return value is \texttt{null}.
+
+\subsubsection{copy}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+copy (string source, string destination, bool overwrite = false);
+\end{verbatim}
+
+\textbf{Description}
+
+Copies one file to another. This function is an equivalent to the ``\texttt{cp}'' command in *nix and ``\texttt{copy}'' in Microsoft Windows.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{source}
+
+Path to the source file. Must not point to a directory.
+
+\item \texttt{destination}
+
+Path to the destination file. Must not point to a directory, but the file must be in an existing one.
+
+\item \texttt{overwrite}
+
+If this parameter is \texttt{false} and the destination file already exists, the function will return without copying any data. Else existing files will be overwritten.
+\end{itemize}
+
+\subsubsection{cos}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float cos (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates cosine of \texttt{x}.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{x}
+
+Angle in radians whose cosine should be calculated.
+\end{itemize}
+
+\textbf{Return Values}
+
+The return value is the cosine of \texttt{x}.
+
+\subsubsection{cosh}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float cosh (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates hyperbolic cosine of \texttt{x}.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{x}
+
+Angle in radians whose hyperbolic cosine should be calculated.
+\end{itemize}
+
+\textbf{Return Values}
+
+The function returns the hyperbolic cosine of \texttt{x}.
+
+\subsubsection{cpuarch}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string cpuarch ();
+\end{verbatim}
+
+\textbf{Description}
+
+Get CPU architecture the shell was compiled for.
+
+\textbf{Return Values}
+
+The function returns one of these values:
+\begin{itemize*}
+\item ``\texttt{alpha}'' --- DEC Alpha;
+\item ``\texttt{arm}'' --- ARM;
+\item ``\texttt{hppa}'' --- HP/PA RISC;
+\item ``\texttt{ia64}'' --- Intel Itanium;
+\item ``\texttt{mips}'' --- MIPS;
+\item ``\texttt{ppc}'' --- PowerPC;
+\item ``\texttt{sparc}'' --- SPARC;
+\item ``\texttt{x86}'' --- 16-bit or 32-bit Intel or compatible;
+\item ``\texttt{x64}'' --- 64-bit AMD or compatible;
+\item ``\texttt{unknown}'' --- none of the above.
+\end{itemize*}
+
+This function never fails.
+
+\subsubsection{crc32}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string crc32 (string path, integer from = 0, integer to = -1);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates CRC32 checksum for a block of file \texttt{path}. This block begins at \texttt{from} and ends at \texttt{to}.
+
+\textbf{Parameters}
+
+Parameters are the same as for the \texttt{adler32()} function.
+
+\textbf{Return Values}
+
+Return values are the same as for the \texttt{adler32()} function.
+
+\subsubsection{deg2rad}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float deg2rad (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Converts angle \texttt{x} from degrees to radians.
+
+\textbf{Return Values}
+
+The function returns converted angle.
+
+\subsubsection{delenv}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+delenv (string name);
+\end{verbatim}
+
+\textbf{Description}
+
+Deletes specified environment variable.
+
+\textbf{Notes}
+
+Staring with version 1.2.1, changes made by this function are not permanent, i.e. system environment variables are not modified and all changes are lost when Squirrel Shell is closed.
+
+\subsubsection{exist}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+bool exist (string path);
+\end{verbatim}
+
+\textbf{Description}
+
+Checks whether the file or directory at \texttt{path} exists or not.
+
+\textbf{Return Values}
+
+If the file or directory at \texttt{path} exists, the function returns \texttt{true}. Else the return value is \texttt{false}.
+
+\subsubsection{exit}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+exit (integer code = 0);
+\end{verbatim}
+
+\textbf{Description}
+
+Closes the shell with specified exit code.
+
+\subsubsection{exp}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float exp (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates exponential value of \texttt{x} ($e^x$).
+
+\textbf{Return Values}
+
+The function returns the exponential value of \texttt{x}.
+
+\subsubsection{fclose}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+fclose (handle file);
+\end{verbatim}
+
+\textbf{Description}
+
+Closes opened file.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{file}
+
+Handle of the file that should be closed. This must be a handle returned by the \texttt{fopen()} function.
+\end{itemize}
+
+\subsubsection{fcloseall}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+fcloseall ();
+\end{verbatim}
+
+\textbf{Description}
+
+Closes all opened files.
+
+\textbf{Notes}
+
+All files that remain opened after the script exits are closed automatically. Though, leaving files opened when they aren't needed anymore isn't recommended, as this leads to a waste of system resources.
+
+\subsubsection{fileext}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string fileext (string path);
+\end{verbatim}
+
+\textbf{Description}
+
+Extracts the extension of a file at \texttt{path}.
+
+\textbf{Return Values}
+
+The function returns extracted extension without period that separates file's name and extension. For example,
+\texttt{fileext(``./i/am/the.file'')} will return ``\texttt{file}''.
+
+\subsubsection{filename}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string filename (string path, bool ext = false);
+\end{verbatim}
+
+\textbf{Description}
+
+Extracts the name of a file at \texttt{path}. Returned string may or may not contain file's extension, depending on the value of the \texttt{ext} parameter.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the file whose name should be extracted.
+
+\item \texttt{ext}
+
+If this parameter is \texttt{true}, the return value will contain file's extension (\texttt{filename(``./i/am/a.file'', true)} will return `\texttt{`a.file}''). Else only the name will be returned (\texttt{filename(``./i/am/a.file'')} will return ``\texttt{a}'').
+\end{itemize}
+
+\textbf{Return Values}
+
+The function returns name with or without extension of the specified file.
+
+\subsubsection{filepath}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string filepath (string path);
+\end{verbatim}
+
+\textbf{Description}
+
+Extracts path to a directory with file (everything before the last path delimiter).
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to file whose directory's path should be extracted.
+\end{itemize}
+
+\textbf{Return Values}
+
+% NOTE: The linebreak is here to avoid the ``Overfull \hbox in paragraph'' LaTeX error
+The function returns path to the directory which contains file \texttt{path} without trailing delimiter. For example, \\ \texttt{filepath(``./i/am/a.file'')} will return ``\texttt{./i/am}''.
+
+\subsubsection{filetime}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer filetime (string path, integer which = MODIFICATION);
+\end{verbatim}
+
+\textbf{Description}
+
+Retrieves date and time of creation, last access, last modification or last change of a file or directory.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the file or directory whose date and time should be retrieved.
+
+\item \texttt{which}
+
+Specifies which date and time should be retrieved. Can be one of the following values:
+\begin{itemize*}
+\item \texttt{CREATION} --- date and time when the entry was created;
+\item \texttt{ACCESS} --- date and time when the entry was last accessed;
+\item \texttt{MODIFICATION} --- date and time when the entry contents were modified;
+\item \texttt{CHANGE} --- date and time when the entry properties (like owner, group, etc.) was changed.
+\end{itemize*}
+\end{itemize}
+
+\textbf{Return Values}
+
+If the function succeeds, it returns date and time when the specified action was performed on \texttt{path}. The returned time is in UTC. To convert it to local time, pass this value to the \texttt{utctolocal()} function.
+
+If the function fails, the return value is \texttt{0} (zero).
+
+\subsubsection{filetype}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer filetype (string path);
+\end{verbatim}
+
+\textbf{Description}
+
+Retrieves type of the specified directory entry.
+
+\textbf{Return Values}
+
+The function returns one of these values:
+\begin{itemize*}
+\item \texttt{0} --- the function failed;
+\item \texttt{DIR} --- \texttt{path} points to a directory;
+\item \texttt{FILE} --- \texttt{path} points to a file or symbolic link.
+\end{itemize*}
+
+\subsubsection{floor}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float floor (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Find largest integer less than or equal to \texttt{x}.
+
+\textbf{Return Values}
+
+The function returns the largest integer less than or equal to \texttt{x}.
+
+\subsubsection{fopen}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+handle fopen (string path, string mode);
+\end{verbatim}
+
+\textbf{Description}
+
+Opens file.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the file that should be opened.
+
+\item \texttt{mode}
+
+Access mode. These modes are supported:
+\begin{itemize*}
+\item \texttt{READ\_ONLY} --- open for reading only (the file must exist);
+\item \texttt{WRITE\_ONLY} --- open for writing only;
+\item \texttt{READ\_WRITE} --- open for both reading and writing (the file must exist);
+\item \texttt{APPEND} --- open for writing data to the end of file.
+\end{itemize*}
+
+Modes accepted by the \texttt{fopen()} standard C library function (\texttt{``r''}, \texttt{``w''}, \texttt{``a''}, \texttt{``r+''}, \texttt{``w+''}, \texttt{``a+''}) are also supported, but should not be used.
+\end{itemize}
+
+\textbf{Return Values}
+
+If the function succeeds, the return value will contain handle of the opened file. Else \texttt{null} is returned.
+
+\subsubsection{fprint}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+fprint (handle file, string text);
+\end{verbatim}
+
+\textbf{Description}
+
+Writes text to a file.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{file}
+
+Handle of the file text should be written to.
+
+\item \texttt{text}
+
+Text that should be written to the file.
+\end{itemize}
+
+\subsubsection{fprintl}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+fprintl (handle file, string text = "");
+\end{verbatim}
+
+\textbf{Description}
+
+Writes text with trailing linefeed to a file.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{file}
+
+Handle of the file text should be written to.
+
+\item \texttt{text}
+
+Text that should be written to the file. If this parameter is omitted, an empty line is printed.
+\end{itemize}
+
+\subsubsection{fscan}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+variant fscan (handle file, integer type = TEXT);
+\end{verbatim}
+
+\textbf{Description}
+
+Reads data from a file.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{file}
+
+Handle of the file data should be read from.
+
+\item \texttt{type}
+
+Type of the data that should be read from the file. Following values are supported:
+\begin{itemize*}
+\item \texttt{TEXT} --- single line of text (default);
+\item \texttt{CHAR} --- single character;
+\item \texttt{INT} --- signed integer number;
+\item \texttt{UINT} --- unsigned integer number;
+\item \texttt{FLOAT} --- floating point number.
+\end{itemize*}
+\end{itemize}
+
+\textbf{Return Values}
+
+If a valid type was specified and the data was read successfully, the function returns value of the requested type. Else \texttt{null} is returned.
+
+\subsubsection{getcwd}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string getcwd ();
+\end{verbatim}
+
+\textbf{Description}
+
+Retrieves path to the current working directory.
+
+\textbf{Return Values}
+
+The function returns path to the current working directory.
+
+\subsubsection{getenv}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string getenv (string name);
+\end{verbatim}
+
+\textbf{Description}
+
+Gets value of specified environment variable.
+
+\textbf{Return Values}
+
+If the function succeeds, the return value is the value of specified environment variable. Else \texttt{null} is returned.
+
+\subsubsection{localtime}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer localtime ();
+\end{verbatim}
+
+\textbf{Description}
+
+Retrieves current local time.
+
+\textbf{Return Values}
+
+This function returns current local time.
+
+\subsubsection{localtoutc}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer localtoutc (integer time);
+\end{verbatim}
+
+\textbf{Description}
+
+Converts local date and time to UTC.
+
+\textbf{Return Values}
+
+The function returns local date and time converted to UTC.
+
+\subsubsection{log}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float log (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates the natural logarithm of \texttt{x}.
+
+\textbf{Return Values}
+
+The function returns the value of $\ln{x}$.
+
+\subsubsection{log10}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float log10 (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates base-10 logarithm of \texttt{x}.
+
+\textbf{Return Values}
+
+The function returns the value of $\lg{x}$.
+
+\subsubsection{md5}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string md5 (string path, integer from = 0, integer to = -1);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates MD5 hash for block of the specified file. This block begins at \texttt{from} and ends at \texttt{to}.
+
+\textbf{Parameters}
+
+Parameters are the same as for \texttt{adler32()} function.
+
+\textbf{Return Values}
+
+Return values are the same as for \texttt{adler32()} function, except the string returned by this function has length of 32 characters instead of 8.
+
+\subsubsection{mkdir}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+bool mkdir (string path, integer mode = 0755);
+\end{verbatim}
+
+\textbf{Description}
+
+Creates a directory. This function is an equivalent to the ``\texttt{mkdir}'' command in other shells.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the directory that should be created.
+
+\item \texttt{mode}
+
+Access permissions that should be set to the created directory.
+\end{itemize}
+
+\textbf{Return Values}
+
+If the function succeeds, the return value is \texttt{true}. Else the function returns \texttt{false}.
+
+\subsubsection{mktime}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer mktime (integer year, integer month, integer day,
+                integer hour, integer minute, integer second);
+\end{verbatim}
+
+\textbf{Description}
+
+Converts date and time to integer number that can be used in other time-related functions of this shell.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{year}, \texttt{month}, \texttt{day}
+
+Date that should be converted. It must be between January 1, 1980 and February 1, 2068 inclusive. Values outside this range will be clamped.
+
+\item \texttt{hour}, \texttt{minute}, \texttt{second}
+
+Time that should be converted. It must be between 00:00:00 and 23:59:59 inclusive. Values outside this range will be clamped.
+\end{itemize}
+
+\textbf{Return Values}
+
+This function returns date and time converted to integer number.
+
+\subsubsection{move}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+move (string source, string destination);
+\end{verbatim}
+
+\textbf{Description}
+
+Copies data from \texttt{source} to \texttt{destination} and deletes the source file. This function is an equivalent to the ``\texttt{mv}'' command in *nix and ``\texttt{move}'' in Microsoft Windows.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{source}
+
+Path to the file data should be copied from. After successful data transfer this file will be deleted. Must not point to a directory.
+
+\item \texttt{destination}
+
+Path to the file data should be written to. Name in an existing directory must be specified. Must not point to a directory.
+\end{itemize}
+
+\subsubsection{pathenv}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string pathenv (string path1[, string path2[, ...]]);
+\end{verbatim}
+
+\textbf{Description}
+
+Build value for the ``\texttt{PATH}'' environment variable. Use of this function is highly recommended as it converts all paths into the OS's native format and takes different entry delimiters (colon in *nix and semicolon in Microsoft Windows) into account.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path*}
+
+Directory entries to be included in ``\texttt{PATH}'' environment variable.
+\end{itemize}
+
+\textbf{Return Values}
+
+The function returns text string that can be set as ``\texttt{PATH}'' environment variable with \texttt{setenv()} function (see below).
+
+\subsubsection{platform}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string platform ();
+\end{verbatim}
+
+\textbf{Description}
+
+Get platform the shell was compiled for.
+
+\textbf{Return Values}
+
+The function returns one of these values:
+\begin{itemize*}
+\item ``\texttt{bsd}'' --- ``generic'' variant of BSD;
+\item ``\texttt{cygwin32}'' --- 32-bit Cygwin;
+\item ``\texttt{freebsd}'' --- FreeBSD;
+\item ``\texttt{hpux}'' --- HP-UX;
+\item ``\texttt{hurd}'' --- GNU Hurd;
+\item ``\texttt{linux}'' --- 32-bit Linux;
+\item ``\texttt{linux64}'' --- 64-bit Linux;
+\item ``\texttt{macintosh}'' --- old versions of Mac OS;
+\item ``\texttt{macosx}'' --- Mac OS X;
+\item ``\texttt{mingw32}'' --- 32-bit MinGW;
+\item ``\texttt{msdos}'' --- MS-DOS;
+\item ``\texttt{netbsd}'' --- NetBSD;
+\item ``\texttt{next}'' --- NeXT (NeXTSTEP);
+\item ``\texttt{openbsd}'' --- OpenBSD;
+\item ``\texttt{os2}'' --- OS/2;
+\item ``\texttt{qnx}'' --- QNX;
+\item ``\texttt{solaris}'' --- Solaris;
+\item ``\texttt{sunos}'' --- SunOS;
+\item ``\texttt{symbian}'' --- Symbian;
+\item ``\texttt{vms}'' --- VMS;
+\item ``\texttt{win32}'' --- 32-bit Microsoft Windows;
+\item ``\texttt{win64}'' --- 64-bit Microsoft Windows;
+\item ``\texttt{unknown}'' --- none of the above.
+\end{itemize*}
+
+This function never fails.
+
+\subsubsection{pow}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float pow (float x, float y);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates \texttt{x} raised to power \texttt{y}.
+
+\textbf{Return Values}
+
+The function returns $x^y$.
+
+\subsubsection{print}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+print (string text);
+\end{verbatim}
+
+\textbf{Description}
+
+Writes text to the console.
+
+\subsubsection{printl}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+printl (string text = "");
+\end{verbatim}
+
+\textbf{Description}
+
+Writes text with terminating linefeed to the console. This function is equivalent to \texttt{print(text + ``\\n'')}.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{text}
+
+Text that should be written to the console. If this parameter is omitted, an empty line is printed.
+\end{itemize}
+
+\subsubsection{rad2deg}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float rad2deg (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Converts angle from radians to degrees.
+
+\textbf{Return Values}
+
+The return value is angle \texttt{x} in degrees.
+
+\subsubsection{readdir}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string_array readdir (string path);
+\end{verbatim}
+
+\textbf{Description}
+
+Lists entries in the specified directory.
+
+\textbf{Return Values}
+
+The function returns array of directory's entries names.
+
+\subsubsection{regcompile}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+handle regcompile (string pattern, bool caseSensitive = true, bool multiLine = false);
+\end{verbatim}
+
+\textbf{Description}
+
+Compiles a regular expression for further matching. Pattern must be specified using Perl regular expressions syntax.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{pattern}
+
+Regular expression in Perl-compatible format.
+
+\item \texttt{caseSensitive}
+
+If this is \texttt{true}, letters in the pattern match both upper and lower case letters. It is equivalent to Perl's ``\texttt{/i}'' option, and it can be changed within the pattern by the ``\texttt{(?i)}'' option.
+
+\item \texttt{multiLine}
+
+If this is \texttt{true}, the ``start of line'' and ``end of line'' constructs match immediately following or immediately before internal newlines in the subject string, respectively, as well as at the very start and end. This is equivalent to Perl's ``\texttt{/m}'' option, and it can be changed within the pattern by the ``\texttt{(?m)}'' option. If there are no newlines in the subject string, or no occurrences of ``\texttt{\textasciicircum}'' or ``\texttt{\$}'' in the pattern, this flag has no effect.
+\end{itemize}
+
+\textbf{Return Values}
+
+On success, the function returns handle of the compiled regular expression. Else \texttt{null} is returned.
+
+\subsubsection{regerror}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string regerror ();
+\end{verbatim}
+
+\textbf{Description}
+
+Returns description of the last occurred regular expression-related error.
+
+\subsubsection{regfree}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+regfree (handle regExp);
+\end{verbatim}
+
+\textbf{Description}
+
+Frees resources used by a compiled regular expression.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{regExp}
+
+Handle of regular expression returned by the \texttt{regcompile()} function.
+\end{itemize}
+
+\subsubsection{regfreeall}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+regfreeall ();
+\end{verbatim}
+
+\textbf{Description}
+
+Frees resources used by all compiled regular expressions.
+
+\textbf{Notes}
+
+All regular expressions are freed automatically when the shell closes. However, keeping unneeded resources should be avoided.
+
+\subsubsection{regmatch}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+array regmatch (handle regExp,  string text, integer startOffset = 0, bool partial = false);
+array regmatch (string pattern, string text, integer startOffset = 0, bool partial = false);
+\end{verbatim}
+
+\textbf{Description}
+
+Matches a regular expression against text.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{regExp}
+
+Handle of the regular expression returned by the \texttt{regcompile()} function.
+
+\item \texttt{pattern}
+
+Regular expression in Perl-compatible format.
+
+\item \texttt{text}
+
+Text that should be matched against the regular expression.
+
+\item \texttt{startOffset}
+
+Offset of the first character of the text matching should be started from.
+
+\item \texttt{partial}
+
+If this is \texttt{true}, partial matching is performed.
+\end{itemize}
+
+\textbf{Return Values}
+
+On success, the function returns array of two-element \texttt{integer} arrays containing matched sub-strings. The first element of each sub-array specifies the beginning of the matched sub-string, while the second element is the end of the match.
+
+If the function fails, \texttt{null} is returned.
+
+\subsubsection{remove}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+remove (string path);
+\end{verbatim}
+
+\textbf{Description}
+
+Deletes a file. This function is an equivalent to the ``\texttt{rm}'' command in *nix and ``\texttt{del}'' in Microsoft Windows.
+
+\subsubsection{rmdir}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+rmdir (string path, bool recursive = false);
+\end{verbatim}
+
+\textbf{Description}
+
+Removes a directory. This function is an equivalent to the ``\texttt{rmdir}'' command in other shells.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the directory that should be removed.
+
+\item \texttt{recursive}
+
+Remove directory with all its contents. If this parameter is set to \texttt{false}, the directory must be empty.
+\end{itemize}
+
+\subsubsection{rsqrt}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float rsqrt (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates reciprocal square root of \texttt{x}.
+
+\textbf{Return Values}
+
+The function returns the value of $\frac{1}{\sqrt{x}}$.
+
+\subsubsection{run}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer run (string       path,
+             string       args     = "",
+             string       redirIn  = null,
+             bool         redirOut = false,
+             bool         redirErr = false);
+integer run (string       path,
+             string_array args     = [],
+             string       redirIn  = null,
+             bool         redirOut = false,
+             bool         redirErr = false);
+\end{verbatim}
+
+\textbf{Description}
+
+Runs another program or script.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the executable file or script that should be run. May contain only file name if the file is in one of the directories listed in the ``\texttt{PATH}'' environment variable. In Microsoft Windows, if extension is omitted, ``exe'' is assumed.
+
+\item \texttt{args}
+
+One or more command line arguments to be passed to the child process. May be \texttt{null}, an empty string or empty array if no arguments are to be passed to the child process.
+
+\item \texttt{redirIn}
+
+If set to a non-empty string, this string will be passed to the child process's standard input.
+
+\item \texttt{redirOut}
+
+If set to \texttt{true}, standard output of the child process will be written to the ``\texttt{OUTPUT}'' variable.
+
+\item \texttt{redirErr}
+
+If set to \texttt{true}, standard error stream of the child process will be written to the ``\texttt{ERROR}'' variable.
+\end{itemize}
+
+\textbf{Return Values}
+
+If the function succeeds, child process' exit code is returned. Else the return value is \texttt{-1}.
+
+\subsubsection{scan}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+variant scan (integer type = TEXT);
+\end{verbatim}
+
+\textbf{Description}
+
+Reads data from the console.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{type}
+
+Type of the data that should be read. For the list of supported data types look \texttt{fscan()} function description.
+\end{itemize}
+
+\textbf{Return Values}
+
+If a valid type was specified and data was read successfully, the function returns value of the requested type. Else \texttt{null} is returned.
+
+\subsubsection{setenv}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+bool setenv(string name, string value);
+\end{verbatim}
+
+\textbf{Description}
+
+Sets value of an environment variable.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{name}
+
+Name of the environment variable whose value should be set.
+
+\item \texttt{value}
+
+New value of the environment variable.
+\end{itemize}
+
+\textbf{Return Values}
+
+This function returns \texttt{true} on success and \texttt{false} on failure.
+
+\textbf{Notes}
+
+Staring with version 1.2.1, changes made by this function are not permanent, i.e. system environment variables are not modified and all changes are lost when Squirrel Shell is closed.
+
+\subsubsection{setfiletime}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+setfiletime (string path, integer which, integer time);
+\end{verbatim}
+
+\textbf{Description}
+
+Changes timestamp of the specified directory entry.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{path}
+
+Path to the directory entry whose date and time should be changed.
+
+\item \texttt{which}
+
+Specifies which date and time should be changed. See the \texttt{filetime()} function for the list of possible values.
+
+\item \texttt{time}
+
+New timestamp.
+\end{itemize}
+
+\subsubsection{sin}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float sin (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates sine of \texttt{x}.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{x}
+
+Angle in radians whose sine should be calculated.
+\end{itemize}
+
+\textbf{Return Values}
+
+The function returns the sine of \texttt{x}.
+
+\subsubsection{sinh}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float sinh (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates hyperbolic sine of \texttt{x}.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{x}
+
+Angle in radians whose hyperbolic sine should be calculated.
+\end{itemize}
+
+\textbf{Return Values}
+
+The return value is the hyperbolic sine of \texttt{x}.
+
+\subsubsection{sqrt}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float sqrt (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates square root of \texttt{x}.
+
+\textbf{Return Values}
+
+The function returns the value of $\sqrt{x}$.
+
+\subsubsection{strchar}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer strchar (string str, integer i);
+\end{verbatim}
+
+\textbf{Description}
+
+Get \texttt{i}'th character of string.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{str}
+
+String character should be extracted from.
+
+\item \texttt{i}
+
+Zero-based index (offset) of the character that should be extracted from \texttt{str}.
+\end{itemize}
+
+\textbf{Return Values}
+
+If \texttt{i} lies in range from \texttt{0} to \texttt{str.len()} exclusive, the function returns the requested character. Else zero is returned.
+
+\subsubsection{strtime}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string strtime (integer time, string format = "\%b \%d \%T \%Y");
+\end{verbatim}
+
+\textbf{Description}
+
+The function represents date and time as text in the specified format.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{time}
+
+Date and time which should be represented as text.
+
+\item \texttt{format}
+
+Format for the resulting text. When a percent sign (\%) appears, it and the character after it are not output, but rather identify part of the date or time to be output in a particular way:
+\begin{itemize*}
+\item \texttt{\%b} --- abbreviated month name (``Jan'', ``Feb'', etc.);
+\item \texttt{\%B} --- full month name (``January'', ``February'', etc.);
+\item \texttt{\%C} --- century;
+\item \texttt{\%d} --- day of month (always two digits);
+\item \texttt{\%D} --- month/day/year (for example, ``12/22/06'');
+\item \texttt{\%e} --- day of month (without leading zero);
+\item \texttt{\%H} --- 24-hour-clock hour (two digits);
+\item \texttt{\%h} --- 12-hour-clock hour (two digits);
+\item \texttt{\%k} --- 12-hour-clock hour (without leading zero);
+\item \texttt{\%l} --- 24-hour-clock hour (without leading zero);
+\item \texttt{\%m} --- month number (two digits);
+\item \texttt{\%M} --- minute (two digits);
+\item \texttt{\%p} --- AM/PM designation;
+\item \texttt{\%r} --- hour:minute:second AM/PM designation (for example, ``05:37:25 PM'');
+\item \texttt{\%R} --- hour:minute (for example, ``17:37'');
+\item \texttt{\%S} --- second (two digits);
+\item \texttt{\%T} --- hour:minute:second (e.g., ``17:37:25'');
+\item \texttt{\%y} --- last two digits of year;
+\item \texttt{\%Y} --- year in full.
+\end{itemize*}
+\end{itemize}
+
+\textbf{Return Values}
+
+The function returns text representation of the specified date and time. Maximum length of the resulting string is 1023 characters. Fields that don't fit into this limit are completely ignored (the result does not contain incomplete components).
+
+\subsubsection{substr}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string substr (string str, integer start, integer end);
+\end{verbatim}
+
+\textbf{Description}
+
+Get sub-string beginning at \texttt{start} and ending at \texttt{end} (inclusive) characters from \texttt{str}. This function is an equivalent to \texttt{str.slice(start, end + 1)} delegate in Squirrel except this function does not support negative offsets.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{str}
+
+String characters should be extracted from.
+
+\item \texttt{start}
+
+Zero-based index (offset) of the first character that should be copied from \texttt{str}.
+
+\item \texttt{end}
+
+Zero-based index (offset) of the last character that should be extracted from \texttt{str}. Must not be less than \texttt{start}.
+\end{itemize}
+
+\textbf{Return Values}
+
+If \texttt{start} lies in range from \texttt{0} to \texttt{str.len()} exclusive and \texttt{end} is in range from \texttt{start} to \texttt{str.len()} exclusive, then the function returns requested sub-string. Else \texttt{null} is returned.
+
+\subsubsection{systime}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer systime ();
+\end{verbatim}
+
+\textbf{Description}
+
+Retrieves current system time (in UTC).
+
+\textbf{Return Values}
+
+This function returns current system time (in UTC).
+
+\subsubsection{tan}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float tan (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates tangent of \texttt{x}.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{x}
+
+Angle in radians whose tangent should be calculated.
+\end{itemize}
+
+\textbf{Return Values}
+
+The function returns tangent of \texttt{x}.
+
+\subsubsection{tanh}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float tanh (float x);
+\end{verbatim}
+
+\textbf{Description}
+
+Calculates hyperbolic tangent of \texttt{x}.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{x}
+
+Angle in radians whose hyperbolic tangent should be calculated.
+\end{itemize}
+
+\textbf{Return Values}
+
+The function returns hyperbolic tangent of \texttt{x}.
+
+\subsubsection{utctolocal}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer utctolocal (integer time);
+\end{verbatim}
+
+\textbf{Description}
+
+This function converts UTC time to local time.
+
+\textbf{Parameters}
+
+\begin{itemize}
+\item \texttt{time}
+
+UTC time that should be converted. This may be value returned by \texttt{filetime()} or \texttt{mktime()} function.
+\end{itemize}
+
+\textbf{Return Values}
+
+This function returns specified UTC time to local date and time.
+
+\subsection{Constants}
+
+\subsubsection{\_\_argc}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+integer __argc
+\end{verbatim}
+
+\textbf{Description}
+
+Number of command line arguments passed to the script.
+
+\textbf{Note}
+
+Minimal value is \texttt{1} because the first argument always contains path to the script file.
+
+\subsubsection{\_\_argv}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string_array __argv
+\end{verbatim}
+
+\textbf{Description}
+
+Array of command line arguments passed to script. Contains \texttt{\_\_argc} elements (\texttt{\_\_argv[0]} ... \texttt{\_\_argv[\_\_argc - 1]}).
+
+Note
+
+\texttt{\_\_argv[0]} always contains path to the script file.
+
+\subsubsection{CPU\_ARCH}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string CPU_ARCH
+\end{verbatim}
+
+\textbf{Description}
+
+CPU architecture the shell was compiled for. Values are the same as for the \texttt{cpuarch()} function.
+
+\subsubsection{DEGREES\_IN\_RADIAN}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float DEGREES_IN_RADIAN
+\end{verbatim}
+
+\textbf{Description}
+
+Number of degrees in one radian (57.295779513082320876798154814105).
+
+\subsubsection{E}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float E
+\end{verbatim}
+
+\textbf{Description}
+
+Mathematical constant $e$ (2.7182818284590452353602874713527).
+
+\subsubsection{PCRE\_VERSION}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string PCRE_VERSION
+\end{verbatim}
+
+\textbf{Description}
+
+Version number of PCRE library used to work with regular expressions.
+
+\subsubsection{PI}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float PI
+\end{verbatim}
+
+\textbf{Description}
+
+Mathematical constant $\pi$ (3.1415926535897932384626433832795).
+
+\subsubsection{PLATFORM}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string PLATFORM
+\end{verbatim}
+
+\textbf{Description}
+
+Name of the OS the shell was compiled for. Values are the same as for the \texttt{platform()} function.
+
+\subsubsection{RADIANS\_IN\_DEGREE}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+float RADIANS_IN_DEGREE
+\end{verbatim}
+
+\textbf{Description}
+
+Number of radians in one degree (0.017453292519943295769236907684886).
+
+\subsubsection{SHELL\_VERSION}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string SHELL_VERSION
+\end{verbatim}
+
+\textbf{Description}
+
+Version number of the shell script is running in (e.g. ``1.2.7'').
+
+\subsubsection{SQUIRREL\_VERSION}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string SQUIRREL_VERSION
+\end{verbatim}
+
+\textbf{Description}
+
+Version number of the  Squirrel library script is running in (e.g. ``3.0.3'').
+
+\subsection{Variables}
+
+\subsubsection{ERROR}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string ERROR
+\end{verbatim}
+
+\textbf{Description}
+
+Text redirected from the child process' standard error stream.
+
+\subsubsection{OUTPUT}
+
+\textbf{Synopsis}
+
+\begin{verbatim}
+string OUTPUT
+\end{verbatim}
+
+\textbf{Description}
+
+Text redirected from the child process' standard output stream.
+
+\section{Links}
+
+\url{http://squirrelsh.sourceforge.net} --- Squirrel Shell's web site.
+
+\url{http://www.squirrel-lang.org} --- web site of the Squirrel scripting language.
+
+\url{http://sourceforge.net} --- the world's largest open source software development web site..
+
+\end{document}
+

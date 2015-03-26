@@ -1,0 +1,67 @@
+Squirrel Shell 1.2.7 Readme
+===========================
+
+Table of Contents
+-----------------
+1. Introduction
+2. License Agreement
+3. Installation Instructions
+4. Documentation
+5. Links
+
+1. Introduction
+---------------
+Squirrel Shell is made as a cross platform alternative to system shells like
+sh, bash and other in *nix and cmd.exe (command.com) in Microsoft Windows.
+
+Its cross platform nature solves the problem of writing several scripts for
+doing the same thing, but in different OS's. This is particularly useful for
+writing configuration scripts in source packages.
+
+Squirrel Shell is based on general purpose scripting language "Squirrel". As
+this language isn't dedicated to one specific purpose, script authors have
+more power. Squirrel has these features:
+- object-oriented programming;
+- C++-like syntax;
+- weak references;
+- generators;
+- exception handling;
+- higher order functions.
+More on Squirrel's web site (link is in "Links" section of this document).
+
+2. License Agreement
+--------------------
+Squirrel Shell is distributed under terms of GNU GPL license. See file
+"COPYING" for details.
+
+PCRE is distributed under terms of BSD license. See file "COPYING-pcre" for
+details.
+
+Squirrel is distributed under terms of zlib license. See file
+"COPYING-squirrel" for details.
+
+Parts of zlib library are distributed under terms of zlib license. See file
+"COPYING-zlib" for details.
+
+3. Installation Instructions
+----------------------------
+These are placed in file "INSTALL".
+
+4. Documentation
+--------------
+Squirrel Shell User Manual is available in file "squirrelsh.pdf" in "doc"
+directory.
+
+5. Links
+--------
+http://squirrelsh.sourceforge.net - Squirrel Shell's web site.
+http://www.squirrel-lang.org      - Web site of Squirrel language.
+http://www.pcre.org               - Web site of PCRE library.
+http://sourceforge.net            - Home of open source software.
+
+You can contact me by sending e-mail to <dinosaur-rus@users.sourceforge.net>.
+But preffered way to do the same things is using appropriate sections on
+project page.
+
+===========================================
+Copyright (c) 2006-2012, Constantin Makshin

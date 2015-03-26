@@ -1,0 +1,37 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "shell", "shell\shell_vs71.vcproj", "{73B0F5A4-DD62-462D-9435-523BE4FBBDB5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3C3267B0-9030-406A-BFA2-9931CD735513} = {3C3267B0-9030-406A-BFA2-9931CD735513}
+		{D505BCF8-3537-43DA-9E2D-D4E21D821547} = {D505BCF8-3537-43DA-9E2D-D4E21D821547}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "squirrel", "squirrel\squirrel_vs71.vcproj", "{3C3267B0-9030-406A-BFA2-9931CD735513}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pcre", "pcre\pcre_vs71.vcproj", "{D505BCF8-3537-43DA-9E2D-D4E21D821547}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{3C3267B0-9030-406A-BFA2-9931CD735513}.Debug.ActiveCfg = Debug|Win32
+		{3C3267B0-9030-406A-BFA2-9931CD735513}.Debug.Build.0 = Debug|Win32
+		{3C3267B0-9030-406A-BFA2-9931CD735513}.Release.ActiveCfg = Release|Win32
+		{3C3267B0-9030-406A-BFA2-9931CD735513}.Release.Build.0 = Release|Win32
+		{73B0F5A4-DD62-462D-9435-523BE4FBBDB5}.Debug.ActiveCfg = Debug|Win32
+		{73B0F5A4-DD62-462D-9435-523BE4FBBDB5}.Debug.Build.0 = Debug|Win32
+		{73B0F5A4-DD62-462D-9435-523BE4FBBDB5}.Release.ActiveCfg = Release|Win32
+		{73B0F5A4-DD62-462D-9435-523BE4FBBDB5}.Release.Build.0 = Release|Win32
+		{D505BCF8-3537-43DA-9E2D-D4E21D821547}.Debug.ActiveCfg = Debug|Win32
+		{D505BCF8-3537-43DA-9E2D-D4E21D821547}.Debug.Build.0 = Debug|Win32
+		{D505BCF8-3537-43DA-9E2D-D4E21D821547}.Release.ActiveCfg = Release|Win32
+		{D505BCF8-3537-43DA-9E2D-D4E21D821547}.Release.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
