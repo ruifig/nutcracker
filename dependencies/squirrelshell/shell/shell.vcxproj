@@ -84,7 +84,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(SolutionDir)pcre;$(SolutionDir)../squirrel/include;$(SolutionDir)../squirrel/sqstdlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)pcre;$(SolutionDir)../squirrel/include;$(SolutionDir)../squirrel/sqstdlib;$(SolutionDir)../squirrel/sqdbg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;PCRE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <MinimalRebuild>true</MinimalRebuild>
@@ -142,7 +142,7 @@
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
-      <AdditionalIncludeDirectories>$(SolutionDir)pcre;$(SolutionDir)../squirrel/include;$(SolutionDir)../squirrel/sqstdlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)pcre;$(SolutionDir)../squirrel/include;$(SolutionDir)../squirrel/sqstdlib;$(SolutionDir)../squirrel/sqdbg;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;PCRE_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -201,6 +201,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\squirrel\sqdbg\sqdbgserver.cpp" />
+    <ClCompile Include="..\..\squirrel\sqdbg\sqrdbg.cpp" />
     <ClCompile Include="base.cpp" />
     <ClCompile Include="file.cpp" />
     <ClCompile Include="hash.cpp" />
@@ -214,6 +216,8 @@
     <ClCompile Include="util.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\squirrel\sqdbg\sqdbgserver.h" />
+    <ClInclude Include="..\..\squirrel\sqdbg\sqrdbg.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="hash.h" />
     <ClInclude Include="platform.h" />

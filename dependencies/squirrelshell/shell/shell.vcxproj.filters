@@ -12,6 +12,12 @@
     <ClCompile Include="math.cpp" />
     <ClCompile Include="regexp.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="..\..\squirrel\sqdbg\sqdbgserver.cpp">
+      <Filter>SQDBG</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\squirrel\sqdbg\sqrdbg.cpp">
+      <Filter>SQDBG</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="common.h" />
@@ -19,6 +25,12 @@
     <ClInclude Include="platform.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="version.h" />
+    <ClInclude Include="..\..\squirrel\sqdbg\sqdbgserver.h">
+      <Filter>SQDBG</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\squirrel\sqdbg\sqrdbg.h">
+      <Filter>SQDBG</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="shell.rc" />
