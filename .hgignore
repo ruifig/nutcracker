@@ -16,33 +16,6 @@ tmp/*
 bin/*
 source/ipch/*
 
-#
-# Squirrel
-#
-#dependencies/squirrel/bin
-#dependencies/squirrel/sq/Debug
-#dependencies/squirrel/sq/Release
-#dependencies/squirrel/squirrel/Debug
-#dependencies/squirrel/squirrel/Release
-#dependencies/squirrel/squirrel/Template
-#dependencies/squirrel/sqstdlib/Debug
-#dependencies/squirrel/sqstdlib/Release
-#dependencies/squirrel/sqstdlib/Template
-#dependencies/squirrel/sqdbg/Debug
-#dependencies/squirrel/sqdbg/Debug Unicode
-#dependencies/squirrel/sqdbg/Release
-#dependencies/squirrel/sqdbg/Release Unicode
-#dependencies/squirrel/doc/squirrel3.chw
-
-#
-# Squirrel Shell
-#
-#dependencies/squirrelshell/pcre/Debug_x86
-#dependencies/squirrelshell/pcre/Release_x86
-#dependencies/squirrelshell/shell/Debug_x86
-#dependencies/squirrelshell/shell/Release_x86
-
-
 
 # CppDepend
 CppDepend/CppDependOut
