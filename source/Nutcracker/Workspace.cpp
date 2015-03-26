@@ -804,7 +804,7 @@ void Workspace::iterateFindResult(std::function<void(const FindResult*)> func)
 		func(&f);
 }
 
-void Workspace::doSave(tinyxml2::XMLDocument& doc)
+void Workspace::doSave(tinyxml2::XMLDocument& doc, const wxString& basePath)
 {
 
 	auto createElement = [&](tinyxml2::XMLElement* parent, const char* name, const char* text)
@@ -829,7 +829,9 @@ void Workspace::doSave(tinyxml2::XMLDocument& doc)
 				return;
 
 			auto folderEle = createElement(foldersEle, "folder", "");
-			createElement(folderEle, "path", item->fullpath.c_str());
+			wxFileName relativePath = item->fullpath.widen();
+			relativePath.MakeRelativeTo(basePath);
+			createElement(folderEle, "path", wxStringToUtf8(relativePath.GetFullPath()).c_str());
 		}
 	}
 
@@ -868,7 +870,7 @@ void iterateElements(tinyxml2::XMLElement* ele, const char* name, std::function<
 	}
 }
 
-void Workspace::doLoad(tinyxml2::XMLDocument& doc)
+void Workspace::doLoad(tinyxml2::XMLDocument& doc, const wxString& basePath)
 {
 	close();
 
@@ -904,7 +906,10 @@ void Workspace::doLoad(tinyxml2::XMLDocument& doc)
 		doCheck(foldersEle != nullptr);
 		iterateElements(foldersEle, "folder", [&](tinyxml2::XMLElement* ele)
 		{
-			addFolder(getSimpleElementAsText(ele, "path"));
+			wxFileName fullpath = getSimpleElementAsText(ele, "path");
+			if (fullpath.IsRelative())
+				fullpath = basePath + "\\" + fullpath.GetFullPath();
+			addFolder(fullpath.GetFullPath().c_str().AsChar());
 		});
 	}
 
@@ -952,7 +957,7 @@ void Workspace::save(const UTF8String& filename)
 	});
 
 	tinyxml2::XMLDocument doc;
-	doSave(doc);
+	doSave(doc, wxFileName(filename.widen()).GetPath());
 	doc.SaveFile(filename.c_str());
 	m_filename = filename;
 	m_isDirty = false;
@@ -990,7 +995,7 @@ void Workspace::load(const UTF8String& filename)
 	tinyxml2::XMLDocument doc;
 	if (doc.LoadFile(filename.c_str()) != tinyxml2::XML_NO_ERROR)
 		throw std::runtime_error("Error loading workspace file.");
-	doLoad(doc);
+	doLoad(doc, wxFileName(filename.widen()).GetPath());
 	m_filename = filename;
 	m_isDirty = false;
 	fireEvent(DataEventID::WorkspaceDirty, false);
