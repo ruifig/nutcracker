@@ -26,6 +26,10 @@ SQUIRREL_API SQRESULT sqstd_format(HSQUIRRELVM v,SQInteger nformatstringidx,SQIn
 
 SQUIRREL_API SQRESULT sqstd_register_stringlib(HSQUIRRELVM v);
 
+// RVF +
+SQUIRREL_API void sqstd_register_stringfunctions(HSQUIRRELVM v);
+// RVF -
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif

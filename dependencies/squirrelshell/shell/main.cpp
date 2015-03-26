@@ -332,11 +332,13 @@ int main (int argc, char** argv)
 
 	// RVF +
 	// Initialize squirrel std libraries
-	sqstd_register_bloblib(sqvm);
-	sqstd_register_iolib(sqvm);
-	sqstd_register_systemlib(sqvm);
-	sqstd_register_mathlib(sqvm);
-	sqstd_register_stringlib(sqvm);
+	//sqstd_register_bloblib(sqvm);
+	sqstd_register_iolib(sqvm); // We need this one because of the handy "dofile" function
+	sqstd_register_stringfunctions(sqvm); // This registers only some string functions that are useful and don't clash with Squirrel Shell
+	// NOTE: Not registering the other libraries, because there are name clashing between Squirrel Shell and SqStdLib
+	//sqstd_register_systemlib(sqvm);
+	//sqstd_register_mathlib(sqvm);
+	//sqstd_register_stringlib(sqvm);
 	// RVF -
 
 

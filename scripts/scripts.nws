@@ -1,0 +1,13 @@
+<folders>
+    <folder>
+        <path>C:\Work\crazygaze\Nutcracker\scripts</path>
+    </folder>
+</folders>
+
+<breakpoints/>
+
+<watches>
+    <watch>str</watch>
+    <watch>vargv</watch>
+    <watch>fmt</watch>
+</watches>

@@ -13,7 +13,7 @@
 #include <sqstdblob.h>
 #include <sqstdsystem.h>
 #include <sqstdio.h>
-#include <sqstdmath.h>	
+#include <sqstdmath.h>
 #include <sqstdstring.h>
 #include <sqstdaux.h>
 
