@@ -708,7 +708,7 @@ static SQInteger Run (HSQUIRRELVM)
 		CloseHandle(pi.hProcess);
 	}
 	else
-		PrintError("ERROR: Failed to run '%s'.\n", path);
+		PrintError("ERROR: Failed to run '%s'.\n", path.c_str());
 #else // SHELL_PLATFORM_WINDOWS
 	if (redirectStdin && pipe(newInput))
 	{

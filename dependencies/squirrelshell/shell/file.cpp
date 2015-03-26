@@ -130,7 +130,6 @@ static SQInteger FPrint (HSQUIRRELVM)
 	}
 	return 0;
 }
-
 // fprintl(handle file[, string text])
 // Output text with trailing linefeed to file
 static SQInteger FPrintL (HSQUIRRELVM)

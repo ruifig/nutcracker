@@ -157,6 +157,17 @@ static SQInteger _string_format(HSQUIRRELVM v)
 	sq_pushstring(v,dest,length);
 	return 1;
 }
+// RVF +
+static SQInteger _string_printf(HSQUIRRELVM v)
+{
+	SQChar *dest = NULL;
+	SQInteger length = 0;
+	if(SQ_FAILED(sqstd_format(v,2,&length,&dest)))
+		return -1;
+	sq_getprintfunc(v)(v, dest);
+	return 1;
+}
+// RVF -
 
 static void __strip_l(const SQChar *str,const SQChar **start)
 {
@@ -339,6 +350,9 @@ static SQRegFunction rexobj_funcs[]={
 #define _DECL_FUNC(name,nparams,pmask) {_SC(#name),_string_##name,nparams,pmask}
 static SQRegFunction stringlib_funcs[]={
 	_DECL_FUNC(format,-2,_SC(".s")),
+	// RVF +
+	_DECL_FUNC(printf,-2,_SC(".s")),
+	// RVF -
 	_DECL_FUNC(strip,2,_SC(".s")),
 	_DECL_FUNC(lstrip,2,_SC(".s")),
 	_DECL_FUNC(rstrip,2,_SC(".s")),
@@ -347,6 +361,21 @@ static SQRegFunction stringlib_funcs[]={
 };
 #undef _DECL_FUNC
 
+// RVF +
+void sqstd_register_stringfunctions(HSQUIRRELVM v)
+{
+	int i = 0;
+	while (stringlib_funcs[i].name != 0)
+	{
+		sq_pushstring(v, stringlib_funcs[i].name, -1);
+		sq_newclosure(v, stringlib_funcs[i].f, 0);
+		sq_setparamscheck(v, stringlib_funcs[i].nparamscheck, stringlib_funcs[i].typemask);
+		sq_setnativeclosurename(v, -1, stringlib_funcs[i].name);
+		sq_newslot(v, -3, SQFalse);
+		i++;
+	}
+}
+// RVF -
 
 SQInteger sqstd_register_stringlib(HSQUIRRELVM v)
 {

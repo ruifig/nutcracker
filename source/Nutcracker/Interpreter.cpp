@@ -461,8 +461,10 @@ std::string TableEntry::getValue() const
 		return cz::formatString("\"%s\"", val->txt.c_str());
 	else if (val->type == VarType::Integer || val->type == VarType::Float)
 		return val->txt;
+	else if (val->type == VarType::Bool)
+		return val->txt == "0" ? "false" : "true";
 	else
-		return "";
+		return val->txt;
 }
 
 std::string TableEntry::getType() const

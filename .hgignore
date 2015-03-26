@@ -19,28 +19,28 @@ source/ipch/*
 #
 # Squirrel
 #
-dependencies/squirrel/bin
-dependencies/squirrel/sq/Debug
-dependencies/squirrel/sq/Release
-dependencies/squirrel/squirrel/Debug
-dependencies/squirrel/squirrel/Release
-dependencies/squirrel/squirrel/Template
-dependencies/squirrel/sqstdlib/Debug
-dependencies/squirrel/sqstdlib/Release
-dependencies/squirrel/sqstdlib/Template
-dependencies/squirrel/sqdbg/Debug
-dependencies/squirrel/sqdbg/Debug Unicode
-dependencies/squirrel/sqdbg/Release
-dependencies/squirrel/sqdbg/Release Unicode
-dependencies/squirrel/doc/squirrel3.chw
+#dependencies/squirrel/bin
+#dependencies/squirrel/sq/Debug
+#dependencies/squirrel/sq/Release
+#dependencies/squirrel/squirrel/Debug
+#dependencies/squirrel/squirrel/Release
+#dependencies/squirrel/squirrel/Template
+#dependencies/squirrel/sqstdlib/Debug
+#dependencies/squirrel/sqstdlib/Release
+#dependencies/squirrel/sqstdlib/Template
+#dependencies/squirrel/sqdbg/Debug
+#dependencies/squirrel/sqdbg/Debug Unicode
+#dependencies/squirrel/sqdbg/Release
+#dependencies/squirrel/sqdbg/Release Unicode
+#dependencies/squirrel/doc/squirrel3.chw
 
 #
 # Squirrel Shell
 #
-dependencies/squirrelshell/pcre/Debug_x86
-dependencies/squirrelshell/pcre/Release_x86
-dependencies/squirrelshell/shell/Debug_x86
-dependencies/squirrelshell/shell/Release_x86
+#dependencies/squirrelshell/pcre/Debug_x86
+#dependencies/squirrelshell/pcre/Release_x86
+#dependencies/squirrelshell/shell/Debug_x86
+#dependencies/squirrelshell/shell/Release_x86
 
 
 
@@ -64,6 +64,17 @@ dependencies/wxWidgets/build/msw/vc_x64_mswu
 dependencies/wxWidgets/build/msw/vc_x64_mswud
 dependencies/wxWidgets/build/msw/vc_x64_mswudll
 dependencies/wxWidgets/build/msw/vc_x64_mswuddll
+# samples
+dependencies/wxWidgets/samples/samples.sln
+dependencies/wxWidgets/samples/*/vc_mswud/
+dependencies/wxWidgets/samples/*/*/vc_mswud/
+dependencies/wxWidgets/samples/*/vc_mswuddll/
+dependencies/wxWidgets/samples/*/*/vc_mswudll/
+dependencies/wxWidgets/samples/*/*.vcxproj
+dependencies/wxWidgets/samples/*/*.vcxproj.filters
+dependencies/wxWidgets/samples/*/*/*.vcxproj
+dependencies/wxWidgets/samples/*/*/*.vcxproj.filters
+
 
 #
 # Visual Paradigm
