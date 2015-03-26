@@ -332,8 +332,8 @@ private:
 
 	Interpreter* _getCurrentInterpreter();
 
-	void doSave(tinyxml2::XMLDocument& doc);
-	void doLoad(tinyxml2::XMLDocument& doc);
+	void doSave(tinyxml2::XMLDocument& doc, const wxString& basePath);
+	void doLoad(tinyxml2::XMLDocument& doc, const wxString& basePath);
 
 	const Breakpoint* toggleBreakpoint(Breakpoint* brk);
 	void fireEvent(const DataEvent& evt);
