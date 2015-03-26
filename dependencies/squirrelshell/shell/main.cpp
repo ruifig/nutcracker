@@ -27,6 +27,7 @@
 #include <sqstdmath.h>	
 #include <sqstdstring.h>
 #include <sqstdaux.h>
+#include <sqrdbg.h>
 // RVF -
 
 #if defined(_MSC_VER)
@@ -123,6 +124,11 @@ static void SquirrelCompileError (HSQUIRRELVM, const SQChar* desc, const SQChar*
 	PrintError("SQUIRREL ERROR: Line " FMT_INT ", Column " FMT_INT ": %s\n", line, column, desc);
 }
 
+// RVF +
+#include <string>
+std::string prepareFilename(const SQChar* filename);
+// RVF -
+
 // Load script from file
 // Script is first read into memory buffer and then line beginning with "#!" (line with script interpreter specification in
 // Linux) is converted into Squirrel comment. This line must be BEFORE actual script text
@@ -132,6 +138,10 @@ static bool LoadScript (const char* fileName)
 	FILE*	file = NULL;
 	SQChar* buf  = NULL;
 
+	// RVF +
+	std::string canonicalizedFilename = prepareFilename(fileName);
+	fileName = canonicalizedFilename.c_str();
+	// RVF -
 	try
 	{
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
@@ -168,7 +178,7 @@ static bool LoadScript (const char* fileName)
 			}
 		}
 
-		if (SQ_FAILED(sq_compilebuffer(sqvm, buf, size, "", SQTrue)))
+		if (SQ_FAILED(sq_compilebuffer(sqvm, buf, size, fileName, SQTrue)))
 			throw "Failed to compile script";
 
 		res = true;
@@ -202,6 +212,7 @@ int main (int argc, char** argv)
 	bool		interactive = argc == 1;
 	int			firstArg	= 0,
 				i;
+	bool isDebug = false;
 	for (i = 1; argv[i]; ++i)
 	{
 		char* arg = argv[i];
@@ -244,7 +255,9 @@ int main (int argc, char** argv)
 			return EXIT_SUCCESS;
 		}
 		else if (!strcmp(arg, "-d") || !strcmp(arg, "--debug"))
-			;
+		{
+			isDebug = true;
+		}
 		else if (!strcmp(arg, "-i") || !strcmp(arg, "--interactive"))
 			interactive = true;
 		else if (!strcmp(arg, "-v") || !strcmp(arg, "--version"))
@@ -275,6 +288,22 @@ int main (int argc, char** argv)
 	{
 		PrintError("ERROR: Failed to create Squirrel VM.\n");
 		return EXIT_FAILURE;
+	}
+
+	HSQREMOTEDBG rdbg = nullptr;
+	if (isDebug)
+	{
+		rdbg = sq_rdbg_init(sqvm, 1234, SQTrue);
+		sq_enabledebuginfo(sqvm, SQTrue);
+
+		//!! SUSPENDS THE APP UNTIL THE DEBUGGER CLIENT CONNECTS
+		scprintf("Waiting for the debugger to connect...\n");
+		if (!SQ_SUCCEEDED(sq_rdbg_waitforconnections(rdbg)))
+		{
+			PrintError("ERROR: Failed to connect to the debugger.\n");
+			return EXIT_FAILURE;
+		}
+		scprintf(_SC("Connected to the debugger\n"));
 	}
 
 	sq_setcompilererrorhandler(sqvm, SquirrelCompileError);
@@ -400,6 +429,11 @@ int main (int argc, char** argv)
 			}
 		} while(sq_getvmstate(sqvm) != SQ_VMSTATE_SUSPENDED);
 		result = retCode;
+	}
+
+	if (isDebug)
+	{
+		sq_rdbg_shutdown(rdbg);
 	}
 
 	Shutdown();
