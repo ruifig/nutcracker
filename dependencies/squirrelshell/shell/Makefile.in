@@ -1,0 +1,50 @@
+objects=base.o \
+        file.o \
+        hash.o \
+        hash_adler32.o \
+        hash_crc32.o \
+        hash_md5.o \
+        io.o   \
+        main.o \
+        math.o \
+        regexp.o \
+        util.o
+target_dir=../bin
+target_name=squirrelsh@EXE_EXT@
+target=$(target_dir)/$(target_name)
+
+.cpp.o:
+	@CXX@ @CXXFLAGS_EXE@ @DEFINES@ -c -o $@ $< @INCLUDES@
+
+$(target): $(objects)
+	@if [ ! -e "$(target_dir)" ]; then @MKDIR@ "$(target_dir)"; fi
+	@MAKE_EXE@
+
+all: $(target)
+
+clean:
+	@RM@ *~ *.o
+
+distclean: clean
+	@RM@ Makefile "$(target)"
+
+install: all
+	@INSTALL@ -d -m 0755 "@BINDIR@"
+	@INSTALL_EXE@
+	@INSTALL_SYMLINK@
+
+uninstall:
+	@RM@ "@BINDIR@/$(target_name)"
+	@UNINSTALL_SYMLINK@
+
+base.o: base.cpp common.h platform.h
+file.o: file.cpp common.h platform.h
+hash.o: hash.cpp hash.h common.h platform.h
+hash_adler32.o: hash_adler32.cpp hash.h common.h platform.h
+hash_crc32.o: hash_crc32.cpp hash.h common.h platform.h
+hash_md5.o: hash_md5.cpp hash.h common.h platform.h
+io.o: io.cpp common.h platform.h
+main.o: main.cpp common.h platform.h version.h
+math.o: math.cpp common.h platform.h
+regexp.o: regexp.cpp common.h platform.h
+util.o: util.cpp common.h platform.h

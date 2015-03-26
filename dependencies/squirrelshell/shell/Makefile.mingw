@@ -1,0 +1,42 @@
+sources=base.cpp \
+        file.cpp \
+        hash.cpp \
+        hash_adler32.cpp \
+        hash_crc32.cpp \
+        hash_md5.cpp \
+        io.cpp \
+        main.cpp \
+        math.cpp \
+        regexp.cpp \
+        util.cpp
+objects=$(sources:.cpp=.o)
+target_dir=../bin
+target=$(target_dir)/squirrelsh.exe
+
+include ../build/mingw.inc
+
+objects:=$(objects) shell.o
+
+all: $(objects)
+	$(mkoutdir)
+	$(LINK) $(LFLAGS) -o "$(target)" $(objects) $(LIBS)
+
+clean:
+	$(RM) $(objects)
+
+distclean: clean
+	$(RM) "$(target)"
+
+base.o: base.cpp common.h platform.h
+file.o: file.cpp common.h platform.h
+hash.o: hash.cpp hash.h common.h platform.h
+hash_adler32.o: hash_adler32.cpp hash.h common.h platform.h
+hash_crc32.o: hash_crc32.cpp hash.h common.h platform.h
+hash_md5.o: hash_md5.cpp hash.h common.h platform.h
+io.o: io.cpp common.h platform.h
+main.o: main.cpp common.h platform.h version.h
+math.o: math.cpp common.h platform.h
+regexp.o: regexp.cpp common.h platform.h
+shell.o: shell.rc platform.h version.h
+	$(RC) $(RCFLAGS) -o $@ $<
+util.o: util.cpp common.h platform.h

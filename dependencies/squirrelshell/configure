@@ -1,0 +1,1367 @@
+#!/bin/sh
+
+# Squirrel Shell configuration script
+# Copyright (c) 2007-2010, Constantin Makshin
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+#------ CONFIGURATION SETTINGS --------------------------------------------------------------------
+
+prefix="/usr/local"
+enable_debug="no"
+with_libraries="static" # static, shared
+with_pcre="auto" # local, system, auto
+with_squirrel="auto" # local, system, auto
+with_mime="auto" # no, file, gnome, kde, auto, all
+with_symlink="no" # yes, no
+maketool="make"
+
+if [ -n "$CC" ]; then
+	c_compiler="$CC"
+else
+	c_compiler="gcc"
+fi
+
+if [ -n "$CFLAGS" ]; then
+	c_compiler_flags="$CFLAGS"
+else
+	c_compiler_flags="-O2 -Wall"
+fi
+
+if [ -n "$CXX" ]; then
+	cpp_compiler="$CXX"
+else
+	cpp_compiler="g++"
+fi
+
+if [ -n "$CXXFLAGS" ]; then
+	cpp_compiler_flags="$CXXFLAGS"
+else
+	cpp_compiler_flags="$c_compiler_flags -fno-rtti"
+fi
+
+librarian="ar rc"
+with_ranlib="yes" # yes, no
+linker="$cpp_compiler"
+
+if [ -n "$LFLAGS" ]; then
+	linker_flags="$LFLAGS"
+else
+	linker_flags="-Wl,-O1 -Wl,--as-needed"
+fi
+
+pkgconfig="$PKG_CONFIG"
+installer="install"
+target="auto"
+platform="unknown"
+
+#------ FUNCTIONS ---------------------------------------------------------------------------------
+
+# showhelp
+# Print usage information
+showhelp ()
+{
+	cat <<__SHEOF__
+'$0' will configure $app_name for further compilation.
+
+Usage: $0 [OPTIONS]...
+
+Configuration:
+    -h, --help                    Display this help and exit
+
+Installation directories:
+    --prefix=PREFIX               Install files in PREFIX [$prefix]
+    --bindir=DIR                  Install executables in DIR [PREFIX/bin]
+    --libdir=DIR                  Install shared libraries in DIR [PREFIX/lib]
+    --datadir=DIR                 Install machine-independent files in DIR
+                                  [PREFIX/share]
+    --mandir=DIR                  Install man pages in DIR [PREFIX/share/man]
+
+Optional featues:
+    --enable-FEATURE[=ARG]        Enable FEATURE [ARG=yes]
+    --disable-FEATURE             Disable FEATURE (same as --enable-FEATURE=no)
+    --enable-debug                Include debugging information in compiled
+                                  binaries [$enable_debug]
+
+Miscellaneous options:
+    --with-OPTION[=ARG]           Set OPTION to ARG [ARG=yes]
+    --without-OPTION              Unset OPTION (same as --with-OPTION=no)
+    --with-libraries=ARG          Compile Squirrel as static or shared library
+                                  [$with_libraries]
+    --with-pcre=ARG               Which PCRE library to use [$with_pcre
+                                  ARG=local     Use PCRE provided with Squirrel
+                                                Shell
+                                  ARG=system    Use PCRE installed in system
+                                  ARG=auto      Use local or system-wide PCRE,
+                                                depending on which is newer
+    --with-squirrel=ARG           Which Squirrel library to use [$with_squirrel]
+                                  See '--with-pcre' option description for the
+                                  list of supported ARG values
+    --with-mime=ARG               Install or not install MIME information [$with_mime]
+                                  ARG=no        Do not install
+                                  ARG=file      Install MIME for 'file' utility
+                                                only
+                                  ARG=gnome     Install MIME for GNOME desktop
+                                                only
+                                  ARG=kde       Install MIME for KDE desktop only
+                                  ARG=auto      Install MIME for all found and
+                                                supported packages (recommended)
+                                  ARG=all       Install MIME for all supported
+                                                packages, even if some of them
+                                                are not installed
+    --with-symlink                Create symlink '/usr/bin/squirrelsh' pointing
+                                  to actual executable location [$with_symlink]
+    --with-cc=COMPILER            Use COMPILER to compile C sources [$c_compiler]
+    --with-cpp=COMPILER           Use COMPILER to compile C++ sources [$cpp_compiler]
+    --with-librarian=LIBRARIAN    Use LIBRARIAN to create static libraries [$librarian]
+    --with-ranlib                 Process static libraries with ranlib [$with_ranlib]
+    --with-linker=LINKER          Use LINKER to create executables and shared
+                                  libraries [$linker]
+    --with-arch=TARGET            Build for TARGET CPU architecture (x86, etc.)
+                                  [$target]
+
+Supported environment variables:
+    CC          C compiler
+    CFLAGS      C compiler options
+    CXX         C++ compiler
+    CXXFLAGS    C++ compiler options
+    LFLAGS      Linker options
+__SHEOF__
+	closescript
+}
+
+# msg_checking MESSAGE
+# Print "Checking ..." message
+msg_checking ()
+{
+	echo "Checking $1..." >>"$configure_log"
+	echo $echo_option "Checking $1...$echo_escapechar"
+}
+
+# msg_checkingfor MESSAGE
+# Print "Checking for ..." message
+msg_checkingfor ()
+{
+	msg_checking "for $1"
+}
+
+# msg_result RESULT [COMMENT]
+# Print check result
+msg_result ()
+{
+	local comment
+	[ "$2" ] && comment=" ($2)"
+
+	echo "Result: ${1}${comment}" >>"$configure_log"
+	echo "===============================================================================" >>"$configure_log"
+	echo "   ${1}${comment}"
+}
+
+# msg_ok [COMMENT]
+# Print message about successful check
+msg_ok ()
+{
+	msg_result "yes" $1
+}
+
+# msg_fail [COMMENT]
+# Print message about failed check and exit
+msg_fail ()
+{
+	msg_result "no" $1
+
+	if [ "$error_desc" ]; then
+		echo
+		echo "$error_desc" >&2
+	fi
+
+	closescript 1
+}
+
+# msg_invalidvalue
+# Print message about invalid option value and exit
+msg_invalidvalue ()
+{
+	echo "Invalid value of '`echo $arg | cut -d '=' -f 1`' option: $arg_value" >&2
+	closescript 1
+}
+
+# findfile FILE DIR1 [DIR2] ...
+# Find FILE in specified directories
+findfile ()
+{
+	local file="$1"
+	local path
+	local result="$2/$1"
+
+	shift
+	msg_checkingfor "'$file'"
+
+	for directory in "$@"; do
+		path="$directory/$file"
+		if [ -r "$path" ] ; then
+			result="$path"
+			break
+		fi
+	done
+
+	msg_result "$result"
+	echo "$result" >"$configure_tmp"
+}
+
+# findprogram PROGRAM
+# Find PROGRAM in directories from PATH environment variable
+findprogram ()
+{
+	local old_IFS="$IFS"
+	local path
+
+	IFS=':'
+
+	for directory in $PATH; do
+		IFS="$old_IFS"
+		path="$directory/$1"
+		if [ -r "$path" ] && [ -x "$path" ]; then
+			echo "$path"
+			return 0
+		fi
+	done
+	return 1
+}
+
+# checkforprogram PROGRAM
+# Check whether PROGRAM is present in any of directories from PATH environment variable
+checkforprogram ()
+{
+	local path
+
+	msg_checkingfor "$1"
+
+	path=`findprogram "$1"`
+	[ "$?" -eq 0 ] || return 1
+
+	msg_result "$path"
+	return 0
+}
+
+# checkforprograms HINT PROGRAM1 [PROGRAM2] ...
+# Check whether any of specified programs is present in any of directories from PATH environment variable
+checkforprograms ()
+{
+	local path
+
+	msg_checkingfor "$1"
+	shift
+
+	for prog in "$@"; do
+		path=`findprogram "$prog"`
+		if [ "$?" -eq 0 ]; then
+			msg_result "$path"
+			echo "$prog" >"$configure_tmp"
+			return 0
+		fi
+	done
+	return 1
+}
+
+# getoutput CPPFLAGS LFLAGS
+# Compile C++ code and run the compiled program
+getoutput ()
+{
+	echo "$cpp_compiler -c $1 -o $configure_obj $configure_cpp" >>"$configure_log"
+	$cpp_compiler -c $1 -o "$configure_obj" "$configure_cpp" >>"$configure_log" 2>&1 || return 1
+
+	echo "$linker $2 -o $configure_exe $configure_obj" >>"$configure_log"
+	$linker $2 -o "$configure_exe" "$configure_obj" >>"$configure_log" 2>&1 || return 1
+
+	echo "./$configure_exe" >> "$configure_log"
+	"./$configure_exe" 2>>"$configure_log"
+}
+
+# checkforcheader HEADER
+# Check whether the specified header file is accessible and usable by the C compiler
+checkforcheader ()
+{
+	msg_checkingfor "<$1>"
+
+	cat >"$configure_c" <<__CFHEOF__
+#include <$1>
+int main (void) { return 0; }
+__CFHEOF__
+
+	echo "$c_compiler -c $c_compiler_flags -o $configure_obj $configure_c" >>"$configure_log"
+	$c_compiler -c $c_compiler_flags -o "$configure_obj" "$configure_c" >>"$configure_log" 2>&1 || return 1
+
+	msg_ok
+	return 0
+}
+
+# checkforcoption [OPTION]
+# Check whether C compiler supports the specified option and add it to the list of used compilation options when possible
+# If OPTION is omitted, check for all options
+checkforcoption ()
+{
+	if [ -n "$1" ]; then
+		msg_checking "whether C compiler supports '$1' option"
+	else
+		msg_checking "whether C compiler supports required options ($c_compiler_flags)"
+	fi
+
+	cat >"$configure_c" <<__CFHEOF__
+int main (void) { return 0; }
+__CFHEOF__
+
+	echo "$c_compiler -c $c_compiler_flags $1 -o $configure_obj $configure_c" >>"$configure_log"
+	$c_compiler -c $c_compiler_flags $1 -o "$configure_obj" "$configure_c" >>"$configure_log" 2>&1 || return 1
+
+	msg_ok
+	[ -n "$1" ] && c_compiler_flags="$c_compiler_flags $1"
+	return 0
+}
+
+# checkforcppheader HEADER
+# Check whether the specified header file is accessible and usable by the C++ compiler
+checkforcppheader ()
+{
+	msg_checkingfor "<$1>"
+
+	cat >"$configure_cpp" <<__CFHEOF__
+#include <$1>
+int main () { return 0; }
+__CFHEOF__
+
+	echo "$cpp_compiler -c $cpp_compiler_flags -o $configure_obj $configure_cpp" >>"$configure_log"
+	$cpp_compiler -c $cpp_compiler_flags -o "$configure_obj" "$configure_cpp" >>"$configure_log" 2>&1 || return 1
+
+	msg_ok
+	return 0
+}
+
+# checkforcppoption [OPTION]
+# Check whether C++ compiler supports the specified option and add it to the list of used compilation options when possible
+# If OPTION is omitted, check for all options
+checkforcppoption ()
+{
+	if [ -n "$1" ]; then
+		msg_checking "whether C++ compiler supports '$1' option"
+	else
+		msg_checking "whether C++ compiler supports required options ($cpp_compiler_flags)"
+	fi
+
+	cat >"$configure_cpp" <<__CFHEOF__
+int main () { return 0; }
+__CFHEOF__
+
+	echo "$cpp_compiler -c $cpp_compiler_flags $1 -o $configure_obj $configure_cpp" >>"$configure_log"
+	$cpp_compiler -c $cpp_compiler_flags $1 -o "$configure_obj" "$configure_cpp" >>"$configure_log" 2>&1 || return 1
+
+	msg_ok
+	[ -n "$1" ] && cpp_compiler_flags="$cpp_compiler_flags $1"
+	return 0
+}
+
+# checkforlinkeroption [OPTION] [ALSO_COMPILER]
+# Check whether linker supports the specified option and add it to the list of used linking options when possible. If OPTION is omitted, check for all options.
+# If ALSO_COMPILER is specified, pass the same option to the compiler
+checkforlinkeroption ()
+{
+	if [ -n "$1" ]; then
+		msg_checking "whether linker supports '$1' option"
+	else
+		msg_checking "whether linker supports required options ($linker_flags)"
+	fi
+
+	cat >"$configure_cpp" <<__CFHEOF__
+int main () { return 0; }
+__CFHEOF__
+
+	local cflags="$cpp_compiler_flags"
+	[ -n "$2" ] && cflags="$cflags $1"
+
+	echo "$cpp_compiler -c $cflags -o $configure_obj $configure_cpp" >>"$configure_log"
+	$cpp_compiler -c $cflags -o "$configure_obj" "$configure_cpp" >>"$configure_log" 2>&1 || return 1
+
+	echo "$linker $linker_flags $1 -o $configure_exe $configure_obj" >>"$configure_log"
+	$linker $linker_flags $1 -o "$configure_exe" "$configure_obj" >>"$configure_log" 2>&1 || return 1
+
+	msg_ok
+	[ -n "$1" ] && linker_flags="$linker_flags $1"
+	return 0
+}
+
+# checkforlib LIBRARY PKGCONFIG_NAME
+# Check whether specified library is accessible by the linker
+# If PKGCONFIG_NAME is specified and pkg-config is available, use it to get compiler and linker options
+checkforlib ()
+{
+	msg_checkingfor "lib$1"
+
+	local package_exists="no"
+	if [ -n "$2" ] && [ -n "$pkgconfig" ] && $pkgconfig --exists "$2"; then
+		package_exists="yes"
+	fi
+
+	local cflags="$cpp_compiler_flags"
+	[ "$package_exists" = "yes" ] && cflags="$cflags `$pkgconfig --cflags "$2"`"
+
+	echo "$cpp_compiler -c $cflags -o $configure_obj $configure_cpp" >>"$configure_log"
+	$cpp_compiler -c $cflags -o "$configure_obj" "$configure_cpp" >>"$configure_log" 2>&1 || return 1
+
+	local lflags=""
+	local lflags_l="-l$1"
+	if [ "$package_exists" = "yes" ]; then
+		lflags=`$pkgconfig --libs-only-other --libs-only-L "$2"`
+		lflags_l=`$pkgconfig --libs-only-l "$2"`
+	fi
+
+	echo "$linker $lflags -o $configure_exe $configure_obj $lflags_l" >>"$configure_log"
+	$linker $lflags -o "$configure_exe" "$configure_obj" $lflags_l >>"$configure_log" 2>&1 || return 1
+
+	msg_ok
+	return 0
+}
+
+# genfile FILE
+# Create FILE from FILE.in
+genfile ()
+{
+	echo "Creating '$1'..." >>"$configure_log"
+	echo $echo_option "Creating '$1'...$echo_escapechar"
+	( [ -r "$1.in" ] && $sed -f "$configure_tmp" "$1.in" >"$1" 2>>"$configure_log" ) || { rm -f "$1"; return 1; }
+	msg_ok
+}
+
+# resetopts
+# Reset temporary file names
+resetfiles ()
+{
+	[ -f "$configure_log" ] && cleanup
+
+	configure_dir="$configure_name-$$_dir/$$/$$"
+	configure_tmp="$configure_name-$$.tmp"
+	configure_c="$configure_name-$$.c"
+	configure_cpp="$configure_name-$$.cpp"
+	configure_obj="$configure_name-$$.o"
+	configure_exe="$configure_name-$$$exe_suffix"
+	configure_lib="lib$configure_name-$$$lib_suffix"
+	configure_dll="lib$configure_name-$$$dll_suffix"
+}
+
+# cleanup
+# Remove temporary files
+cleanup ()
+{
+	rm -rf "`echo "$configure_dir" | cut -d '/' -f 1`"
+	rm -f "$configure_tmp" "$configure_c" "$configure_cpp" "$configure_obj" "$configure_exe" "$configure_lib" "$configure_dll"
+}
+
+# closescript [RESULT]
+# Remove temporary files and exit
+closescript ()
+{
+	cleanup
+	exit $1
+}
+
+#------ INITIALIZATION ----------------------------------------------------------------------------
+
+app_version_major=`grep -o '^[[:space:]]*#[[:space:]]*define[[:space:]]\+SHELL_VERSION_MAJOR[[:space:]]\+[[:digit:]]\+' "shell/version.h" | grep -o '[[:digit:]]\+'`
+[ -z "$app_version_major" ] && app_version_major=0
+
+app_version_minor=`grep -o '^[[:space:]]*#[[:space:]]*define[[:space:]]\+SHELL_VERSION_MINOR[[:space:]]\+[[:digit:]]\+' "shell/version.h" | grep -o '[[:digit:]]\+'`
+[ -z "$app_version_minor" ] && app_version_minor=0
+
+app_version_patch=`grep -o '^[[:space:]]*#[[:space:]]*define[[:space:]]\+SHELL_VERSION_PATCH[[:space:]]\+[[:digit:]]\+' "shell/version.h" | grep -o '[[:digit:]]\+'`
+[ -z "$app_version_patch" ] && app_version_patch=0
+
+app_name="Squirrel Shell $app_version_major.$app_version_minor.$app_version_patch"
+configure_name=`basename "$0"`
+configure_log="$configure_name.log"
+
+source_dir=`dirname "$0"`
+case "$source_dir" in
+/*)
+	;;
+
+*)
+	# Get absolute path to the source directory by switching to it
+	oldPWD="$PWD"
+	cd "$PWD/$source_dir"
+	source_dir="$PWD"
+	cd "$oldPWD";;
+esac
+
+rm -f "$configure_log"
+
+exe_suffix=""
+lib_suffix=".a"
+dll_suffix=".so"
+mime_group="application"
+mime_type="x-squirrelshscript"
+mime_type_full="$mime_group/$mime_type"
+mime_gnome_pkg="gnome-mime-data"
+echo_option="-n"
+echo_escapechar=""
+resetfiles
+
+# Check if this is SystemV 'echo'
+if [ "`echo -n`" = "-n" ]; then
+  echo_option=""
+  echo_escapechar='\c'
+fi
+
+#------ PARSING COMMAND LINE PARAMETERS -----------------------------------------------------------
+
+for arg in "$@"; do
+	arg_value=`echo "$arg" | cut -d '=' -f 2`
+	case "$arg" in
+	-h | --help)
+		showhelp;;
+
+	--prefix=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		prefix="$arg_value";;
+
+	--bindir=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		bindir="$arg_value";;
+
+	--libdir=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		libdir="$arg_value";;
+
+	--datadir=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		datadir="$arg_value";;
+
+	--mandir=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		mandir="$arg_value";;
+
+	--enable-debug)
+		enable_debug="yes";;
+
+	--enable-debug=*)
+		case "$arg_value" in
+		y | yes)
+			enable_debug="yes";;
+
+		n | no)
+			enable_debug="no";;
+
+		*)
+			msg_invalidvalue;;
+		esac;;
+
+	--disable-debug)
+		enable_debug="no";;
+
+	--with-libraries=*)
+		case "$arg_value" in
+		static | shared)
+			with_libraries="$arg_value";;
+
+		*)
+			msg_invalidvalue;;
+		esac;;
+
+	--with-pcre=*)
+		case "$arg_value" in
+		local | system | auto)
+			with_pcre="$arg_value";;
+
+		*)
+			msg_invalidvalue;;
+		esac;;
+
+	--with-squirrel=*)
+		case "$arg_value" in
+		local | system | auto)
+			with_squirrel="$arg_value";;
+
+		*)
+			msg_invalidvalue;;
+		esac;;
+
+	--with-mime=*)
+		case "$arg_value" in
+		no | file | gnome | kde | auto)
+			with_mime="$arg_value";;
+
+		*)
+			msg_invalidvalue;;
+		esac;;
+
+	--without-mime)
+		with_mime="no";;
+
+	--with-symlink)
+		with_symlink="yes";;
+
+	--with-symlink=*)
+		case "$arg_value" in
+		y | yes)
+			with_symlink="yes";;
+
+		n | no)
+			with_symlink="no";;
+
+		*)
+			msg_invalidvalue;;
+		esac;;
+
+	--without-symlink)
+		with_symlink="no";;
+
+	--with-cc=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		c_compiler="$arg_value";;
+
+	--with-cpp=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		cpp_compiler="$arg_value";;
+
+	--with-librarian=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		librarian="$arg_value";;
+
+	--with-ranlib)
+		with_ranlib="yes";;
+
+	--with-ranlib=*)
+		case "$arg_value" in
+		y | yes)
+			with_ranlib="yes";;
+
+		n | no)
+			with_ranlib="no";;
+
+		*)
+			msg_invalidvalue;;
+		esac;;
+
+	--without-ranlib)
+		with_ranlib="no";;
+
+	--with-linker=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		linker="$arg_value";;
+
+	--with-arch=*)
+		[ "$arg_value" ] || msg_invalidvalue
+		target="$arg_value";;
+
+	*)
+		echo "Invalid option: $arg"
+		exit 1;;
+	esac # case "$arg"
+done # for arg in "$@"
+
+[ -z "$bindir"  ] && bindir="$prefix/bin"
+[ -z "$libdir"  ] && libdir="$prefix/lib"
+[ -z "$datadir" ] && datadir="$prefix/share"
+[ -z "$mandir"  ] && mandir="$prefix/share/man"
+
+#------ CONFIGURATION -----------------------------------------------------------------------------
+
+# Check for sed
+error_desc="GNU-compatible sed is required for proper functioning of this script"
+checkforprograms "sed" "gsed" "sed" || msg_fail
+
+[ "`echo 'abc' | sed 's/b/\n\t/g'`" = "antd" ] && msg_fail
+sed=`cat "$configure_tmp"`
+
+# Detect CPU architecture
+msg_checking "CPU architecture"
+
+if [ "$target" = "auto" ]; then
+	cat >"$configure_cpp" <<__EOF__
+#include "shell/common.h"
+int main ()
+{
+	puts(SHELL_CPUARCH);
+	return 0;
+}
+__EOF__
+
+	target=`getoutput -Isquirrel`
+fi
+
+case "$target" in
+i[3-9]86 | x86 | x86pc | k5 | k6 | k6-2 | k6-3 | pentium* | athlon* | i586-i686)
+	target="x86";;
+
+x64 | x86-64 | x86_64 | amd64)
+	target="x86_64";;
+
+ia64)
+	target="ia64";;
+
+alpha)
+	target="alpha";;
+
+arm)
+	target="arm";;
+
+mips)
+	target="mips";;
+
+hppa)
+	target="hppa";;
+
+ppc|powerpc)
+	target="powerpc";;
+
+sparc)
+	target="sparc";;
+
+*)
+	target="unknown";;
+esac
+msg_result "$target"
+
+# Detect platform (OS)
+msg_checking "platform (OS)"
+
+cat >"$configure_cpp" <<__EOF__
+#include "shell/common.h"
+int main ()
+{
+	puts(SHELL_PLATFORM);
+	return 0;
+}
+__EOF__
+
+platform=`getoutput -Isquirrel`
+msg_result "$platform"
+
+# Apply platform-specific settings
+case "$platform" in
+win32 | win64)
+	exe_suffix=".exe"
+	dll_suffix=".dll";;
+
+macosx)
+	dll_suffix=".dylib"
+	if [ "$with_libraries" = "shared" ]; then
+		echo "WARNING: Forcing use of static libraries"
+		with_libraries="static"
+	fi
+
+	if [ "$with_pcre" != "local" ]; then
+		echo "WARNING: Forcing use of local PCRE library"
+		with_pcre="local"
+	fi
+	;;
+*)
+	;;
+esac
+resetfiles
+
+# Check whether install is available and supports required options
+error_desc="You need BSD-compatible install tool.
+The following command line semantics are used:
+$installer -c -m MODE SOURCE DEST   Copy file
+$installer -d -m MODE PATH          Create all components of specified directory"
+checkforprogram "$installer" || msg_fail
+
+msg_checking "whether $installer supports required options"
+$installer -c -m 0644 "$configure_log" "$configure_tmp" >>"$configure_log" 2>&1 || msg_fail
+$installer -d -m 0755 "$configure_dir" >>"$configure_log" 2>&1 || [ -d "$configure_dir" ] || msg_fail
+msg_ok
+
+# Check for make
+error_desc="You need GNU-compatible make tool"
+checkforprograms "make tool" "gmake" "make" || msg_fail
+maketool=`cat "$configure_tmp"`
+
+# Check whether make sets $(MAKE)
+msg_checking "whether $maketool sets \$(MAKE)"
+
+cat >"$configure_tmp" <<__EOF__
+default:
+	@echo "maketool=\$(MAKE)"
+__EOF__
+
+[ "`$maketool -f "$configure_tmp" 2>>"$configure_log" | grep maketool | cut -d '=' -f 2`" ] || msg_fail
+msg_ok
+
+# Check for C++ compiler
+error_desc="You need gcc-compatible C++ compiler"
+checkforprograms "C++ compiler" "$cpp_compiler" "g++" "icc" "c++" "cpp" || msg_fail
+cpp_compiler=`cat "$configure_tmp"`
+
+# Check whether C++ compiler supports required options
+checkforcppoption || msg_fail
+
+# Check for optional C++ compiler options
+if [ -z "$CXXFLAGS" ]; then
+	checkforcppoption "-pipe" || msg_result "no"
+	checkforcppoption "-flto" || msg_result "no"
+fi
+
+# Check for ranlib if necessary
+if [ "$with_libraries" = "static" ] && [ "$with_ranlib" = "yes" ]; then
+	checkforprogram "ranlib"
+	if [ "$?" -ne 0 ]; then
+		msg_result "no"
+		with_ranlib="no"
+	fi
+fi
+
+# Check whether linker supports required options
+checkforlinkeroption || msg_fail
+
+# Check for optional linker options
+if [ -z "$LFLAGS" ]; then
+	checkforlinkeroption "-pipe" || msg_result "no"
+	checkforlinkeroption "-flto" y || msg_result "no"
+fi
+
+# Check for standard headers
+error_desc=""
+checkforcheader "stdio.h"  || msg_fail
+checkforcheader "stddef.h" || msg_fail
+checkforcheader "stdarg.h" || msg_fail
+checkforcheader "string.h" || msg_fail
+checkforcheader "stdlib.h" || msg_fail
+checkforcheader "limits.h" || msg_fail
+checkforcheader "math.h"   || msg_fail
+checkforcheader "ctype.h"  || msg_fail
+checkforcheader "assert.h" || msg_fail
+checkforcheader "setjmp.h" || msg_fail
+checkforcheader "signal.h" || msg_fail
+checkforcheader "unistd.h" || msg_fail
+checkforcppheader "new"    || msg_fail
+
+# Check for pkg-config
+if [ -z "$pkgconfig" ]; then
+	checkforprogram "pkg-config" && pkgconfig="pkg-config"
+fi
+
+# Perform a simple check that would let us assume PKG_CONFIG environment variable points to a valid pkg-config program
+if [ -z "$pkgconfig" ]; then
+	msg_checking "pkg-config utility"
+	if $pkgconfig --atleast-pkgconfig-version 0.9; then
+		msg_ok
+	else
+		msg_result "invalid or too old"
+		pkgconfig=""
+	fi
+fi
+
+# Check for system-wide PCRE if necessary
+if [ "$with_pcre" != "local" ]; then
+	cat >"$configure_cpp" <<__EOF__
+#include <stdio.h>
+#include <pcre.h>
+int main ()
+{
+	puts(pcre_version());
+	return 0;
+}
+__EOF__
+
+	checkforlib "pcre" "libpcre"
+	if [ "$?" -ne 0 ]; then
+		if [ "$with_pcre" = "system" ]; then
+			error_desc="System-wide PCRE library is unavailable or invalid"
+			msg_fail
+		else
+			msg_result "no"
+			with_pcre="local"
+		fi
+	fi
+
+	# Determine which library is newer, ignoring prerelease number
+	if [ "$with_pcre" != "system" ]; then
+		msg_checking "local PCRE version number"
+		major_regexp='^[[:space:]]*#[[:space:]]*define[[:space:]]\+PCRE_MAJOR[[:space:]]\+\([[:digit:]]\+\)'
+		minor_regexp=`echo "$major_regexp" | $sed 's/MAJOR/MINOR/'`
+		local_major=`grep -m 1 -o "$major_regexp" "pcre/pcre.h" | $sed "s/$major_regexp/\\1/"`
+		local_minor=`grep -m 1 -o "$minor_regexp" "pcre/pcre.h" | $sed "s/$minor_regexp/\\1/"`
+		local_full="$local_major.$local_minor"
+		pcre_version_full="$local_full"
+		msg_result "$local_full"
+	fi
+
+	if [ "$with_pcre" != "local" ]; then
+		msg_checking "system PCRE version number"
+
+		system_full=`./"$configure_exe" | grep -o '[[:digit:]]\+\.[[:digit:]]\+'`
+		system_major=`echo "$system_full" | cut -d '.' -f 1`
+		system_minor=`echo "$system_full" | cut -d '.' -f 2`
+		pcre_version_full="$system_full"
+		msg_result "$system_full"
+
+		if [ "$with_pcre" = "auto" ]; then
+			msg_checking "which libpcre is newer"
+			if [ $local_major -gt $system_major ]; then
+				with_pcre="local"
+				pcre_version_full="$local_full"
+			elif [ $local_major -lt $system_major ]; then
+				with_pcre="system"
+				pcre_version_full="$system_full"
+			else
+				if [ $local_minor -gt $system_minor ]; then
+					with_pcre="local"
+					pcre_version_full="$local_full"
+				else # Use system-wide library by default
+					with_pcre="system"
+					pcre_version_full="$system_full"
+				fi
+			fi
+			msg_result "$with_pcre"
+		fi
+	fi
+fi # if [ "$with_pcre" != "local" ]
+
+# If decided to use local PCRE, check for C compiler
+if [ "$with_pcre" = "local" ]; then
+	error_desc="You need gcc-compatible C compiler"
+	checkforprograms "C compiler" "$c_compiler" "gcc" "icc" "cc" || msg_fail
+	c_compiler=`cat "$configure_tmp"`
+
+	# Check whether C compiler supports required options
+	checkforcoption || msg_fail
+
+	# Check for optional C compiler options
+	if [ -z "$CFLAGS" ]; then
+		checkforcoption "-pipe" || msg_result "no"
+		checkforcoption "-flto" || msg_result "no"
+	fi
+fi
+
+# Check for system-wide Squirrel if necessary
+if [ "$with_squirrel" != "local" ]; then
+	cat >"$configure_cpp" <<__EOF__
+#include <stdio.h>
+#include <squirrel.h>
+int main ()
+{
+	puts(SQUIRREL_VERSION);
+	HSQUIRRELVM vm = sq_open(16);
+	if (!vm)
+		return 1;
+
+	sq_setmaxparams(vm, 1);
+	sq_close(vm);
+	return 0;
+}
+__EOF__
+
+	checkforlib "squirrel" "libsquirrel"
+	if [ "$?" -ne 0 ]; then
+		if [ "$with_squirrel" = "system" ]; then
+			error_desc="System-wide Squirrel library is unavailable or invalid"
+			msg_fail
+		else
+			msg_result "no"
+			with_squirrel="local"
+		fi
+	fi
+
+	# Determine which library is newer
+	version_regexp='[[:digit:]]\+\(\.[[:digit:]]\+\(\.[[:digit:]]\+\)\?\)\?'
+	if [ "$with_squirrel" != "system" ]; then
+		msg_checking "local Squirrel version number"
+		local_full=`grep -m 1 '^[[:space:]]*#[[:space:]]*define[[:space:]]\+SQUIRREL_VERSION' "squirrel/squirrel.h" | grep -o "$version_regexp"`
+		local_major=`echo "$local_full" | cut -d '.' -f 1`
+		local_minor=`echo "$local_full" | cut -d '.' -f 2`
+		local_patch=`echo "$local_full" | cut -d '.' -f 3`
+		squirrel_version_full="$local_full"
+		msg_result "$local_full"
+	fi
+
+	if [ "$with_squirrel" != "local" ]; then
+		msg_checking "system Squirrel version number"
+
+		system_full=`./"$configure_exe" | grep -o "$version_regexp"`
+		system_major=`echo "$system_full" | cut -d '.' -f 1`
+		system_minor=`echo "$system_full" | cut -d '.' -f 2`
+		system_patch=`echo "$system_full" | cut -d '.' -f 3`
+		squirrel_version_full="$system_full"
+		msg_result "$system_full"
+
+		if [ "$with_pcre" = "auto" ]; then
+			msg_checking "which libsquirrel is newer"
+			if [ $local_major -gt $system_major ]; then
+				with_squirrel="local"
+				squirrel_version_full="$local_full"
+			elif [ $local_major -lt $system_major ]; then
+				with_squirrel="system"
+				squirrel_version_full="$system_full"
+			else
+				if [ $local_minor -gt $system_minor ]; then
+					with_squirrel="local"
+					squirrel_version_full="$local_full"
+				elif [ $local_minor -lt $system_minor ]; then
+					with_squirrel="system"
+					squirrel_version_full="$system_full"
+				else
+					if [ $local_patch -gt $system_patch ]; then
+						with_squirrel="local"
+						squirrel_version_full="$local_full"
+					else # Use system-wide library by default
+						with_pcre="system"
+						squirrel_version_full="$system_full"
+					fi
+				fi
+			fi
+			msg_result "$with_squirrel"
+		fi
+	fi
+fi # if [ "$with_squirrel" != "local" ]
+
+error_desc=""
+
+if [ "$with_mime" = "all" ]; then
+	mime_file="yes"
+	mime_gnome="yes"
+	mime_kde="yes"
+fi
+
+# Check if 'file' utility is installed
+if [ "$with_mime" = "auto" ]; then
+	if checkforprogram "file"; then
+		mime_file="yes"
+	else
+		msg_result "no"
+	fi
+fi
+
+if [ "$with_mime" = "file" ] || [ "$mime_file" = "yes" ]; then
+	if [ -z "$mime_file" ]; then
+		checkforprogram "file" || msg_result "no" "ignored"
+	fi
+
+	mime_file="yes"
+
+	findfile "magic" "/etc" "/usr/share/file" "/usr/local/share/file"
+	mime_file_f1=`cat "$configure_tmp"`
+
+	findfile "mime.types" "/etc" "/usr/share/file"
+	mime_file_f2=`cat "$configure_tmp"`
+fi
+
+# Check if GNOME desktop is installed
+if [ "$with_mime" = "auto" ]; then
+	if [ -n "$pkgconfig" ]; then
+		msg_checkingfor "'$mime_gnome_pkg.pc'"
+		if $pkgconfig --exists "$mime_gnome_pkg" >>"$configure_log" 2>&1;then
+			msg_ok
+			mime_gnome="yes"
+		else
+			msg_result "no"
+		fi
+	else
+		msg_result "no"
+	fi
+fi
+
+if [ "$with_mime" = "gnome" ] || [ "$mime_gnome" = "yes" ]; then
+	if [ -z "$mime_gnome" ]; then
+		if [ -n "$pkgconfig" ]; then
+			msg_checkingfor "'$mime_gnome_pkg.pc'"
+			if $pkgconfig --exists "$mime_gnome_pkg" >>"$configure_log" 2>&1;then
+				msg_ok
+				mime_gnome="yes"
+			else
+				error_desc="No default paths are defined for GNOME MIME data directory. Please contact the developers of $app_name if you have any information on this thing"
+				msg_fail
+			fi
+		else
+			msg_result "no" "ignored"
+		fi
+	fi
+
+	mime_gnome="yes"
+	mime_gnome_d="`$pkgconfig --variable=prefix "$mime_gnome_pkg" 2>>"$configure_log"`/share/mime-info"
+	mime_gnome_f1="$mime_gnome_d/$mime_type.mime"
+	mime_gnome_f2="$mime_gnome_d/$mime_type.keys"
+fi
+
+# Check if KDE desktop is installed
+if [ "$with_mime" = "auto" ]; then
+	if checkforprogram "kde-config"; then
+		mime_kde="yes"
+	else
+		msg_result "no"
+	fi
+fi
+
+if [ "$with_mime" = "kde" ] || [ "$mime_kde" = "yes" ]; then
+	if [ -z "$mime_kde" ]; then
+		checkforprogram "kde-config" || msg_result "no" "ignored"
+	fi
+
+	mime_kde="yes"
+
+	msg_checkingfor "KDE MIME data directory"
+	mime_kde_d1=`kde-config --expandvars --install mime 2>>"$configure_log"`
+
+	msg_result "$mime_kde_d1"
+	mime_kde_f1="$mime_kde_d1/$mime_type_full.desktop"
+
+	msg_checkingfor "KDE configuration directory"
+	mime_kde_d2="`kde-config --expandvars --install config 2>>"$configure_log"`/magic"
+
+	msg_result "$mime_kde_d2"
+	mime_kde_f2="$mime_kde_d2/$mime_type.magic"
+fi
+
+# Disable MIME completely if no supported packages were found
+if [ -z "$mime_file" ] && [ -z "$mime_gnome" ] && [ -z "$mime_kde" ]; then
+	with_mime="no"
+fi
+
+cleanup
+
+#------ CREATE MAKEFILES --------------------------------------------------------------------------
+
+# Define variables for substitution
+# ... CFLAGS, CXXFLAGS, DEFINES, LFLAGS, INSTALL_EXE (machine-independent)
+in_CFLAGS="-c $c_compiler_flags"
+in_CXXFLAGS="-c $cpp_compiler_flags"
+in_LFLAGS="$linker_flags"
+in_INSTALL_EXE="$installer -c -m 0755 \"\$(target)\" \"$bindir/\$(target_name)\""
+
+if [ "$with_pcre" = "local" ] || [ "$with_squirrel" = "local" ]; then
+	in_LFLAGS="-L\"$source_dir/lib\""
+fi
+
+if [ -n "$pkgconfig" ]; then
+	if [ "$with_pcre" = "system" ]; then
+		in_CFLAGS="$in_CFLAGS `$pkgconfig --cflags-only-other libpcre`"
+		in_CXXFLAGS="$in_CXXFLAGS `$pkgconfig --cflags-only-other libpcre`"
+		in_LFLAGS="$in_LFLAGS `$pkgconfig --libs-only-other --libs-only-L libpcre`"
+	fi
+
+	if [ "$with_squirrel" = "system" ]; then
+		in_CFLAGS="$in_CFLAGS `$pkgconfig --cflags-only-other libsquirrel`"
+		in_CXXFLAGS="$in_CXXFLAGS `$pkgconfig --cflags-only-other libsquirrel`"
+		in_LFLAGS="$in_LFLAGS `$pkgconfig --libs-only-other --libs-only-L libsquirrel`"
+	fi
+fi
+
+if [ "$enable_debug" = "yes" ]; then
+	in_CFLAGS="$in_CFLAGS -g"
+	in_CXXFLAGS="$in_CXXFLAGS -g"
+	in_DEFINES="-D_DEBUG"
+else
+	[ -z "$CFLAGS" ] && in_CFLAGS="$in_CFLAGS -fomit-frame-pointer"
+	[ -z "$CXXFLAGS" ] && in_CXXFLAGS="$in_CXXFLAGS -fomit-frame-pointer"
+	in_DEFINES="-DNDEBUG"
+	[ -z "$LFLAGS" ] && in_LFLAGS="$in_LFLAGS -s"
+fi
+
+if [ "$with_pcre" = "local" ] && [ "$with_libraries" = "static" ]; then
+	in_DEFINES="$in_DEFINES -DPCRE_STATIC"
+fi
+
+# ... CFLAGS, CXXFLAGS, DEFINES, LFLAGS (machine-dependent)
+case "$target" in
+x86)
+	in_CFLAGS="-m32 $in_CFLAGS"
+	in_CXXFLAGS="-m32 $in_CXXFLAGS"
+	in_LFLAGS="-m32 $in_LFLAGS";;
+
+x86_64)
+	in_CFLAGS="-m64 $in_CFLAGS"
+	in_CXXFLAGS="-m64 $in_CXXFLAGS"
+	in_DEFINES="$in_DEFINES -D_SQ64"
+	in_LFLAGS="-m64 $in_LFLAGS";;
+
+ia64)
+	in_DEFINES="$in_DEFINES -D_SQ64";;
+esac
+
+# ... INCLUDES, LIBS
+in_INCLUDES="-I."
+in_LIBS=""
+
+if [ "$with_pcre" = "local" ] || [ -z "$pkgconfig" ]; then
+	[ "$with_pcre" = "local" ] && in_INCLUDES="$in_INCLUDES -I\"$source_dir/pcre\""
+	in_LIBS="$in_LIBS -lpcre"
+else
+	in_INCLUDES="$in_INCLUDES `$pkgconfig --cflags-only-I libpcre`"
+	in_LIBS="$in_LIBS `$pkgconfig --libs-only-l libpcre`"
+fi
+
+if [ "$with_squirrel" = "local" ] || [ -z "$pkgconfig" ]; then
+	[ "$with_squirrel" = "local" ] && in_INCLUDES="$in_INCLUDES -I\"$source_dir/squirrel\""
+	in_LIBS="$in_LIBS -lsquirrel"
+else
+	in_INCLUDES="$in_INCLUDES `$pkgconfig --cflags-only-I libsquirrel`"
+	in_LIBS="$in_LIBS `$pkgconfig --libs-only-l libsquirrel`"
+fi
+
+# ... CFLAGS_EXE, CXXFLAGS_EXE
+in_CFLAGS_EXE="$in_CFLAGS"
+in_CXXFLAGS_EXE="$in_CXXFLAGS"
+
+# ... CFLAGS_LIB, CXXFLAGS_LIB, MAKE_LIB
+if [ "$with_libraries" = "static" ]; then
+	in_LIB_EXT="$lib_suffix"
+	in_CFLAGS_LIB="$in_CFLAGS"
+	in_CXXFLAGS_LIB="$in_CXXFLAGS"
+	in_MAKE_LIB="$librarian \"\$(target)\" \$(objects)"
+	[ "$with_ranlib" = "yes" ] && in_MAKE_LIB="${in_MAKE_LIB}\n\tranlib \"\$(target)\""
+	in_INSTALL_LIB='@true Static libraries are not installed'
+	in_UNINSTALL_LIB='@true Static libraries are not installed'
+
+	# Work around Apple's linker behavior ("-L../lib" linker option seems to be ignored)
+	if [ "$platform" = "macosx" ]; then
+		#in_LFLAGS="$in_LFLAGS -search_paths_first"
+		[ "$with_pcre"     = "local" ] && in_LIBS=`echo "$in_LIBS" | $sed -e "s@-lpcre@../lib/libpcre$lib_suffix@"`
+		[ "$with_squirrel" = "local" ] && in_LIBS=`echo "$in_LIBS" | $sed -e "s@-lsquirrel@../lib/libsquirrel$lib_suffix@"`
+	fi
+else
+	in_LIB_EXT="$dll_suffix"
+	in_CFLAGS_LIB="$in_CFLAGS -fPIC"
+	in_CXXFLAGS_LIB="$in_CXXFLAGS -fPIC"
+	in_MAKE_LIB="$linker -shared $in_LFLAGS -o \"\$(target)\" \$(objects)"
+	in_INSTALL_LIB="$installer -c -m 0755 \"\$(target)\" \"$libdir\""
+	[ "$with_strip" ] && in_INSTALL_LIB="$in_INSTALL_LIB \\&\\& strip --strip-unneeded \"$libdir/\$(target_name)\""
+	in_UNINSTALL_LIB="rm -f \"$libdir/\$(target_name)\""
+fi
+
+# ... and other :)
+if [ "$with_symlink" = "yes" ] && [ "$bindir" != "/usr/bin" ] && [ "$bindir" != "/usr/bin/" ]; then
+	in_INSTALL_SYMLINK='ln -s "@BINDIR@/$(target_name)" "/usr/bin/$(target_name)"'
+	in_UNINSTALL_SYMLINK='rm -f "/usr/bin/$(target_name)"'
+else
+	in_INSTALL_SYMLINK='@true Symbolic link is not installed'
+	in_UNINSTALL_SYMLINK='@true Symbolic link is not installed'
+fi
+
+if [ "$with_mime" != "no" ]; then
+	mime_flags="${mime_file:+--file} ${mime_gnome:+--gnome} ${mime_kde:+--kde}"
+	in_INSTALL_MIME="./configure-mime --install $mime_flags"
+	in_UNINSTALL_MIME="./configure-mime --uninstall $mime_flags"
+else
+	in_INSTALL_MIME='@true MIME information is not installed'
+	in_UNINSTALL_MIME='@true MIME information is not installed'
+fi
+
+if [ "$with_pcre" = "local" ]; then
+	in_MAKE_PCRE='@cd pcre \&\& $(MAKE) $@'
+else
+	in_MAKE_PCRE='@true System PCRE library is used'
+fi
+
+if [ "$with_squirrel" = "local" ]; then
+	in_MAKE_SQUIRREL='@cd squirrel \&\& $(MAKE) $@'
+else
+	in_MAKE_SQUIRREL='@true System Squirrel library is used'
+fi
+
+# Write sed script
+cat >"$configure_tmp" <<__EOF__
+s#@CC@#$c_compiler#
+s#@CXX@#$cpp_compiler#
+s#@LINK@#$linker#
+s#@EXE_EXT@#$exe_suffix#
+s#@LIB_EXT@#$in_LIB_EXT#
+s#@MAKE_EXE@#$linker $in_LFLAGS -o "\$(target)" \$(objects) $in_LIBS#
+s#@MAKE_LIB@#$in_MAKE_LIB#
+s#@MAKE_PCRE@#$in_MAKE_PCRE#
+s#@MAKE_SHELL@#@cd shell \&\& \$(MAKE) \$@#
+s#@MAKE_SQUIRREL@#$in_MAKE_SQUIRREL#
+s#@CFLAGS@#$in_CFLAGS#
+s#@CXXFLAGS@#$in_CXXFLAGS#
+s#@CFLAGS_EXE@#$in_CFLAGS_EXE#
+s#@CXXFLAGS_EXE@#$in_CXXFLAGS_EXE#
+s#@CFLAGS_LIB@#$in_CFLAGS_LIB#
+s#@CXXFLAGS_LIB@#$in_CXXFLAGS_LIB#
+s#@LFLAGS@#$in_LFLAGS#
+s#@DEFINES@#$in_DEFINES#
+s#@INCLUDES@#$in_INCLUDES#
+s#@LIBS@#$in_LIBS#
+s#@INSTALL@#$installer#
+s#@INSTALL_EXE@#$in_INSTALL_EXE#
+s#@INSTALL_LIB@#$in_INSTALL_LIB#
+s#@INSTALL_SYMLINK@#$in_INSTALL_SYMLINK#
+s#@INSTALL_MIME@#$in_INSTALL_MIME#
+s#@MKDIR@#mkdir -m 0755#
+s#@RM@#rm -f#
+s#@RMDIR@#rm -rf#
+s#@UNINSTALL_SYMLINK@#$in_UNINSTALL_SYMLINK#
+s#@UNINSTALL_MIME@#$in_UNINSTALL_MIME#
+s#@BINDIR@#$bindir#
+s#@LIBDIR@#$libdir#
+s#@DOCDIR@#$datadir/doc/squirrelsh#
+s#@MANDIR@#$mandir/man1#
+s#@FILE_MAGIC@#$mime_file_f1#
+s#@FILE_TYPES@#$mime_file_f2#
+s#@GNOME_DIR@#$mime_gnome_d#
+s#@GNOME_MIME@#$mime_gnome_f1#
+s#@GNOME_KEYS@#$mime_gnome_f2#
+s#@KDE_DESKTOP_DIR@#$mime_kde_d1#
+s#@KDE_DESKTOP_FILE@#$mime_kde_f1#
+s#@KDE_MAGIC_DIR@#$mime_kde_d2#
+s#@KDE_MAGIC_FILE@#$mime_kde_f2#
+__EOF__
+
+# Create makefiles
+genfile "Makefile" || msg_fail
+
+if [ "$with_pcre" = "local" ]; then
+	genfile "pcre/Makefile" || msg_fail
+else
+	rm -f "pcre/Makefile"
+fi
+
+if [ "$with_squirrel" = "local" ]; then
+	genfile "squirrel/Makefile" || msg_fail
+else
+	rm -f "squirrel/Makefile"
+fi
+
+genfile "shell/Makefile" || msg_fail
+genfile "configure-mime" || msg_fail
+chmod 0755 configure-mime
+
+#------ HAPPY END ---------------------------------------------------------------------------------
+
+# Build list of enabled MIME data types
+with_mime="${mime_file:+file} ${mime_gnome:+GNOME} ${mime_kde:+KDE}"
+if [ -n "$with_mime" ]; then
+	# Remove leading space
+	with_mime=`echo "$with_mime" | $sed -e 's/^[[:space:]]*//'`
+else
+	with_mime="(none)"
+fi
+
+echo "$app_name has been configured successfully" >>"$configure_log"
+cat <<__EOF__
+-------------------------------------------------------------------------------
+Configuration has been completed successfully.
+    Build for $platform platform with $target CPU architecture
+    Installation prefix: $prefix
+    Allow debugging: $enable_debug
+    Build $with_libraries libraries
+    Use $with_pcre PCRE $pcre_version_full library
+    Use $with_squirrel Squirrel $squirrel_version_full library
+    Install MIME information: $with_mime
+    Create symbolic link: $with_symlink
+    Compile C code with '$c_compiler' using '$c_compiler_flags' options
+    Compile C++ code with '$cpp_compiler' using '$cpp_compiler_flags' options
+    Create static libraries with '$librarian'
+    Create executables and shared libraries with '$linker' using '$linker_flags' options
+    Install files with '$installer'
+
+Now use '$maketool' to compile $app_name.
+__EOF__
+closescript

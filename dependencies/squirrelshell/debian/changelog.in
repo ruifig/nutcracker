@@ -1,0 +1,53 @@
+squirrelsh (1.2.4-1) unstable; urgency=low
+  * Updated Squirrel Shell to version 1.2.4.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  DATE_AND_TIME
+
+squirrelsh (1.2.3-1) unstable; urgency=low
+
+  * Updated Squirrel Shell to version 1.2.3.
+  * Changed package distribution to unstable.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  Thu, 26 Feb 2009 21:51:04 +0300
+
+squirrelsh (1.2.2-1) stable; urgency=low
+
+  * Updated Squirrel Shell to version 1.2.2.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  Sun, 12 Oct 2008 12:49:56 +0400
+
+squirrelsh (1.2.1-1) stable; urgency=low
+
+  * Updated Squirrel Shell to version 1.2.1.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  Tue, 01 Apr 2008 23:39:41 +0400
+
+squirrelsh (1.2-1) stable; urgency=low
+
+  * Updated Squirrel Shell to version 1.2.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  Mon, 18 Jun 2007 19:09:37 +0300
+
+squirrelsh (1.1.2007-1) stable; urgency=low
+
+  * Updated Squirrel Shell to version 1.1.2007.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  Sat, 30 Dec 2006 23:00:12 +0300
+
+squirrelsh (1.1.2-1) stable; urgency=low
+
+  * Updated Squirrel Shell to version 1.1.2.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  Tue, 26 Dec 2006 09:39:10 +0300
+
+squirrelsh (1.1-1) stable; urgency=low
+
+  * Updated Squirrel Shell to version 1.1.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  Mon, 25 Dec 2006 11:51:10 +0300
+
+squirrelsh (1.0-1) stable; urgency=low
+
+  * First Debian package release.
+
+ -- Constantin Makshin <dinosaur-rus@users.sourceforge.net>  Tue, 28 Nov 2006 18:56:48 +0300

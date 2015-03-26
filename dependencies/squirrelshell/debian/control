@@ -1,0 +1,26 @@
+Source: squirrelsh
+Section: universe/shells
+Priority: optional
+Maintainer: Constantin Makshin <dinosaur-rus@users.sourceforge.net>
+Build-Depends: debhelper (>= 4)
+Standards-Version: 3.6.1
+
+Package: squirrelsh
+Architecture: i386 amd64 alpha
+Depends: ${shlibs:Depends}
+Description: Cross-platform system shell
+ Squirrel Shell is made as a cross platform alternative to system shells like
+ sh, bash and other in *nix and command.com (or cmd.exe) in Microsoft Windows.
+ .
+ Squirrel Shell is based on general purpose scripting language "Squirrel".
+ Some of its features:
+  - object-oriented programming;
+  - C++-like syntax;
+  - dynamic typing;
+  - delegation;
+  - generators;
+  - weak references;
+  - exception handling.
+ More on Squirrel's web site (http://www.squirrel-lang.org).
+ .
+ Homepage: http://squirrelsh.sf.net.

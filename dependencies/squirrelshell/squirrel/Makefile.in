@@ -1,0 +1,50 @@
+objects=sqapi.o \
+        sqbaselib.o \
+        sqclass.o \
+        sqcompiler.o \
+        sqdebug.o \
+        sqfuncstate.o \
+        sqlexer.o \
+        sqmem.o \
+        sqobject.o \
+        sqstate.o \
+        sqtable.o \
+        sqvm.o
+target_dir=../lib
+target_name=libsquirrel@LIB_EXT@
+target=$(target_dir)/$(target_name)
+
+.cpp.o:
+	@CXX@ @CXXFLAGS_LIB@ @DEFINES@ -c -o $@ $< @INCLUDES@
+
+$(target): $(objects)
+	@if [ ! -e "$(target_dir)" ]; then @MKDIR@ "$(target_dir)"; fi
+	@MAKE_LIB@
+
+all: $(target)
+
+clean:
+	@RM@ *~ *.o
+
+distclean: clean
+	@RM@ Makefile "$(target)"
+
+install: all
+	@INSTALL@ -d -m 0755 "@LIBDIR@"
+	@INSTALL_LIB@
+
+uninstall:
+	@RM@ "@LIBDIR@/$(target_name)"
+
+sqapi.o: sqapi.cpp sqpcheader.h sqvm.h sqstring.h sqtable.h sqarray.h sqfuncproto.h sqclosure.h squserdata.h sqcompiler.h sqfuncstate.h sqclass.h
+sqbaselib.o: sqbaselib.cpp sqpcheader.h sqvm.h sqstring.h sqtable.h sqarray.h sqfuncproto.h sqclosure.h sqclass.h
+sqclass.o: sqclass.cpp sqpcheader.h sqvm.h sqtable.h sqclass.h sqclosure.h
+sqcompiler.o: sqcompiler.cpp sqpcheader.h sqvm.h sqopcodes.h sqstring.h sqfuncproto.h sqcompiler.h sqfuncstate.h sqlexer.h
+sqdebug.o: sqdebug.cpp sqpcheader.h sqvm.h sqfuncproto.h sqclosure.h sqstring.h
+sqfuncstate.o: sqfuncstate.cpp sqpcheader.h sqcompiler.h sqfuncproto.h sqstring.h sqtable.h sqopcodes.h sqfuncstate.h
+sqlexer.o: sqlexer.cpp sqpcheader.h sqtable.h sqstring.h sqcompiler.h sqlexer.h
+sqmem.o: sqmem.cpp sqpcheader.h
+sqobject.o: sqobject.cpp sqpcheader.h sqvm.h sqstring.h sqarray.h sqtable.h squserdata.h sqfuncproto.h sqclass.h sqclosure.h
+sqstate.o: sqstate.cpp sqpcheader.h sqvm.h sqopcodes.h sqfuncproto.h sqclosure.h sqstring.h sqtable.h sqarray.h squserdata.h sqclass.h
+sqtable.o: sqtable.cpp sqpcheader.h sqvm.h sqtable.h sqfuncproto.h sqclosure.h
+sqvm.o: sqvm.cpp sqpcheader.h sqvm.h sqopcodes.h sqfuncproto.h sqclosure.h sqstring.h sqtable.h squserdata.h sqarray.h sqclass.h

@@ -1,0 +1,77 @@
+#!/bin/bash
+
+if [ `id -ur` -ne 0 ]; then
+	echo "Sorry, but you need to be root."
+	exit 1
+fi
+
+mimeGroup="application"
+mimeType="x-squirrelshscript"
+fullMimeType="${mimeGroup}/${mimeType}"
+
+# Uninstall MIME information used by "file" utility
+install-common ()
+{
+echo "   from 'file' utility..."
+
+local filePath="/etc/magic"
+cat <<__EOF__ | ed >/dev/null 2>/dev/null
+e ${filePath}
+1,\$g/squirrelsh/d
+wq
+__EOF__
+
+filePath="/etc/mime.types"
+cat <<__EOF__ | ed >/dev/null 2>/dev/null
+e ${filePath}
+1,\$g/^[[:space:]]*${mimeGroup}\/${mimeType}[[:space:]]\{1,\}nut[[:space:]]*\$/d
+wq
+__EOF__
+}
+
+# Uninstall MIME information used by GNOME desktop
+install-gnome ()
+{
+echo "   from GNOME desktop..."
+
+if !(which pkg-config >/dev/null 2>/dev/null); then
+	echo "      Could not find 'pkg-config' utility."
+	return 1
+fi
+
+local packageName="gnome-mime-data"
+
+if !(pkg-config --exists ${packageName}); then
+	echo "      Could not find 'gnome-mime-data' package."
+	return 1
+fi
+
+local destDir=""
+
+rm -f "`pkg-config --variable=prefix ${packageName}`/share/mime-info/${mimeType}.*"
+}
+
+# Uninstall MIME information used by KDE desktop
+install-kde ()
+{
+echo "   from KDE desktop..."
+
+if !(which kde-config >/dev/null 2>/dev/null); then
+	echo "      Could not find 'kde-config' utility."
+	return 1
+fi
+
+rm -f "`kde-config --expandvars --install config`/${mimeType}.magic" "`kde-config --expandvars --install mime`/${fullMimeType}.desktop"
+}
+
+echo "Uninstalling MIME information"
+
+uninstall-common
+
+if (which startgnome >/dev/null 2>/dev/null); then
+	uninstall-gnome
+fi
+
+if (which startkde >/dev/null 2>/dev/null); then
+	uninstall-kde
+fi

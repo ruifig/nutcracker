@@ -1,0 +1,118 @@
+#!/bin/bash
+
+if [ `id -ur` -ne 0 ]; then
+	echo "Sorry, but you need to be root."
+	exit 1
+fi
+
+mimeGroup="application"
+mimeType="x-squirrelshscript"
+fullMimeType="${mimeGroup}/${mimeType}"
+
+# Install MIME information for use by "file" utility
+install-common ()
+{
+echo "   for 'file' utility..."
+
+local filePath="/etc/magic"
+# Delete existing entries
+cat <<__EOF__ | ed >/dev/null 2>/dev/null
+e ${filePath}
+1,\$g/squirrelsh/d
+wq
+__EOF__
+# Add new entries
+cat >>${filePath} <<__EOF__
+0	string/b	#!\ /usr/bin/squirrelsh		Squirrel shell script text executable
+0	string/b	#!\ /usr/local/bin/squirrelsh	Squirrel shell script text executable
+0	string/b	#!\ /usr/bin/env\ squirrelsh	Squirrel Shell script text executable
+__EOF__
+
+filePath="/etc/mime.types"
+# Delete existing entry
+cat <<__EOF__ | ed >/dev/null 2>/dev/null
+e ${filePath}
+1,\$g/^[[:space:]]*${mimeGroup}\/${mimeType}[[:space:]]\{1,\}nut[[:space:]]*\$/d
+wq
+__EOF__
+# Add new entry
+cat >>${filePath} <<__EOF__
+${fullMimeType}			nut
+__EOF__
+}
+
+# Install MIME information for use by GNOME desktop
+install-gnome ()
+{
+echo "   for GNOME desktop..."
+
+if !(which pkg-config >/dev/null 2>/dev/null); then
+	echo "      Could not find 'pkg-config' utility."
+	return 1
+fi
+
+local packageName="gnome-mime-data"
+
+if !(pkg-config --exists ${packageName}); then
+	echo "      Could not find 'gnome-mime-data' package."
+	return 1
+fi
+
+local destDir="`pkg-config --variable=prefix ${packageName}`/share/mime-info"
+
+cat >${destDir}/${mimeType}.mime <<__EOF__
+${fullMimeType}:
+	ext: nut
+__EOF__
+
+cat >${destDir}/${mimeType}.keys <<__EOF__
+${fullMimeType}:
+	can_be_executable=TRUE
+	description=Squirrel Shell Script
+	category=Software Development/Source Code
+__EOF__
+}
+
+# Install MIME information for use by KDE desktop
+install-kde ()
+{
+echo "   for KDE desktop..."
+
+if !(which kde-config >/dev/null 2>/dev/null); then
+	echo "      Could not find 'kde-config' utility."
+	return 1
+fi
+
+local destDir=`kde-config --expandvars --install mime`
+cat >${destDir}/${fullMimeType}.desktop <<__EOF__
+[Desktop Entry]
+Comment=Squirrel Shell Script
+Hidden=false
+Icon=shellscript
+MimeType=${fullMimeType}
+Patterns=*.nut
+Type=MimeType
+X-KDE-IsAlso=application/x-executable-script
+__EOF__
+
+destDir="`kde-config --expandvars --install config`/magic"
+mkdir -p ${destDir}
+cat >${destDir}/${mimeType}.magic <<__EOF__
+0	string	#!/usr/bin/squirrelsh		${fullMimeType}
+0	string	#!\ /usr/bin/squirrelsh		${fullMimeType}
+0	string	#!/usr/local/bin/squirrelsh	${fullMimeType}
+0	string	#!\ /usr/local/bin/squirrelsh	${fullMimeType}
+__EOF__
+}
+
+echo "Installing MIME information"
+
+install-common
+
+if (which startgnome >/dev/null 2>/dev/null); then
+	install-gnome
+fi
+
+if (which startkde >/dev/null 2>/dev/null); then
+	install-kde
+fi

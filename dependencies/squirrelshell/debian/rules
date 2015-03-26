@@ -1,0 +1,45 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# Build targets
+build:
+	dh_testdir
+	@if ! [ -f Makefile ]; then ./configure --prefix="$(PWD)/debian/squirrelsh/usr" --with-pcre=system --with-mime=no --with-arch="$(shell dpkg-architecture -qDEB_HOST_ARCH)" && make; fi
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
+	@if [ -f "Makefile" ]; then make distclean; fi
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_installdirs
+	make install
+
+binary-indep: build install
+
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs -k HISTORY
+	dh_installdocs
+	dh_installman doc/squirrelsh.1
+	dh_installexamples examples/hello.nut examples/hello2.nut examples/listdir.nut examples/regexp.nut
+	dh_link
+	dh_strip
+	dh_compress -XCOPYING -XHISTORY -X.pdf
+	dh_fixperms
+	dh_installdeb
+	dh_shlibdeps debian/squirrelsh/usr/bin/squirrelsh
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+
+.PHONY: build clean binary-indep binary-arch binary install

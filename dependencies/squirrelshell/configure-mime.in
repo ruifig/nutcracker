@@ -1,0 +1,168 @@
+#!/bin/sh
+
+mime_group="application"
+mime_type_name="x-squirrelshscript"
+mime_type="${mime_group}/${mime_type_name}"
+
+install_file () {
+	uninstall_file
+
+	# Add new entries to 'magic'
+	if [ -n "@FILE_MAGIC@" ]; then
+		cat >>"@FILE_MAGIC@" <<__EOF__
+0	string/b	#!\ /usr/bin/squirrelsh		Squirrel Shell script text executable
+0	string/b	#!\ /usr/local/bin/squirrelsh	Squirrel Shell script text executable
+0	string/b	#!\ /usr/bin/env\ squirrelsh	Squirrel Shell script text executable
+__EOF__
+	fi
+
+	# Add new entry to 'mime.types'
+	if [ -n "@FILE_TYPES@" ]; then
+		cat >>"@FILE_TYPES@" <<__EOF__
+${mime_type}			nut
+__EOF__
+	fi
+}
+
+uninstall_file () {
+	# Delete existing entries from 'magic'
+	if [ -n "@FILE_MAGIC@" ]; then
+		cat <<__EOF__ | ed >/dev/null 2>/dev/null
+e @FILE_MAGIC@
+1,\$g/squirrelsh/d
+wq
+__EOF__
+	fi
+
+	# Delete existing entry from 'mime.types'
+	if [ -n "@FILE_TYPES@" ]; then
+		cat <<__EOF__ | ed >/dev/null 2>/dev/null
+e @FILE_TYPES@
+1,\$g/^[[:space:]]*${mime_group}\/${mime_type_name}[[:space:]]\{1,\}nut[[:space:]]*\$/d
+wq
+__EOF__
+	fi
+}
+
+install_gnome () {
+	if [ -n "@GNOME_DIR@" ]; then
+		@INSTALL@ -d -m 0755 "@GNOME_DIR@"
+	fi
+
+	if [ -n "@GNOME_MIME@" ]; then
+		cat >"@GNOME_MIME@" <<__EOF__
+${mime_type}:
+	ext: nut
+__EOF__
+	fi
+
+	if [ -n "@GNOME_KEYS@" ]; then
+		cat >"@GNOME_KEYS@" <<__EOF__
+${mime_type}:
+	can_be_executable=TRUE
+	description=Squirrel Shell Script
+	category=Software Development/Source Code
+__EOF__
+	fi
+}
+
+uninstall_gnome () {
+	if [ -n "@GNOME_MIME@" ] && [ -n "@GNOME_KEYS@" ]; then
+		@RM@ "@GNOME_MIME@" "@GNOME_KEYS@"
+	fi
+}
+
+install_kde () {
+	if [ -n "@KDE_DESKTOP_DIR@" ]; then
+		@INSTALL@ -d -m 0755 "@KDE_DESKTOP_DIR@"
+	fi
+
+	if [ -n "@KDE_DESKTOP_FILE@" ]; then
+		cat >"@KDE_DESKTOP_FILE@" <<__EOF__
+[Desktop Entry]
+Comment=Squirrel Shell Script
+Hidden=false
+Icon=shellscript
+MimeType=${mime_type}
+Patterns=*.nut
+Type=MimeType
+X-KDE-IsAlso=application/x-executable-script
+__EOF__
+	fi
+
+	if [ -n "@KDE_MAGIC_DIR@" ]; then
+		@INSTALL@ -d -m 0755 "@KDE_MAGIC_DIR@"
+	fi
+	if [ -n "@KDE_MAGIC_FILE@" ]; then
+		cat >"@KDE_MAGIC_FILE@" <<__EOF__
+0	string	#!/usr/bin/squirrelsh		${mime_type}
+0	string	#!\ /usr/bin/squirrelsh		${mime_type}
+0	string	#!/usr/local/bin/squirrelsh	${mime_type}
+0	string	#!\ /usr/local/bin/squirrelsh	${mime_type}
+0	string	#!/usr/bin/env\ squirrelsh	${mime_type}
+0	string	#!\ usr/bin/env squirrelsh	${mime_type}
+__EOF__
+	fi
+}
+
+uninstall_kde () {
+	if [ -n "@KDE_DESKTOP_FILE@" ] && [ -n "@KDE_MAGIC_FILE@" ]; then
+		@RM@ "@KDE_DESKTOP_FILE@" "@KDE_MAGIC_FILE@"
+	fi
+}
+
+showhelp () {
+cat <<__EOF__
+Usage: $0 [OPTIONS]...
+
+Options:
+   -h, --help        Display this help and exit
+   -i, --install     Install MIME information (default)
+   -u, --uninstall   Uninstall MIME information
+   -f, --file        (Un)install MIME information used by 'file' tool
+   -g, --gnome       (Un)install MIME information used by GNOME desktop
+   -k, --kde         (Un)install MIME information used by KDE desktop
+__EOF__
+}
+
+mode="install"
+enable_file="no"
+enable_gnome="no"
+enable_kde="no"
+
+for arg in "$@"; do
+	case "$arg" in
+	-h | --help)
+		showhelp
+		exit 0;;
+
+	-i | --install)
+		mode="install";;
+
+	-u | --uninstall)
+		mode="uninstall";;
+
+	-f | --file)
+		enable_file="yes";;
+
+	-g | --gnome)
+		enable_gnome="yes";;
+
+	-k | --kde)
+		enable_kde="yes";;
+
+	*)
+		echo "Invalid argument: $arg" >&2
+		exit 1;;
+	esac
+done
+
+if [ "$mode" = "install" ]; then
+	[ "$enable_file" = "yes" ] && install_file || true
+	[ "$enable_gnome" = "yes" ] && install_gnome || true
+	[ "$enable_kde" = "yes" ] && install_kde || true
+else
+	[ "$enable_file" = "yes" ] && uninstall_file || true
+	[ "$enable_gnome" = "yes" ] && uninstall_gnome || true
+	[ "$enable_kde" = "yes" ] && uninstall_kde || true
+fi

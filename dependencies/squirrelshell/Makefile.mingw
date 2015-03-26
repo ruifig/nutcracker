@@ -1,0 +1,35 @@
+bindir=$(CURDIR)\\bin
+regfile=squirrelsh-install.reg
+
+include build\mingw.inc
+
+all:
+	@cd pcre && $(MAKE) -f Makefile.mingw DEBUG="$(DEBUG)"
+	@cd squirrel && $(MAKE) -f Makefile.mingw DEBUG="$(DEBUG)"
+	@cd shell && $(MAKE) -f Makefile.mingw DEBUG="$(DEBUG)"
+
+clean:
+	@cd pcre && $(MAKE) -f Makefile.mingw $@
+	@cd squirrel && $(MAKE) -f Makefile.mingw $@
+	@cd shell && $(MAKE) -f Makefile.mingw $@
+
+distclean:
+	@cd pcre && $(MAKE) -f Makefile.mingw $@
+	@cd squirrel && $(MAKE) -f Makefile.mingw $@
+	@cd shell && $(MAKE) -f Makefile.mingw $@
+
+install: .FORCE
+	@echo Windows Registry Editor Version 5.00 >$(regfile)
+	@echo [HKEY_CLASSES_ROOT\.nut] >>$(regfile)
+	@echo @="Squirrel.Script" >>$(regfile)
+	@echo [HKEY_CLASSES_ROOT\Squirrel.Script] >>$(regfile)
+	@echo @="Squirrel Script" >>$(regfile)
+	@echo [HKEY_CLASSES_ROOT\Squirrel.Script\shell\open\command] >>$(regfile)
+	@echo @="\"$(bindir)\\squirrelsh.exe\" \"%%1\" %%*" >>$(regfile)
+	@echo [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\squirrelsh.exe] >>$(regfile)
+	@echo @="$(bindir)\\squirrelsh.exe" >>$(regfile)
+	@echo Path="$(bindir)" >>$(regfile)
+	@regedit $(regfile)
+	@$(RM) $(regfile)
+
+.FORCE:

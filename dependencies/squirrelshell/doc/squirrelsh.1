@@ -1,0 +1,52 @@
+.TH "Squirrel Shell" "1" "1.2.7" "Constantin Makshin" "System Shells"
+.SH "NAME"
+squirrelsh \- a cross\-platform system shell
+.SH "DESCRIPTION"
+Squirrel Shell is a cross\-platform alternative to system shells like bash in *nix and cmd.exe (command.com) in Microsoft Windows. It is based on powerful general\-purpose scripting language "Squirrel".
+.SH "SYNOPSIS"
+\fBsquirrelsh\fR [\fIoptions\fR] [\fIscript_file\fR] [\fIscript_arguments\fR]
+.SH "COMMAND LINE OPTIONS"
+.TP
+\fB\-h, \-\-help\fR
+Display help information.
+.TP
+\fB\-d, \-\-debug\fR
+Enable debugging info for script compilation. (DEPRECATED)
+.TP
+\fB\-i, \-\-interactive\fR
+Run shell in interactive mode. If script file is specified, it will be executed before entering this mode.
+.TP
+\fB\-s, \-\-silent\fR
+Do not display error and warning messages
+.TP
+\fB\-v, \-\-version\fR
+Display shell version number
+.PD
+.SH "FILES"
+.LP
+Actual location of the files depends on installation method. For installations from pre\-compiled distribution\-specific packages (RPM, DEB, etc.) they are located in /usr directory. Else parent directory is /usr/local.
+.LP
+In the following list installation directory is referred as \fIinstall_dir\fR.
+.TP
+/usr/bin/squirrelsh
+Shell executable or symbolic link to it.
+.TP
+\fIinstall_dir\fR/doc/squirrelsh/squirrel3.pdf
+Squirrel language reference manual.
+.TP
+\fIinstall_dir\fR/doc/squirrelsh/squirrelsh.pdf
+Squirrel Shell user manual.
+.SH "AUTHORS"
+.TP
+dinosaur\-rus@users.sourcefore.net
+Constantin Makshin, author of Squirrel Shell.
+.TP
+http://www.ademichelis.com
+Alberto Demichelis, author of Squirrel language.
+.SH "SEE ALSO"
+.LP
+http://squirrelsh.sf.net \- official web site of Squirrel Shell.
+.LP
+http://www.squirrel\-lang.org \- home of Squirrel language.
+.LP
+http://www.pcre.org \- home of PCRE library.
