@@ -20,6 +20,15 @@
 #include <ctype.h>
 #include "version.h"
 
+// RVF +
+#include <sqstdblob.h>
+#include <sqstdsystem.h>
+#include <sqstdio.h>
+#include <sqstdmath.h>	
+#include <sqstdstring.h>
+#include <sqstdaux.h>
+// RVF -
+
 #if defined(_MSC_VER)
 #	include <conio.h>
 #endif
@@ -291,6 +300,16 @@ int main (int argc, char** argv)
 
 	// Set up global variables...
 	sq_pushroottable(sqvm);
+
+	// RVF +
+	// Initialize squirrel std libraries
+	sqstd_register_bloblib(sqvm);
+	sqstd_register_iolib(sqvm);
+	sqstd_register_systemlib(sqvm);
+	sqstd_register_mathlib(sqvm);
+	sqstd_register_stringlib(sqvm);
+	// RVF -
+
 
 	// ... number of command line arguments...
 	sq_pushstring(sqvm, "__argc", -1);

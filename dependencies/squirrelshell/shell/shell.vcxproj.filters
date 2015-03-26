@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="base.cpp" />
+    <ClCompile Include="file.cpp" />
+    <ClCompile Include="hash.cpp" />
+    <ClCompile Include="hash_adler32.cpp" />
+    <ClCompile Include="hash_crc32.cpp" />
+    <ClCompile Include="hash_md5.cpp" />
+    <ClCompile Include="io.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="math.cpp" />
+    <ClCompile Include="regexp.cpp" />
+    <ClCompile Include="util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="common.h" />
+    <ClInclude Include="hash.h" />
+    <ClInclude Include="platform.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="version.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="shell.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="squirrelsh.ico" />
+    <None Include="..\archive.nut" />
+    <None Include="..\History" />
+    <None Include="..\Install" />
+    <None Include="..\Readme" />
+    <None Include="..\Todo" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="SQDBG">
+      <UniqueIdentifier>{68744734-99b8-448c-8293-282aa21d3383}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
