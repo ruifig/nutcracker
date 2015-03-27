@@ -236,7 +236,7 @@ int main (int argc, char** argv)
 				   "\n"
 				   "Options:\n"
 				   "   -h, --help          Display this text\n"
-				   "   -d, --debug         Enable debugging information in script (DEPRECATED)\n"
+				   "   -d, --debug         Enable debugging information in script\n"
 				   "   -i, --interactive   Run shell in interactive mode\n"
 				   "                       If script file is specified, it will be executed before\n"
 				   "                       entering this mode\n"
@@ -290,6 +290,8 @@ int main (int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
+	sqstd_seterrorhandlers(sqvm);
+
 	HSQREMOTEDBG rdbg = nullptr;
 	if (isDebug)
 	{
@@ -306,7 +308,8 @@ int main (int argc, char** argv)
 		scprintf(_SC("Connected to the debugger\n"));
 	}
 
-	sq_setcompilererrorhandler(sqvm, SquirrelCompileError);
+
+	//sq_setcompilererrorhandler(sqvm, SquirrelCompileError);
 
 	_RPT0(_CRT_WARN, "--- Squirrel initialized\n");
 
@@ -373,7 +376,7 @@ int main (int argc, char** argv)
 	if (fileName && LoadScript(fileName))
 	{
 		sq_pushroottable(sqvm);
-		if (SQ_FAILED(sq_call(sqvm, 1, SQTrue, SQFalse)))
+		if (SQ_FAILED(sq_call(sqvm, 1, SQTrue, isDebug ? SQTrue : SQFalse)))
 		{
 			if (!silent)
 			{
