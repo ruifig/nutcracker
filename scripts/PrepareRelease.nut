@@ -1,8 +1,4 @@
-function exitWithError(msg)
-{
-	printf("ERROR: %s\n", msg);
-	exit(1);
-}
+dofile("utils.nut")
 
 function originPath(file)
 {
@@ -21,24 +17,6 @@ function testMSBuild()
 		exitWithError("msbuild not found")
 }
 
-function build(solution)
-{
-	solution = originPath(solution)
-	local params = [
-		solution,
-		"/t:Rebuild",
-		"/p:Platform=Win32",
-		"/p:Configuration=Release",
-		"/verbosity:quiet",
-		"/maxcpucount",
-		"/nr:false"];
-		
-	printf("Building %s...\n", filename(solution));
-	if (run("msbuild", params, null, false, false)!=0)
-		exitWithError("Failed to build " + solution);
-	print("Done\n")
-}
-
 function copyToDist(src, dst)
 {
 	src = originPath(src)
@@ -53,10 +31,10 @@ testMSBuild()
 
 //
 // Build
-//build("dependencies\\squirrel\\squirrel.sln");
+build("dependencies\\squirrel\\squirrel.sln");
 //build("dependencies\\squirrelshell\\squirrelsh.sln");
 //build("source\\Nutcracker.sln");
-
+exit(1)
 //
 // Prepare distribution folder
 //
