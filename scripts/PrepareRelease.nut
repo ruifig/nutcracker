@@ -1,11 +1,5 @@
-print("Hello World\n")
-print("Hello World\n")
-print("Hello World\n")
-
 dofile("utils/Common.nut")
 dofile("utils/Filesystem.nut")
-
-exit(0)
 
 /**!
 Tests if MSBuild.exe is reachable
