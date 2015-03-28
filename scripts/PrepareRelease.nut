@@ -160,12 +160,12 @@ function makeZip()
 print("\n")
 
 //
-// Build
-build()
-
-//
 // Delete existing output directory
 rmdir(distPath(""), true)
+
+//
+// Build
+build()
 
 //
 // Copy required files
