@@ -20,10 +20,9 @@ Over the years I've used Squirrel on and off, but I was always put off by the la
 * Basic syntax colouring.
     * Current parser is actually a C parser, so not everything is perfect.
 
-
 ## Available shortcuts
 
-They mostly emulate Visual Studio and/or Visual Assist shortcuts where applicable
+Keyboard shortcuts mostly emulate Visual Studio and/or Visual Assist where applicable
 
 ### Editor shortcuts
 
