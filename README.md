@@ -39,6 +39,7 @@ Keyboard shortcuts mostly emulate Visual Studio and/or Visual Assist where appli
 * **F10** - Step over
 * **F11** - Step into
 * **SHIFT + F11** - Step out (exit current function)
+* **CTRL + ALT + BREAK** - Break
 
 # Workspace management
 
