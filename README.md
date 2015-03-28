@@ -49,6 +49,11 @@ A quick overview on how to manage files:
 * At the moment you can't create/rename/delete files from the workspace. You need to externally create files, then click the "refresh" button in the workspace, to synchronize the folders.
 * You can remove a folder from the workspace by right clicking it.
 
+# TODO
+
+* Only ansi and x86 provided at the moment. I need to refactor some things for proper Unicode support, and 64-bits. Nothing particularly hard.
+* Would be nice to have some kind of autocompletion, although that's not an easy task for a dynamically typed language like Squirrel.
+
 # How it looks like at the moment (Work in progress) #
 
 ![Screenshot3.png](https://bitbucket.org/repo/jnoqe9/images/3573107134-Screenshot3.png)
