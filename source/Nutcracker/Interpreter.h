@@ -289,7 +289,7 @@ public:
 	~DebugSession();
 	
 	// If port is 0, it will not use a debugger;
-	bool start(const std::string& ip, int port);
+	bool start(const std::string& ip, int port, bool* cancelFlag);
 
 	Listeners < std::function<void()>> resumeListeners;
 	Listeners < std::function<void(int, std::shared_ptr<const File>)>> addBreakpointListeners;
@@ -336,13 +336,15 @@ public:
 	virtual ~Interpreter();
 	bool hasDebugger() const;
 	bool launch(const Variables& variables, const UTF8String& file);
-	std::shared_ptr<DebugSession> launchDebug(const Variables& variables, const UTF8String& file);
+	std::shared_ptr<DebugSession> launchDebug(const Variables& variables, const UTF8String& file, bool* cancelFlag);
 	const UTF8String& getName() const;
+	UTF8String getConfigFileDirectory() const;
 
 	static std::vector<std::unique_ptr<Interpreter>> initAll(const UTF8String& folder);
 private:
 	static std::unique_ptr<Interpreter> init(const UTF8String& cfgFile);
 	UTF8String m_name;
+	Filename m_configFilename;
 	bool m_hasDebugger = false;
 	UTF8String m_launchNormal;
 	UTF8String m_launchDebug;

@@ -4,7 +4,13 @@
     </folder>
 </folders>
 
-<breakpoints/>
+<breakpoints>
+    <breakpoint>
+        <file>C:\Work\crazygaze\Nutcracker\scripts\PrepareRelease.nut</file>
+        <line>2</line>
+        <enabled>1</enabled>
+    </breakpoint>
+</breakpoints>
 
 <watches>
     <watch>str</watch>

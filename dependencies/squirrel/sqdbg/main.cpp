@@ -63,13 +63,27 @@ int main(int argc, char *argv[])
 		scprintf(_SC("SQDBG error : no file specified"));
 		return -1;
 	}
-		
+
+	// RVF +
+	int debuggerPort = 0;
+	for (int i = 1; i < argc; i++) {
+		const char* arg = argv[i];
+		if (!strncmp(arg, "-d", 2))
+			debuggerPort = std::atoi(arg + 2);
+	}
+
+	if (!debuggerPort) {
+		scprintf(_SC("SQDBG error : Debugger port not specified. Use the -d<PORT> parameter"));
+		return EXIT_FAILURE;
+	}
+	// RVF -
+
 	HSQUIRRELVM v = sq_open(1024);
 	sqstd_seterrorhandlers(v);
 
 	//!! INITIALIZES THE DEBUGGER ON THE TCP PORT 1234
 	//!! ENABLES AUTOUPDATE
-	HSQREMOTEDBG rdbg = sq_rdbg_init(v,1234,SQTrue);
+	HSQREMOTEDBG rdbg = sq_rdbg_init(v,debuggerPort,SQTrue);
 	if(rdbg) {
 
 		//!! ENABLES DEBUG INFO GENERATION(for the compiler)
@@ -84,10 +98,10 @@ int main(int argc, char *argv[])
 			const SQChar *fname=NULL;
 #ifdef _UNICODE
 			SQChar sTemp[256];
-			mbstowcs(sTemp,argv[1],(int)strlen(argv[1])+1);
+			mbstowcs(sTemp,argv[argc-1],(int)strlen(argv[1])+1);
 			fname=sTemp;
 #else
-			fname=argv[1];
+			fname=argv[argc-1];
 #endif 
 			//!!REGISTERS STANDARDS LIBS
 			sq_pushroottable(v);

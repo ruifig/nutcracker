@@ -285,7 +285,7 @@ public:
 	//
 	// Debugger
 	//
-	bool debuggerStart(FileId fileId);
+	bool debuggerStart(FileId fileId, bool* cancelFlag);
 	bool debuggerActive();
 	const BreakInfo* debuggerGetBreakInfo();
 	void debuggerSetCallstackFrame(int index);

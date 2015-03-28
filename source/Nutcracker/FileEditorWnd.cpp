@@ -346,6 +346,30 @@ void FileEditorWnd::syncBreakInfo(const BreakInfo& brk)
 	setFile(m_file, brk.line, 0);
 }
 
+void FileEditorWnd::doBreakpoint(int txtline)
+{
+	int markers = m_textCtrl->MarkerGet(txtline);
+
+	if (markers&((1 << MARK_BREAKPOINT_ON) | (1 << MARK_BREAKPOINT_INVALID)))
+	{
+		gWorkspace->removeBreakpoint(m_file->id, FROM_TXTLINE(txtline));
+		m_textCtrl->MarkerDelete(txtline, MARK_BREAKPOINT_ON);
+	}
+	else if (markers&(1 << MARK_BREAKPOINT_OFF))
+	{
+		auto brk = gWorkspace->toggleBreakpoint(m_file->id, FROM_TXTLINE(txtline));
+		CZ_ASSERT(brk->enabled);
+		gWorkspace->setBreakpointPos(brk, brk->line, -1);
+		syncBreakpoint(brk);
+	}
+	else
+	{
+		// If we are running, the breakpoint is set as invalid, until we get the confirmation from the target that
+		// the breakpoint is ok
+		auto handle = m_textCtrl->MarkerAdd(txtline, gWorkspace->debuggerActive() ? MARK_BREAKPOINT_INVALID : MARK_BREAKPOINT_ON);
+		gWorkspace->addBreakpoint(m_file->id, FROM_TXTLINE(txtline), handle);
+	}
+}
 
 void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 {
@@ -353,29 +377,7 @@ void FileEditorWnd::OnMarginClick(wxStyledTextEvent& event)
 	{
 		case MARGIN_BREAKPOINTS:
 		{
-			int txtline = m_textCtrl->LineFromPosition(event.GetPosition());
-			int markers = m_textCtrl->MarkerGet(txtline);
-
-			if (markers&((1<<MARK_BREAKPOINT_ON)|(1<<MARK_BREAKPOINT_INVALID)))
-			{
-				gWorkspace->removeBreakpoint(m_file->id, FROM_TXTLINE(txtline));
-				m_textCtrl->MarkerDelete(txtline, MARK_BREAKPOINT_ON);
-			}
-			else if (markers&(1 << MARK_BREAKPOINT_OFF))
-			{
-				auto brk = gWorkspace->toggleBreakpoint(m_file->id, FROM_TXTLINE(txtline));
-				CZ_ASSERT(brk->enabled);
-				gWorkspace->setBreakpointPos(brk, brk->line, -1);
-				syncBreakpoint(brk);
-			}
-			else
-			{
-				// If we are running, the breakpoint is set as invalid, until we get the confirmation from the target that
-				// the breakpoint is ok
-				auto handle =m_textCtrl->MarkerAdd(txtline, gWorkspace->debuggerActive() ? MARK_BREAKPOINT_INVALID : MARK_BREAKPOINT_ON);
-				gWorkspace->addBreakpoint(m_file->id, FROM_TXTLINE(txtline), handle);
-			}
-			
+			doBreakpoint(m_textCtrl->LineFromPosition(event.GetPosition()));
 		}
 		break;
 		case MARGIN_FOLD:
@@ -638,103 +640,10 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 		m_textCtrl->DiscardEdits();
 		m_textCtrl->LoadFile(m_file->fullpath.widen());
 	}
-	/*
-	else if (modifiers == wxMOD_CONTROL && keycode == WXK_F7) // Compile current file
+	else if (modifiers == 0 && keycode == WXK_F9)
 	{
-		try
-		{
-			buildutil::compileFile(BuildVariables(), m_file, wxStringToUtf8(gMainFrame->getActiveConfigurationName()));
-			fireCustomAppEvent(CAE_BuildFinished);
-		}
-		catch (std::exception& e)
-		{
-			showException(e);
-		}
-
-		this->SetFocus();
+		doBreakpoint(m_textCtrl->GetCurrentLine());
 	}
-	else if (modifiers == wxMOD_CONTROL && keycode == '-') // Previous cursor position
-	{
-		gFileEditorGroupWnd->cursorHistory_Previous();
-	}
-	else if (modifiers == (wxMOD_CONTROL | wxMOD_SHIFT) && keycode == '-') // Next cursor position
-	{
-		gFileEditorGroupWnd->cursorHistory_Next();
-	}
-	else if (modifiers == wxMOD_CONTROL && keycode == ' ') // Explicitly shows auto complete
-	{
-		showAutoComplete();
-	}
-	else if (modifiers == (wxMOD_CONTROL | wxMOD_SHIFT) && keycode == ' ') // Explicitly show the calltip for function call
-	{
-		showCallTip(true);
-	}
-	else if (modifiers == wxMOD_ALT && keycode == 'O') // switch between C and H files
-	{
-		auto ext = m_file->getExtension();
-		auto basename = Filename(m_file->name).getBaseFilename();
-		UTF8String othername;
-		if (ext == "c")
-			othername = basename + ".h";
-		else if (ext == "h")
-			othername = basename + ".c";
-
-		if (othername != "")
-		{
-			auto f = cz::apcpuide::gWorkspace->findFile(othername);
-			if (f)
-				gFileEditorGroupWnd->gotoFile(f, -1, -1);
-		}
-	}
-	else if (modifiers == wxMOD_ALT && keycode == 'M') // Search symbols in current file
-	{
-		FindSymbolDlg dlg(this, m_file->getFullPath().c_str(), FINDSYMBOL_FUNCTIONS);
-		dlg.setDelays(250, 250);
-		dlg.setFilter("");
-		dlg.ShowModal();
-		UTF8String file; int line; int col;
-		if (dlg.getResult(file, line, col))
-			gFileEditorGroupWnd->gotoFile(file, line, col);
-	}
-	else if (modifiers == (wxMOD_CONTROL | wxMOD_SHIFT) && keycode == 'G') // Open header file under cursor (in #include statement)
-	{
-		int line, column;
-		getPositionForParser(line, column);
-		if (column == 0)
-			column++;
-		auto filename =
-			gWorkspace->getCParser().findHeaderAtPos(m_file->getFullPath().c_str(), line, column);
-		if (filename != "")
-		{
-			gFileEditorGroupWnd->cursorHistory_AddHistory(gFileEditorGroupWnd->getCurrentLocation());
-			gFileEditorGroupWnd->gotoFile(UTF8String(filename.c_str()));
-		}
-	}
-	else if (modifiers == (wxMOD_CONTROL | wxMOD_ALT) && (keycode == WXK_F11 || keycode == WXK_F12)) // Goto declaration
-	{
-		int line, column;
-		getPositionForParser(line, column);
-		cparser::Location2 loc =
-			gWorkspace->getCParser().findDeclaration(m_file->getFullPath().c_str(), line, column);
-		if (loc.isValid())
-		{
-			gFileEditorGroupWnd->cursorHistory_AddHistory(gFileEditorGroupWnd->getCurrentLocation());
-			gFileEditorGroupWnd->gotoFile(UTF8String(loc.filename.c_str()), loc.line, loc.column - 1, true);
-		}
-	}
-	else if (modifiers == 0 && (keycode == WXK_F11 || keycode == WXK_F12)) // Goto definition
-	{
-		int line, column;
-		getPositionForParser(line, column);
-		cparser::Location2 loc =
-			gWorkspace->getCParser().findDefinition(m_file->getFullPath().c_str(), line, column);
-		if (loc.isValid())
-		{
-			gFileEditorGroupWnd->cursorHistory_AddHistory(gFileEditorGroupWnd->getCurrentLocation());
-			gFileEditorGroupWnd->gotoFile(UTF8String(loc.filename.c_str()), loc.line, loc.column - 1, true);
-		}
-	}
-	*/
 	else // Skip this event (nothing we have to do)
 	{
 		event.Skip();

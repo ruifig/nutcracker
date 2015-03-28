@@ -494,17 +494,28 @@ void Workspace::removeWatchByID(int id)
 	}
 }
 
-static Variables getVariables(File* file)
+static Variables getVariables(File* file, Interpreter* interpreter)
 {
 	Variables vars;
 	vars.set("%FILE%", [file]()
 	{
 		return UTF8String("\"") + file->fullpath + "\"";
 	});
-	vars.set("%NUTCRACKERDIR%", []()
+	vars.set("%NUTCRACKER_DIR%", []()
 	{
 		return cz::Filesystem::getSingleton().getExecutableDirectory();
 	});
+
+	vars.set("%INTERPRETER_CFG_DIR%", [interpreter]()
+	{
+		return interpreter->getConfigFileDirectory();
+	});
+
+	vars.set("%INTERPRETER_NAME%", [interpreter]()
+	{
+		return interpreter->getName();
+	});
+
 	return vars;
 }
 
@@ -521,14 +532,14 @@ void Workspace::doDebugResume()
 	fireEvent(DataEventID::DebugResume, false);
 }
 
-bool Workspace::debuggerStart(FileId fileId)
+bool Workspace::debuggerStart(FileId fileId, bool* cancelFlag)
 {
 	auto file = m_files.getFile(fileId);
 	CZ_ASSERT(file);
 
-	auto vars = getVariables(file.get());
+	auto vars = getVariables(file.get(), _getCurrentInterpreter());
 
-	m_debugSession = _getCurrentInterpreter()->launchDebug(vars, file->fullpath);
+	m_debugSession = _getCurrentInterpreter()->launchDebug(vars, file->fullpath, cancelFlag);
 	if (!m_debugSession)
 		return false;
 
@@ -567,7 +578,7 @@ bool Workspace::run(FileId fileId)
 {
 	auto file = m_files.getFile(fileId);
 	CZ_ASSERT(file);
-	auto vars = getVariables(file.get());
+	auto vars = getVariables(file.get(), _getCurrentInterpreter());
 	auto res = _getCurrentInterpreter()->launch(vars, file->fullpath);
 	return res;
 }

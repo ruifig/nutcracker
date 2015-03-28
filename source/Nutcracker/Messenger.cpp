@@ -30,7 +30,7 @@ void Messenger::setOnDisconnected(std::function<void()> callback)
 	m_onDisconnectedCallback = std::move(callback);
 }
 
-bool Messenger::connect(const char* ip, unsigned int port, unsigned timeoutSeconds)
+bool Messenger::connect(const char* ip, unsigned int port, unsigned timeoutSeconds, bool* cancelFlag)
 {
 	wxIPV4address addr;
 	addr.Hostname(ip);
@@ -41,8 +41,7 @@ bool Messenger::connect(const char* ip, unsigned int port, unsigned timeoutSecon
 	m_sock.SetFlags(wxSOCKET_NOWAIT);
 	m_sock.Notify(false);
 
-	int todo = timeoutSeconds;
-	while (todo)
+	while (true)
 	{
 		m_sock.Connect(addr, false);
 		if (!m_sock.WaitOnConnect(timeoutSeconds))
@@ -62,11 +61,10 @@ bool Messenger::connect(const char* ip, unsigned int port, unsigned timeoutSecon
 			break;
 		}
 
-		todo--;
-		if (todo <= 0)
+		if (*cancelFlag)
 			return false;
-		::Sleep(1000);
-		czDebug(ID_Log, "Messenger: Retrying in 1 second");
+		::Sleep(10);
+		//czDebug(ID_Log, "Messenger: Retrying in 1 second");
 	}
 
 	m_isRunning = true;
