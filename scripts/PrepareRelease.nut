@@ -165,7 +165,7 @@ build()
 
 //
 // Delete existing output directory
-//rmdir(distPath(""), true)
+rmdir(distPath(""), true)
 
 //
 // Copy required files
