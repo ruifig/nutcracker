@@ -20,11 +20,11 @@ Over the years I've used Squirrel on and off, but I was always put off by the la
 * Basic syntax colouring.
     * Current parser is actually a C parser, so not everything is perfect.
 
-## Available shortcuts
+# Available shortcuts
 
 Keyboard shortcuts mostly emulate Visual Studio and/or Visual Assist where applicable
 
-### Editor shortcuts
+## Editor shortcuts
 
 * **F5** - Starts the current script with the debugger
 * **CTRL + F5** - Starts the current script without the debugger
@@ -34,11 +34,20 @@ Keyboard shortcuts mostly emulate Visual Studio and/or Visual Assist where appli
 * **SHIFT + ALT + O** - Go to file. Start typing and it will filter
 * **F9** - Sets/Remove a breakpoint in the current line
 
-### Debugger shortcuts
+## Debugger shortcuts
 
 * **F10** - Step over
 * **F11** - Step into
 * **SHIFT + F11** - Step out (exit current function)
+
+# Workspace management
+
+The workspace simply keeps track of folders, breakpoints and watches. It does not keep track of any per-file specific options, or interpreter options.
+A quick overview on how to manage files:
+
+* Drag a folder into the workspace window. It will start tracking that folder
+* At the moment you can't create/rename/delete files from the workspace. You need to externally create files, then click the "refresh" button in the workspace, to synchronize the folders.
+* You can remove a folder from the workspace by right clicking it.
 
 # How it looks like at the moment (Work in progress) #
 
