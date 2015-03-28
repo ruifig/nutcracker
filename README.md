@@ -3,17 +3,22 @@
 # Nutcracker IDE (Squirrel scripting Editor) #
 
 Nutracker is an IDE purely focused on the [Squirrel scripting language](http://squirrel-lang.org).
-I've used Squirrel on and off over the years, but despite being a nice little scripting language, I was always put off by the lack of tools.
+Over the years I've used Squirrel on and off, but I was always put off by the lack of tools, so I've reused code from another project ([https://bitbucket.org/ruifig/g4devkit](https://bitbucket.org/ruifig/g4devkit)) to quickly create a usable IDE for Squirrel.
 
-The code is mostly a refactoring of the C/Assembly IDE I've been working on for my game toolkit:
+# Features #
 
-* [https://bitbucket.org/ruifig/g4devkit](https://bitbucket.org/ruifig/g4devkit)
-* [https://www.youtube.com/watch?v=cIyHgQvfETE](https://www.youtube.com/watch?v=cIyHgQvfETE)
-
-As such, it's pretty much unorganized while I refactor and bring things across as fast as possible, so don't expect pretty code.
-
-Also, this repository references code from another one of my repositories which is not public at the moment, so you won't be able to build.
-I'll get that sorted out as soon as I have a usable version.
+* Simple workspace management
+* Debugger. Supports step in, out, over. Also supports inspecting locals and watches.
+    * Step in, out, over.
+    * Breakpoints
+    * Watches and Locals (only inspectable, not editable)
+* Easy to add more interpreters.
+    * For the debugger to work, the interpreter needs to implement the SQDBG protocol:
+        * [http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBG.html](http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBG.html)
+        * [http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBGProtocolReference.html](http://wiki.squirrel-lang.org/default.aspx/SquirrelWiki/SQDBGProtocolReference.html).
+    * At the moment it doesn't allow connecting to an already running interpreter, but that's easily done. Lets me know if you need that feature.
+* Basic syntax colouring.
+    * Current parser is actually a C parser, so not everything is perfect.
 
 Planned features:
 
