@@ -65,12 +65,12 @@ void DebugSession::updateBreakpoint(Breakpoint* brk)
 		removeBreakpoint(brk);
 }
 
-bool DebugSession::start(const std::string& ip, int port)
+bool DebugSession::start(const std::string& ip, int port, bool* cancelFlag)
 {
 	if (port)
 	{
 		m_messenger = std::make_unique<Messenger>();
-		if (!m_messenger->connect(ip.c_str(), port, 60*60))
+		if (!m_messenger->connect(ip.c_str(), port, 60 * 60, cancelFlag))
 			return false;
 
 		m_messenger->setOnIncoming([this]{ processIncoming(); });
@@ -143,7 +143,7 @@ void DebugSession::terminate()
 	m_messenger->send("tr\n");
 }
 
-const char* getString(tinyxml2::XMLElement* ele, const char* name, const char* defValue=0)
+const char* getString(tinyxml2::XMLElement* ele, const char* name, const char* defValue = 0)
 {
 	auto s = ele->Attribute(name);
 	if (s)
@@ -172,10 +172,15 @@ void DebugSession::processMsgAddBreakpoint(tinyxml2::XMLElement* xml)
 {
 	int line;
 	CZ_CHECK(xml->QueryAttribute("line", &line) == tinyxml2::XML_SUCCESS);
-	auto file = gWorkspace->createFile( getString(xml, "src"));
-	CZ_ASSERT(file);
+	const char* fname = getString(xml, "src");
+	auto file = gWorkspace->createFile(fname);
+	if (!file)
+	{
+		czDebug(ID_Log, "File %s not found", fname);
+		return;
+	}
 	auto this_ = shared_from_this();
-	postAppLambdaEvent([this_, line, file ]
+	postAppLambdaEvent([this_, line, file]
 	{
 		this_->addBreakpointListeners.fire(line, file);
 	});
@@ -185,8 +190,8 @@ void DebugSession::processMsgBreak(tinyxml2::XMLElement* xml)
 {
 	m_paused = true;
 	auto info = std::make_shared<BreakInfo>();
-	CZ_CHECK(xml->QueryAttribute("line", &info->line)==tinyxml2::XML_SUCCESS);
-	info->file = gWorkspace->createFile( getString(xml, "src"));
+	CZ_CHECK(xml->QueryAttribute("line", &info->line) == tinyxml2::XML_SUCCESS);
+	info->file = gWorkspace->createFile(getString(xml, "src"));
 	auto type = xml->Attribute("type");
 	CZ_CHECK(type);
 	if (strcmp(type, "step") == 0)
@@ -222,7 +227,7 @@ void DebugSession::processMsgBreak(tinyxml2::XMLElement* xml)
 			entry = entry->NextSiblingElement("call");
 		}
 	}
-	
+
 	// Keep a pointer to this session
 	auto this_ = shared_from_this();
 	postAppLambdaEvent([info, this_]
@@ -246,10 +251,10 @@ void DebugSession::processIncoming()
 
 	/*
 	{
-		FILE* fp = fopen("doc.txt", "w+");
-		tinyxml2::XMLPrinter printer(fp);
-		doc.Print(&printer);
-		fclose(fp);
+	FILE* fp = fopen("doc.txt", "w+");
+	tinyxml2::XMLPrinter printer(fp);
+	doc.Print(&printer);
+	fclose(fp);
 	}
 	*/
 
@@ -300,7 +305,7 @@ std::shared_ptr<ValueBase> DebugSession::processValue(tinyxml2::XMLElement* ele,
 	else if (strcmp(type, "y") == 0)
 		base = std::make_shared<ValueClass>();
 	else if (strcmp(type, "b") == 0)
-		base = std::make_shared<ValueBool>(strcmp(val,"true")==0 ? true : false);
+		base = std::make_shared<ValueBool>(strcmp(val, "true") == 0 ? true : false);
 	else if (strcmp(type, "w") == 0)
 		base = std::make_shared<ValueWeakRef>();
 	else
@@ -325,7 +330,7 @@ std::shared_ptr<ValueBase> DebugSession::processValue(tinyxml2::XMLElement* ele,
 void DebugSession::processObjElement(tinyxml2::XMLElement* ele, BreakInfo& info)
 {
 	//czDebug(ID_Log, "obj: type=\"%s\" ref=\"%s\"", getString(ele, "type"), getString(ele, "ref"));
-	
+
 	// Because the "obj" entries dependencies are not necessarly ordered (an "e" entry might reference an obj that is further
 	// down the document), it means those forward references were created when reading the "e" entry that references it.
 	// This means we might already have it in the map
@@ -364,40 +369,40 @@ void DebugSession::processCallElement(tinyxml2::XMLElement* ele, BreakInfo& info
 	}
 
 	// Local variables
+{
+	auto l = ele->FirstChildElement("l");
+	while (l)
 	{
-		auto l = ele->FirstChildElement("l");
-		while (l)
-		{
-			TableEntry v;
-			v.key = std::make_shared<ValueString>(getString(l, "name"));
-			v.val = processValue(l, info, "type", "val");
-			e.locals.push_back(std::move(v));
-			l = l->NextSiblingElement("l");
-		}
+		TableEntry v;
+		v.key = std::make_shared<ValueString>(getString(l, "name"));
+		v.val = processValue(l, info, "type", "val");
+		e.locals.push_back(std::move(v));
+		l = l->NextSiblingElement("l");
 	}
+}
 
-	// Watches
+// Watches
+{
+	auto w = ele->FirstChildElement("w");
+	while (w)
 	{
-		auto w = ele->FirstChildElement("w");
-		while (w)
-		{
-			WatchValue v;
-			v.key = std::make_shared<ValueString>(getString(w, "exp"));
-			v.id = std::stoi( getString(w, "id") );
-			std::string status = getString(w, "status");
-			v.state = status == "ok" ? WatchState::Valid : WatchState::Invalid;
+		WatchValue v;
+		v.key = std::make_shared<ValueString>(getString(w, "exp"));
+		v.id = std::stoi(getString(w, "id"));
+		std::string status = getString(w, "status");
+		v.state = status == "ok" ? WatchState::Valid : WatchState::Invalid;
 
-			if (v.state==WatchState::Valid)
-				v.val = processValue(w, info, "type", "val");
+		if (v.state == WatchState::Valid)
+			v.val = processValue(w, info, "type", "val");
 
-			e.watches[v.id] = std::move(v);
-			w = w->NextSiblingElement("w");
-		}
+		e.watches[v.id] = std::move(v);
+		w = w->NextSiblingElement("w");
 	}
+}
 
 }
 
-struct TypeInfo 
+struct TypeInfo
 {
 	const char* dbg;
 	VarType type;
@@ -512,7 +517,7 @@ bool Interpreter::launch(const Variables& variables, const UTF8String& file)
 	return true;
 }
 
-std::shared_ptr<DebugSession> Interpreter::launchDebug(const Variables& variables, const UTF8String& file)
+std::shared_ptr<DebugSession> Interpreter::launchDebug(const Variables& variables, const UTF8String& file, bool* cancelFlag)
 {
 	auto session = std::make_shared<DebugSession>();
 
@@ -527,7 +532,7 @@ std::shared_ptr<DebugSession> Interpreter::launchDebug(const Variables& variable
 		return nullptr;
 	}
 
-	if (!session->start(m_ip, m_port))
+	if (!session->start(m_ip, m_port, cancelFlag))
 		return nullptr;
 
 	return session;
@@ -551,18 +556,57 @@ std::unique_ptr<Interpreter> Interpreter::init(const UTF8String& cfgFile)
 	inter->m_launchDebug = file.getValue<const char*>("General", "launch_debug", "");
 	inter->m_ip = file.getValue<const char*>("Debugger", "ip", "127.0.0.1");
 	inter->m_port = file.getValue<int>("Debugger", "port", 0);
+	inter->m_configFilename = cfgFile;
 
 	return std::move(inter);
+}
+
+std::vector<Filename> findFilesHelper(const UTF8String& dir,  const UTF8String& base, bool recursive, std::function<bool(const Filename&)>& filter)
+{
+	auto files = Filesystem::getSingleton().getFilesInDirectory(dir, "*.*", true);
+	std::vector<Filename> res;
+	for (auto& f : files)
+	{
+		if (f.type == Filesystem::Type::File)
+		{
+			Filename fname = base + f.name;
+			if (filter(fname))
+				res.push_back(fname);
+		}
+	}
+
+	if (recursive)
+	{
+		for (auto& f : files)
+		{
+			if (f.type == Filesystem::Type::Directory)
+			{
+				auto other = findFilesHelper(dir + f.name + "\\", base + f.name + "\\", recursive, filter);
+				res.insert(res.end(), other.begin(), other.end());
+			}
+		}
+	}
+
+return res;
+}
+
+std::vector<Filename> findFiles(const UTF8String& dir, bool recursive, std::function<bool(const Filename&)> filter = []{return true; })
+{
+	return findFilesHelper(dir, "", recursive, filter);
 }
 
 std::vector<std::unique_ptr<Interpreter>> Interpreter::initAll(const UTF8String& folder)
 {
 	decltype(initAll(folder)) res;
-	auto files = Filesystem::getSingleton().getFilesInDirectory(folder, "*.ini", false);
+
+	auto files = findFiles(folder, true, [](const Filename& fname)
+	{
+		return cz::ansiToLower(fname.getExtension()) == "ini";
+	});
 
 	for (auto& f : files)
 	{
-		auto interpreter = init(folder + f.name);
+		auto interpreter = init(folder + f);
 		if (interpreter)
 			res.push_back(std::move(interpreter));
 	}
@@ -573,6 +617,11 @@ std::vector<std::unique_ptr<Interpreter>> Interpreter::initAll(const UTF8String&
 const UTF8String& Interpreter::getName() const
 {
 	return m_name;
+}
+
+UTF8String Interpreter::getConfigFileDirectory() const
+{
+	return m_configFilename.getDirectory();
 }
 
 } // nutcracker

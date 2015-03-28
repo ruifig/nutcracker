@@ -138,6 +138,12 @@
     <ClCompile Include="AutoUI\AboutDlg_Auto.cpp">
       <Filter>AutoUI</Filter>
     </ClCompile>
+    <ClCompile Include="AutoUI\BlockingOperationDlg_Auto.cpp">
+      <Filter>AutoUI</Filter>
+    </ClCompile>
+    <ClCompile Include="BlockingOperationDlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h">
@@ -259,6 +265,12 @@
     </ClInclude>
     <ClInclude Include="AutoUI\AboutDlg_Auto.h">
       <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="AutoUI\BlockingOperationDlg_Auto.h">
+      <Filter>AutoUI</Filter>
+    </ClInclude>
+    <ClInclude Include="BlockingOperationDlg.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

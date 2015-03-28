@@ -24,22 +24,17 @@ Also, to detect errors in the visualizer, set this in the register, add this DWO
 </Type>
 
 <Type Name="cz::UTF8String">
-    <DisplayString Condition="mData==0">{&quot;&quot;}</DisplayString>
-    <DisplayString Condition="mData!=0 &amp;&amp; mData-&gt;mBuf==0">{mData-&gt;mQuickBuf,s8}</DisplayString>
-    <DisplayString Condition="mData!=0 &amp;&amp; mData-&gt;mBuf!=0">{mData-&gt;mBuf,s8}</DisplayString>
+    <DisplayString Condition="mData.mBuf==0">{mData.mQuickBuf,s8}</DisplayString>
+    <DisplayString Condition="mData.mBuf!=0">{mData.mBuf,s8}</DisplayString>
 
-    <Expand>
-        <Item Condition="mData==0" Name="[sizeBytes]">0</Item>
-        <Item Condition="mData==0" Name="[sizeCodePoints]">0</Item>
-        <Item Condition="mData==0" Name="[capacityBytes]">0</Item>
-		
-        <Item Condition="mData!=0" Name="[sizeBytes]">mData-&gt;mStringLengthBytes</Item>
-        <Item Condition="mData!=0" Name="[sizeCodePoints]">mData-&gt;mStringLengthCodePoints</Item>
-        <Item Condition="mData!=0" Name="[capacityBytes]">mData-&gt;mBufferSize</Item>
+    <Expand>		
+        <Item Name="[sizeBytes]">mData.mStringLengthBytes</Item>
+        <Item Name="[sizeCodePoints]">mData.mStringLengthCodePoints</Item>
+        <Item Name="[capacityBytes]">mData.mBufferSize</Item>
 
-        <ArrayItems Condition="mData!=0">
-            <Size>mData==0 ? 0 : mData-&gt;mStringLengthBytes</Size>
-            <ValuePointer>mData-&gt;mBuf==0 ? mData-&gt;mQuickBuf : mData-&gt;mBuf</ValuePointer>
+        <ArrayItems>
+            <Size>mData.mStringLengthBytes</Size>
+            <ValuePointer>mData.mBuf==0 ? mData.mQuickBuf : mData.mBuf</ValuePointer>
         </ArrayItems>
 		
     </Expand>	

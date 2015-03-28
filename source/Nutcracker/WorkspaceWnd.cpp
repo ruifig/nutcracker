@@ -12,6 +12,7 @@
 #include "WorkspaceWnd.h"
 #include "FileEditorGroupWnd.h"
 #include "Interpreter.h"
+#include "MainWnd.h"
 
 namespace nutcracker
 {
@@ -199,7 +200,7 @@ void WorkspaceWnd::OnRunScriptFile(wxCommandEvent& /*event*/)
 		return UTF8String("\"") + file->fullpath + "\"";
 	});
 
-	gWorkspace->debuggerStart(file->id);
+	gMainWnd->startDebugger(file);
 }
 
 void WorkspaceWnd::OnRemoveFolder(wxCommandEvent& event)

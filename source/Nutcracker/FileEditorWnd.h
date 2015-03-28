@@ -56,6 +56,7 @@ private:
 	int findCurrentWordStart(int pos, std::string& token);
 	void getPositionForParser(int& line, int& column, bool adjustForSymbol);
 	void recolourise(bool reparse);
+	void doBreakpoint(int txtline);
 
 	std::shared_ptr<const File> m_file;
 	bool m_isLoading = false; // used to detect if we are loading the file, and thus ignore some events

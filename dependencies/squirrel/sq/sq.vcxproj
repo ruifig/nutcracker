@@ -41,13 +41,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)..\..\interpreters\bin\</OutDir>
+    <OutDir>$(SolutionDir)..\..\interpreters\squirrel\</OutDir>
     <IntDir>$(SolutionDir)..\..\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)_$(Platform)_$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)..\..\interpreters\bin\</OutDir>
+    <OutDir>$(SolutionDir)..\..\interpreters\squirrel\</OutDir>
     <IntDir>$(SolutionDir)..\..\tmp\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)_$(Platform)_$(Configuration)</TargetName>

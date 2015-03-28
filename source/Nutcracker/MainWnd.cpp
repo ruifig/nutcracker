@@ -18,6 +18,7 @@
 #include "FindDlg.h"
 #include "AboutDlg.h"
 #include "FileEditorWnd.h"
+#include "BlockingOperationDlg.h"
 
 namespace nutcracker
 {
@@ -562,6 +563,24 @@ void MainWnd::updateDebugMenu()
 		item->Enable(gWorkspace->debuggerActive() && gWorkspace->debuggerGetBreakInfo());
 }
 
+void MainWnd::startDebugger(const std::shared_ptr<const File>& file)
+{
+	auto interpreter = gWorkspace->getCurrentInterpreter();
+	BlockingOperationDlg dlg(this,
+		"Starting debugger",
+		wxString::Format(L"Launching '%s'...", interpreter->getName().widen().c_str()));
+
+	auto res = dlg.show([&](bool* cancelFlag)
+	{
+		if (!gWorkspace->debuggerStart(file->id, cancelFlag))
+			return false;
+		return true;
+	});
+
+	if (!res)
+		showError("Error", "Could not connect to the script host's debugger");
+}
+
 void MainWnd::OnMenuDebugStartOrContinue(wxCommandEvent& event)
 {
 	if (gWorkspace->debuggerActive())
@@ -572,7 +591,7 @@ void MainWnd::OnMenuDebugStartOrContinue(wxCommandEvent& event)
 		if (!file)
 			showError("No file selected", "No file selected to start debugger!\nOpen a file first");
 		else
-			gWorkspace->debuggerStart(file->id);
+			startDebugger(file);
 	}
 }
 

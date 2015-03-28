@@ -164,7 +164,13 @@ void AboutDlg_Auto::CreateControls()
 	itemGridSizer17->Add(itemStaticText18, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	wxHyperlinkCtrl* itemHyperlinkCtrl19 = new wxHyperlinkCtrl( itemPanel3, ID_HYPERLINKCTRL3, _("http://www.squirrel-lang.org/"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
-	itemGridSizer17->Add(itemHyperlinkCtrl19, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+	itemGridSizer17->Add(itemHyperlinkCtrl19, 0, wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxStaticText* itemStaticText20 = new wxStaticText( itemPanel3, wxID_STATIC, _("Squirrel Shell:"), wxDefaultPosition, wxDefaultSize, 0 );
+	itemGridSizer17->Add(itemStaticText20, 0, wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL|wxALL, 5);
+
+	wxHyperlinkCtrl* itemHyperlinkCtrl21 = new wxHyperlinkCtrl( itemPanel3, ID_HYPERLINKCTRL4, _("http://squirrelsh.sourceforge.net/"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_DEFAULT_STYLE );
+	itemGridSizer17->Add(itemHyperlinkCtrl21, 0, wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL|wxALL, 5);
 
 	itemGridBagSizer4->AddGrowableRow(1);
 	itemGridBagSizer4->AddGrowableCol(1);

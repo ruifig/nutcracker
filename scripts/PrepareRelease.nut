@@ -1,67 +1,186 @@
-dofile("utils.nut")
+print("Hello World\n")
+print("Hello World\n")
+print("Hello World\n")
 
-function originPath(file)
-{
-	local res = filepath(__argv[0]) + "\\..\\" + file;
-	return res;
-}
+dofile("utils/Common.nut")
+dofile("utils/Filesystem.nut")
 
-function distPath(path)
-{
-	return originPath("tmp\\distribution\\") + path;
-}
+exit(0)
 
+/**!
+Tests if MSBuild.exe is reachable
+*/
 function testMSBuild()
 {
 	if (run("msbuild","/version", null, true, true)==-1)
 		exitWithError("msbuild not found")
 }
 
-function copyToDist(src, dst)
+/**!
+Builds the specified solution
+*/
+function buildSolution(solution, target, platform, configuration)
 {
-	src = originPath(src)
-	dst = distPath(dst);
-	printf("Copying %s to %s\n", src, dst);
-	local res = copy(src, dst, false);
+	testMSBuild()
+
+	local params = [
+		solution,
+		"/t:"+target,
+		"/p:Platform="+platform,
+		"/p:Configuration="+configuration,
+		"/maxcpucount",
+		"/nr:false" // Disable node reuse (so no instance of MSBuild stay open)
+	]
+	
+	printf("Building %s...\n", filename(solution))
+	if (run("msbuild", params, null, false, false)!=0)
+		exitWithError("Failed to build " + solution)
+	print("Done\n")
+}
+
+
+// Returns a full path given a relative path to the Nutcracker repository root
+function makeFullPath(path)
+{
+	return filepath(__argv[0]) + "\\..\\" + path
+}
+
+// Returns a full path give a relative path to the distribution folder
+function distPath(path)
+{
+	return makeFullPath("tmp\\distribution\\Nutcracker\\") + path
+}
+
+function copySquirrel()
+{
+	copyFiles(
+		makeFullPath("interpreters\\squirrel\\"),
+		distPath("interpreters\\squirrel\\"),
+		[
+			"sq.ini",
+			"sq.exe",
+			"sqdbg.exe"
+		])
+		
+	copyFiles(
+		makeFullPath("dependencies\\squirrel\\"),
+		distPath("interpreters\\squirrel\\"),
+		[
+			"COPYRIGHT",
+			"HISTORY",
+			"README"
+		])
+		
+	copyFiles(
+		makeFullPath("dependencies\\squirrel\\doc\\"),
+		distPath("interpreters\\squirrel\\doc\\"),
+		[
+			"sqstdlib3.chm",
+			"sqstdlib3.pdf",
+			"squirrel3.chm",
+			"squirrel3.pdf"
+		])
+}
+
+function copySquirrelShell()
+{
+	copyFiles(
+		makeFullPath("interpreters\\squirrelsh\\"),
+		distPath("interpreters\\squirrelsh\\"),
+		[
+			"squirrelsh.ini",
+			"squirrelsh.exe"
+		])
+	copyFiles(
+		makeFullPath("dependencies\\squirrelsh\\"),
+		distPath("interpreters\\squirrelsh\\"),
+		[
+			"COPYING",
+			"COPYING-pcre",
+			"README"
+		])
+		
+	copyFiles(
+		makeFullPath("dependencies\\squirrelsh\\doc\\"),
+		distPath("interpreters\\squirrelsh\\"),
+		[
+			"squirrelsh.pdf"
+		])
+}	
+
+function copyNutcracker()
+{
+	copyFiles(
+		makeFullPath("interpreters\\"),
+		distPath("interpreters\\"),
+		[
+			"readme.txt"
+		])
+
+	copyFile(
+		makeFullPath("bin\\Nutcracker_Win32_Release.exe"),		
+		distPath("bin\\Nutcracker.exe"), true)
+
+	copyFiles(
+		makeFullPath("bin\\"),
+		distPath("bin\\"),
+		[
+			"config.ini"
+		]);	
+		
+	copyFiles(
+		makeFullPath("samples\\"),
+		distPath("samples\\"),
+		[
+			"samples.nws",
+			"HelloWorld.nut",
+			"Utils.nut"
+		]);
+}
+
+function build()
+{
+	buildSolution(makeFullPath("dependencies\\squirrel\\squirrel.sln"),
+		"Rebuild", "Win32", "Release")
+	buildSolution(makeFullPath("dependencies\\squirrelsh\\squirrelsh.sln"),
+		"Rebuild", "Win32", "Release")
+	buildSolution(makeFullPath("source\\Nutcracker.sln"),
+		"Rebuild", "Win32", "Release");
+}
+
+function makeZip()
+{
+	if (run("c:\\Program Files\\7-Zip\\7z.exe",
+		[
+			"a",
+			"-tzip",
+			makeFullPath("tmp\\distribution\\Nutcracker.zip"),
+			distPath("")
+		]))
+	{
+		exitWithError("Couldn't create zip file")
+	}
 }
 
 
 print("\n")
-testMSBuild()
 
 //
 // Build
-build("dependencies\\squirrel\\squirrel.sln");
-//build("dependencies\\squirrelshell\\squirrelsh.sln");
-//build("source\\Nutcracker.sln");
-exit(1)
-//
-// Prepare distribution folder
-//
-rmdir(distPath(""), true)
-mkdir(distPath(""))
-mkdir(distPath("bin"))
-mkdir(distPath("bin\\interpreters"))
-mkdir(distPath("dependencies"))
-mkdir(distPath("dependencies\\squirrel"))
-mkdir(distPath("dependencies\\squirrel\\bin"))
-mkdir(distPath("dependencies\\squirrelshell"))
-mkdir(distPath("dependencies\\squirrelshell\\bin"))
+build()
 
 //
-// Copy files
+// Delete existing output directory
+//rmdir(distPath(""), true)
+
 //
-copyToDist("bin\\Nutcracker_Win32_Release.exe", "bin\\Nutcracker.exe")
-copyToDist("bin\\config.ini", "bin\\config.ini")
-copyToDist("bin\\interpreters\\sq.ini", "bin\\interpreters\\sq.ini")
-copyToDist("bin\\interpreters\\squirrelshell.ini", "bin\\interpreters\\squirrelshell.ini")
-/*
-copyToDist("dependencies\\squirrel\\bin\\sq.exe", "dependencies\\squirrel\\bin\\sq.exe")
-copyToDist("dependencies\\squirrel\\bin\\sqdbg.exe", "dependencies\\squirrel\\bin\\sqdbg.exe")
-copyToDist("dependencies\\squirrelshell\\bin\\squirrelsh.exe", "dependencies\\squirrelshell\\bin\\squirrelsh.exe")
-*/
+// Copy required files
+copyNutcracker()
+copySquirrel()
+copySquirrelShell()
+makeZip()
 
-copyToDist("dependencies\\squirrel\\bin\\*.exe", "dependencies\\squirrel\\bin");
+print("\nDONE\n")
+scan()
 
-print("\nOK\n")
 

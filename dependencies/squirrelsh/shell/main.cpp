@@ -213,6 +213,7 @@ int main (int argc, char** argv)
 	int			firstArg	= 0,
 				i;
 	bool isDebug = false;
+	int debuggerPort = 0;
 	for (i = 1; argv[i]; ++i)
 	{
 		char* arg = argv[i];
@@ -236,7 +237,7 @@ int main (int argc, char** argv)
 				   "\n"
 				   "Options:\n"
 				   "   -h, --help          Display this text\n"
-				   "   -d, --debug         Enable debugging information in script\n"
+				   "   -d<PORT>            Enable the debugger, in the specified port\n"
 				   "   -i, --interactive   Run shell in interactive mode\n"
 				   "                       If script file is specified, it will be executed before\n"
 				   "                       entering this mode\n"
@@ -254,9 +255,17 @@ int main (int argc, char** argv)
 
 			return EXIT_SUCCESS;
 		}
-		else if (!strcmp(arg, "-d") || !strcmp(arg, "--debug"))
+		else if (!strncmp(arg, "-d", 2))
 		{
+			// RVF +
 			isDebug = true;
+			debuggerPort = std::atoi(arg + 2);
+			if (debuggerPort == 0)
+			{
+				printf("No debugger port specified\n");
+				return EXIT_FAILURE;
+			}
+			// RVF -
 		}
 		else if (!strcmp(arg, "-i") || !strcmp(arg, "--interactive"))
 			interactive = true;
@@ -295,7 +304,7 @@ int main (int argc, char** argv)
 	HSQREMOTEDBG rdbg = nullptr;
 	if (isDebug)
 	{
-		rdbg = sq_rdbg_init(sqvm, 1234, SQTrue);
+		rdbg = sq_rdbg_init(sqvm, debuggerPort, SQTrue);
 		sq_enabledebuginfo(sqvm, SQTrue);
 
 		//!! SUSPENDS THE APP UNTIL THE DEBUGGER CLIENT CONNECTS

@@ -209,6 +209,7 @@ static bool WriteToPipe (SysHandle pipe, const void* buffer, size_t numBytesToWr
 	return true;
 #else
 	int nbw = write(pipe, buffer, numBytesToWrite);
+
 	if (numBytesWritten)
 		*numBytesWritten = max(nbw, 0);
 
@@ -301,7 +302,11 @@ static SQInteger Copy (HSQUIRRELVM)
 	SQChar src[MAX_PATH], dest[MAX_PATH];
 	strncpy_s(src, sizeof(src), ConvPath(from, SQTrue), MAX_PATH);
 	strncpy_s(dest, sizeof(dest), ConvPath(to, SQTrue), MAX_PATH);
-	CopyFile(src, dest, !ovr);
+	BOOL res = CopyFile(src, dest, !ovr);
+
+	// RVF +
+	sq_pushbool(sqvm, (res) ? SQTrue : SQFalse);
+	// RVF -
 
 #if !defined(SHELL_PLATFORM_WINDOWS)
 	// Copy timestamps and permissions
@@ -313,7 +318,7 @@ static SQInteger Copy (HSQUIRRELVM)
 		utime(dest, &fileTime);
 	}
 #endif
-	return 0;
+	return 1;
 }
 
 // move(string from, string to)

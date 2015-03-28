@@ -90,6 +90,7 @@
     </ClCompile>
     <ClCompile Include="AboutDlg.cpp" />
     <ClCompile Include="AutoUI\AboutDlg_Auto.cpp" />
+    <ClCompile Include="AutoUI\BlockingOperationDlg_Auto.cpp" />
     <ClCompile Include="AutoUI\BreakpointsWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\CallstackWnd_Auto.cpp" />
     <ClCompile Include="AutoUI\FileEditorGroupWnd_Auto.cpp" />
@@ -102,6 +103,7 @@
     <ClCompile Include="AutoUI\WorkspaceWnd_Auto.cpp" />
     <ClCompile Include="BaseTreeUtilCode.cpp" />
     <ClCompile Include="BaseWatchesWnd.cpp" />
+    <ClCompile Include="BlockingOperationDlg.cpp" />
     <ClCompile Include="Breakpoints.cpp" />
     <ClCompile Include="BreakpointsWnd.cpp" />
     <ClCompile Include="CallstackWnd.cpp" />
@@ -133,6 +135,7 @@
     <ClInclude Include="..\..\dependencies\tinyxml2\tinyxml2.h" />
     <ClInclude Include="AboutDlg.h" />
     <ClInclude Include="AutoUI\AboutDlg_Auto.h" />
+    <ClInclude Include="AutoUI\BlockingOperationDlg_Auto.h" />
     <ClInclude Include="AutoUI\BreakpointsWnd_Auto.h" />
     <ClInclude Include="AutoUI\CallstackWnd_Auto.h" />
     <ClInclude Include="AutoUI\FileEditorGroupWnd_Auto.h" />
@@ -145,6 +148,7 @@
     <ClInclude Include="AutoUI\WorkspaceWnd_Auto.h" />
     <ClInclude Include="BaseTreeUtilCode.h" />
     <ClInclude Include="BaseWatchesWnd.h" />
+    <ClInclude Include="BlockingOperationDlg.h" />
     <ClInclude Include="Breakpoints.h" />
     <ClInclude Include="BreakpointsWnd.h" />
     <ClInclude Include="CallstackWnd.h" />

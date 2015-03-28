@@ -48,7 +48,7 @@ dependencies/wxWidgets/samples/*/*.vcxproj.filters
 dependencies/wxWidgets/samples/*/*/*.vcxproj
 dependencies/wxWidgets/samples/*/*/*.vcxproj.filters
 
-dependencies/squirrel/doc/squirrel3.chw
+dependencies/squirrel/doc/*.chw
 
 #
 # Visual Paradigm

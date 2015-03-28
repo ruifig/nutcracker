@@ -15,6 +15,7 @@ namespace nutcracker
 {
 
 class MainWndLoggerOutput;
+struct File;
 
 class MainWnd : public MainWnd_Auto
 {
@@ -26,6 +27,7 @@ public:
 	int getInterpreterIndex();
 	void showFindResultsWnd();
 
+	void startDebugger(const std::shared_ptr<const File>& file);
 private:
 	DECLARE_EVENT_TABLE()
 
