@@ -55,6 +55,11 @@ A quick overview on how to manage files:
 * Only ansi and x86 provided at the moment. I need to refactor some things for proper Unicode support, and 64-bits. Nothing particularly hard.
 * Would be nice to have some kind of autocompletion, although that's not an easy task for a dynamically typed language like Squirrel.
 
-# How it looks like at the moment (Work in progress) #
+# A quick tour #
 
-![Screenshot3.png](https://bitbucket.org/repo/jnoqe9/images/3573107134-Screenshot3.png)
+I recorded a small video explaining the basic features.
+[http://www.youtube.com/watch?v=gf07Da3K1lw](http://www.youtube.com/watch?v=gf07Da3K1lw)
+
+# How it looks like at the moment #
+
+![Screenshot4.png](https://bitbucket.org/repo/jnoqe9/images/2965400008-Screenshot4.png)
