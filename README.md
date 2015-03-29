@@ -20,6 +20,17 @@ Over the years I've used Squirrel on and off, but I was always put off by the la
 * Basic syntax colouring.
     * Current parser is actually a C parser, so not everything is perfect.
 
+# Building from source #
+
+You need Visual Studio 2013. Everything else you need should be included in the repository already.
+
+* Build wxWidgets (dependencies\wxWidgets\build\msw\wx_vc12.sln)
+    * Win32 (Debug and Release configurations)
+    * Alternatively you can use the "dependencies\PrepareEnvironment.bat" batch file to build wxWidgets.
+* Build Squirrel Shell (dependencies\squirrelsh\quirrelsh.sln)
+* Build Squirrel (dependencies\squirrel\squirrel.sln)
+* Build nutcracker (source\Nutcracker.sln)
+
 # Available shortcuts
 
 Keyboard shortcuts mostly emulate Visual Studio and/or Visual Assist where applicable
