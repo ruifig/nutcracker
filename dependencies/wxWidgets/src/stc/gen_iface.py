@@ -16,6 +16,7 @@ from fileinput import FileInput
 
 
 IFACE         = os.path.abspath('./scintilla/include/Scintilla.iface')
+HDR_SCN       = os.path.abspath('./scintilla/include/Scintilla.h')
 H_TEMPLATE    = os.path.abspath('./stc.h.in')
 IH_TEMPLATE   = os.path.abspath('./stc.interface.h.in')
 CPP_TEMPLATE  = os.path.abspath('./stc.cpp.in')
@@ -54,7 +55,8 @@ cmdValues = [ 2011,
               (2450, 2455),
               2518,
               (2619, 2621),
-              (2628, 2629)
+              (2628, 2629),
+              (2652, 2653)
             ]
 
 
@@ -243,7 +245,7 @@ methodOverrideMap = {
     'wxString %s(int line) const;',
 
      '''wxString %s(int line) const {
-         long msg = %s;
+         const int msg = %s;
          long len = SendMsg(msg, line, 0);
 
          wxMemoryBuffer mbuf(len+1);
@@ -259,7 +261,7 @@ methodOverrideMap = {
     'wxString %s(int line) const;',
 
      '''wxString %s(int line) const {
-         long msg = %s;
+         const int msg = %s;
          long len = SendMsg(msg, line, 0);
 
          wxMemoryBuffer mbuf(len+1);
@@ -280,7 +282,7 @@ methodOverrideMap = {
     'wxString %s(int line) const;',
 
      '''wxString %s(int line) const {
-         long msg = %s;
+         const int msg = %s;
          long len = SendMsg(msg, line, 0);
 
          wxMemoryBuffer mbuf(len+1);
@@ -296,7 +298,7 @@ methodOverrideMap = {
     'wxString %s(int line) const;',
 
      '''wxString %s(int line) const {
-         long msg = %s;
+         const int msg = %s;
          long len = SendMsg(msg, line, 0);
 
          wxMemoryBuffer mbuf(len+1);
@@ -318,7 +320,7 @@ methodOverrideMap = {
     ('StyleGetFaceName',
      'wxString %s(int style);',
       '''wxString %s(int style) {
-         long msg = %s;
+         const int msg = %s;
          long len = SendMsg(msg, style, 0);
          wxMemoryBuffer mbuf(len+1);
          char* buf = (char*)mbuf.GetWriteBuf(len+1);
@@ -404,6 +406,8 @@ methodOverrideMap = {
     'AutoCGetMaxHeight'     : ('AutoCompGetMaxHeight', 0, 0, 0),
     'AutoCSetCaseInsensitiveBehaviour'     : ('AutoCompSetCaseInsensitiveBehaviour', 0, 0, 0),
     'AutoCGetCaseInsensitiveBehaviour'     : ('AutoCompGetCaseInsensitiveBehaviour', 0, 0, 0),
+    'AutoCSetOrder'         : ('AutoCompSetOrder', 0, 0, 0),
+    'AutoCGetOrder'         : ('AutoCompGetOrder', 0, 0, 0),
 
     'RegisterImage' :
     (0,
@@ -583,6 +587,7 @@ methodOverrideMap = {
     'GetDirectPointer' : (None, 0, 0, 0),
 
     'CallTipPosStart'   : ('CallTipPosAtStart', 0, 0, 0),
+    'CallTipSetPosStart': ('CallTipSetPosAtStart', 0, 0, 0),
     'CallTipSetHlt'     : ('CallTipSetHighlight', 0, 0, 0),
     'CallTipSetBack'    : ('CallTipSetBackground', 0, 0, 0),
     'CallTipSetFore'    : ('CallTipSetForeground', 0, 0, 0),
@@ -761,7 +766,7 @@ methodOverrideMap = {
      'wxString %s() const;',
 
      '''wxString %s() const {
-         int msg = %s;
+         const int msg = %s;
          int len = SendMsg(msg, 0, (sptr_t)NULL);
          if (!len) return wxEmptyString;
 
@@ -779,7 +784,7 @@ methodOverrideMap = {
      'wxString %s(int tagNumber) const;',
 
      '''wxString %s(int tagNumber) const {
-         int msg = %s;
+         const int msg = %s;
          int len = SendMsg(msg, tagNumber, (sptr_t)NULL);
          if (!len) return wxEmptyString;
 
@@ -796,7 +801,7 @@ methodOverrideMap = {
      'wxString %s() const;',
 
      '''wxString %s() const {
-         int msg = %s;
+         const int msg = %s;
          int len = SendMsg(msg, 0, (sptr_t)NULL);
          if (!len) return wxEmptyString;
 
@@ -814,7 +819,7 @@ methodOverrideMap = {
      'wxString %s() const;',
 
      '''wxString %s() const {
-         int msg = %s;
+         const int msg = %s;
          int len = SendMsg(msg, 0, (sptr_t)NULL);
          if (!len) return wxEmptyString;
 
@@ -832,7 +837,7 @@ methodOverrideMap = {
      'wxString %s() const;',
 
      '''wxString %s() const {
-         int msg = %s;
+         const int msg = %s;
          int len = SendMsg(msg, 0, (sptr_t)NULL);
          if (!len) return wxEmptyString;
 
@@ -851,7 +856,7 @@ methodOverrideMap = {
      'wxString %s(const wxString& name) const;',
 
      '''wxString %s(const wxString& name) const {
-         int msg = %s;
+         const int msg = %s;
          int len = SendMsg(msg, (sptr_t)(const char*)wx2stc(name), (sptr_t)NULL);
          if (!len) return wxEmptyString;
 
@@ -870,7 +875,7 @@ methodOverrideMap = {
      'wxString %s() const;',
 
      '''wxString %s() const {
-         int msg = %s;
+         const int msg = %s;
          int len = SendMsg(msg, 0, (sptr_t)NULL);
          if (!len) return wxEmptyString;
 
@@ -912,6 +917,22 @@ methodOverrideMap = {
          return (void*)(sptr_t)SendMsg(%s, bytes); """,
      0),
 
+    'GetRepresentation' :
+    (0,
+     'wxString %s(const wxString& encodedCharacter) const;',
+     '''wxString %s(const wxString& encodedCharacter) const {
+         int msg = %s;
+         int len = SendMsg(msg, (sptr_t)(const char*)wx2stc(encodedCharacter), (sptr_t)NULL);
+         if (!len) return wxEmptyString;
+
+         wxMemoryBuffer mbuf(len+1);
+         char* buf = (char*)mbuf.GetWriteBuf(len+1);
+         SendMsg(msg, (sptr_t)(const char*)wx2stc(encodedCharacter), (sptr_t)buf);
+         mbuf.UngetWriteBuf(len);
+         mbuf.AppendByte(0);
+         return stc2wx(buf);''',
+     0),
+
      'PrivateLexerCall' :
      (0,
       'void* %s(int operation, void* pointer);',
@@ -922,6 +943,22 @@ methodOverrideMap = {
     'GetMultiPaste' : 
     (0, 0, 0, 
     ('Retrieve the effect of pasting when there are multiple selections.',)),
+
+    'GetSubStyleBases' :
+    (0,
+     'wxString %s() const;',
+     '''wxString %s() const {
+         int msg = %s;
+         int len = SendMsg(msg, 0, (sptr_t)NULL);
+         if (!len) return wxEmptyString;
+
+         wxMemoryBuffer mbuf(len+1);
+         char* buf = (char*)mbuf.GetWriteBuf(len+1);
+         SendMsg(msg, 0, (sptr_t)buf);
+         mbuf.UngetWriteBuf(len);
+         mbuf.AppendByte(0);
+         return stc2wx(buf);''',
+     0),
     
     '' : ('', 0, 0, 0),
 
@@ -942,7 +979,7 @@ constNonGetterMethods = (
 
 #----------------------------------------------------------------------------
 
-def processIface(iface, h_tmplt, cpp_tmplt, ih_tmplt, h_dest, cpp_dest, docstr_dest, ih_dest):
+def processIface(iface, h_tmplt, cpp_tmplt, ih_tmplt, h_dest, cpp_dest, docstr_dest, ih_dest, msgcodes):
     curDocStrings = []
     values = []
     methods = []
@@ -965,7 +1002,7 @@ def processIface(iface, h_tmplt, cpp_tmplt, ih_tmplt, h_dest, cpp_dest, docstr_d
             curDocStrings = []
 
         elif op == 'fun ' or op == 'set ' or op == 'get ':
-            parseFun(line[4:], methods, curDocStrings, cmds, op == 'get ')
+            parseFun(line[4:], methods, curDocStrings, cmds, op == 'get ', msgcodes)
             curDocStrings = []
 
         elif op == 'cat ':
@@ -1014,6 +1051,30 @@ def processIface(iface, h_tmplt, cpp_tmplt, ih_tmplt, h_dest, cpp_dest, docstr_d
 
 def joinWithNewLines(values):
     return '\n'.join(values)
+
+#----------------------------------------------------------------------------
+
+# parse header file for message codes
+def processHeader(hdr_scn, codeDict):
+    fh = FileInput(hdr_scn)
+    for line in fh:
+        line = line[:-1]
+        if line[:8] != '#define ':
+            continue
+
+        op = line[8:]
+        tokens = op.split()
+        if len(tokens) != 2:
+            continue
+
+        symbname = tokens[0]
+        symbval = tokens[1]
+        if symbname[:4] == 'SCI_':
+            # add symbol and its value to the dictionary
+            if symbval in codeDict:
+                print("***** Duplicated message code for " + symbname)
+            else:
+                codeDict[symbval] = symbname
 
 #----------------------------------------------------------------------------
 
@@ -1180,7 +1241,7 @@ funregex = re.compile(r'\s*([a-zA-Z0-9_]+)'  # <ws>return type
                       '\(([ a-zA-Z0-9_]*),'  # (param,
                       '([ a-zA-Z0-9_]*),*\)')  # param)
 
-def parseFun(line, methods, docs, values, is_const):
+def parseFun(line, methods, docs, values, is_const, msgcodes):
     def parseParam(param):
         param = param.strip()
         if param == '':
@@ -1209,7 +1270,12 @@ def parseFun(line, methods, docs, values, is_const):
             if not FUNC_FOR_CMD:
                 return
 
-    methods.append( (retType, name, number, param1, param2, tuple(docs),
+    # if possible, replace numeric value with symbol
+    if number in msgcodes:
+        code = msgcodes[number]
+    else:
+        code = number
+    methods.append( (retType, name, code, param1, param2, tuple(docs),
                      is_const or name in constNonGetterMethods) )
 
 
@@ -1223,8 +1289,12 @@ def main(args):
         print('Please run this script from src/stc subdirectory.')
         sys.exit(1)
 
+    # parse header file for message codes and create dictionary
+    msgcodes = {}
+    processHeader(HDR_SCN, msgcodes)
+
     # Now just do it
-    processIface(IFACE, H_TEMPLATE, CPP_TEMPLATE, IH_TEMPLATE, H_DEST, CPP_DEST, DOCSTR_DEST, IH_DEST)
+    processIface(IFACE, H_TEMPLATE, CPP_TEMPLATE, IH_TEMPLATE, H_DEST, CPP_DEST, DOCSTR_DEST, IH_DEST, msgcodes)
 
 
 

@@ -134,6 +134,8 @@ wxDEFINE_EVENT( wxEVT_STC_INDICATOR_RELEASE, wxStyledTextEvent );
 wxDEFINE_EVENT( wxEVT_STC_AUTOCOMP_CANCELLED, wxStyledTextEvent );
 wxDEFINE_EVENT( wxEVT_STC_AUTOCOMP_CHAR_DELETED, wxStyledTextEvent );
 wxDEFINE_EVENT( wxEVT_STC_HOTSPOT_RELEASE_CLICK, wxStyledTextEvent );
+wxDEFINE_EVENT( wxEVT_STC_CLIPBOARD_COPY, wxStyledTextEvent );
+wxDEFINE_EVENT( wxEVT_STC_CLIPBOARD_PASTE, wxStyledTextEvent );
 
 
 
@@ -355,8 +357,8 @@ void wxStyledTextCtrl::StyleSetFont(int styleNum, wxFont& font) {
 #endif
     int            size     = font.GetPointSize();
     wxString       faceName = font.GetFaceName();
-    bool           bold     = font.GetWeight() == wxBOLD;
-    bool           italic   = font.GetStyle() != wxNORMAL;
+    bool           bold     = font.GetWeight() == wxFONTWEIGHT_BOLD;
+    bool           italic   = font.GetStyle() != wxFONTSTYLE_NORMAL;
     bool           under    = font.GetUnderlined();
     wxFontEncoding encoding = font.GetEncoding();
 
@@ -626,10 +628,17 @@ bool wxStyledTextCtrl::LoadFile(const wxString& filename)
 #endif // !wxUSE_TEXTCTRL
 
 #if wxUSE_DRAG_AND_DROP
-wxDragResult wxStyledTextCtrl::DoDragOver(wxCoord x, wxCoord y, wxDragResult def) {
-        return m_swx->DoDragOver(x, y, def);
+wxDragResult wxStyledTextCtrl::DoDragEnter(wxCoord x, wxCoord y, wxDragResult def) {
+    return m_swx->DoDragEnter(x, y, def);
 }
 
+wxDragResult wxStyledTextCtrl::DoDragOver(wxCoord x, wxCoord y, wxDragResult def) {
+    return m_swx->DoDragOver(x, y, def);
+}
+
+void wxStyledTextCtrl::DoDragLeave() {
+    m_swx->DoDragLeave();
+}
 
 bool wxStyledTextCtrl::DoDropText(long x, long y, const wxString& data) {
     return m_swx->DoDropText(x, y, data);
@@ -963,7 +972,7 @@ static void SetEventText(wxStyledTextEvent& evt, const char* text,
                          size_t length) {
     if(!text) return;
 
-    evt.SetText(stc2wx(text, length));
+    evt.SetString(stc2wx(text, length));
 }
 
 
@@ -1165,7 +1174,6 @@ wxStyledTextEvent::wxStyledTextEvent(const wxStyledTextEvent& event):
     m_key =           event.m_key;
     m_modifiers =     event.m_modifiers;
     m_modificationType = event.m_modificationType;
-    m_text =          event.m_text;
     m_length =        event.m_length;
     m_linesAdded =    event.m_linesAdded;
     m_line =          event.m_line;
@@ -1187,7 +1195,6 @@ wxStyledTextEvent::wxStyledTextEvent(const wxStyledTextEvent& event):
     m_updated =      event.m_updated;
 
 #if wxUSE_DRAG_AND_DROP
-    m_dragText =     event.m_dragText;
     m_dragFlags =    event.m_dragFlags;
     m_dragResult =   event.m_dragResult;
 #endif
@@ -1198,7 +1205,7 @@ wxStyledTextEvent::wxStyledTextEvent(const wxStyledTextEvent& event):
 
 /*static*/ wxVersionInfo wxStyledTextCtrl::GetLibraryVersionInfo()
 {
-    return wxVersionInfo("Scintilla", 3, 21, 0, "Scintilla 3.21");
+    return wxVersionInfo("Scintilla", 3, 4, 1, "Scintilla 3.4.1");
 }
 
 #endif // wxUSE_STC

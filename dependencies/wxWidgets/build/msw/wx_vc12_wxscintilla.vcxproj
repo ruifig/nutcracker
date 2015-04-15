@@ -432,9 +432,18 @@
     <Xdcmake />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\stc\scintilla\lexers\LexDMAP.cxx" />
+    <ClCompile Include="..\..\src\stc\scintilla\lexers\LexKVIrc.cxx" />
+    <ClCompile Include="..\..\src\stc\scintilla\lexers\LexLaTeX.cxx" />
+    <ClCompile Include="..\..\src\stc\scintilla\lexers\LexPO.cxx" />
+    <ClCompile Include="..\..\src\stc\scintilla\lexers\LexRust.cxx" />
+    <ClCompile Include="..\..\src\stc\scintilla\lexers\LexSTTXT.cxx" />
     <ClCompile Include="..\..\src\stc\scintilla\lexlib\Accessor.cxx" />
+    <ClCompile Include="..\..\src\stc\scintilla\lexlib\CharacterCategory.cxx" />
     <ClCompile Include="..\..\src\stc\scintilla\src\AutoComplete.cxx" />
     <ClCompile Include="..\..\src\stc\scintilla\src\CallTip.cxx" />
+    <ClCompile Include="..\..\src\stc\scintilla\src\CaseConvert.cxx" />
+    <ClCompile Include="..\..\src\stc\scintilla\src\CaseFolder.cxx" />
     <ClCompile Include="..\..\src\stc\scintilla\src\Catalogue.cxx" />
     <ClCompile Include="..\..\src\stc\scintilla\src\CellBuffer.cxx" />
     <ClCompile Include="..\..\src\stc\scintilla\src\CharClassify.cxx" />
@@ -573,6 +582,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\stc\scintilla\lexlib\CharacterCategory.h" />
+    <ClInclude Include="..\..\src\stc\scintilla\lexlib\StringCopy.h" />
+    <ClInclude Include="..\..\src\stc\scintilla\lexlib\SubStyles.h" />
+    <ClInclude Include="..\..\src\stc\scintilla\src\CaseConvert.h" />
+    <ClInclude Include="..\..\src\stc\scintilla\src\CaseFolder.h" />
+    <ClInclude Include="..\..\src\stc\scintilla\src\UnicodeFromUTF8.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
