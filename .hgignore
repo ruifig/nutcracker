@@ -1,3 +1,6 @@
+#
+# Note: Patterns using the glob syntax are never rooted (it will match files in any directory)
+#
 syntax: glob
 *.swp
 *.suo
@@ -9,53 +12,36 @@ syntax: glob
 *.idb
 *.aps
 *.ilk
+*.ipch
 
 #
+# Note: Patterns using the regexp syntax can be rooted with the prefix ^
 #
-tmp/*
-bin/*
-source/ipch/*
+# A good online test: https://regex101.com/#python
+syntax: regexp
 
+^bin/[^/]*\.(exe|dll|manifest|pdb|log|txt|exp|lib)$
 
-# CppDepend
-CppDepend/CppDependOut
+^tmp/
+^lib/
+^interpreters/[^/]+/[^/]+\.(exe)
 
-#
-# wxWidgets
-#
+# Ignore temporary/backup files created Visual Paradigm
+^doc/[^/]*\.(bak)$
+
 # Libraries/dlls
-dependencies/wxWidgets/lib/vc_dll
-dependencies/wxWidgets/lib/vc_lib
-dependencies/wxWidgets/lib/vc_x64_dll
-dependencies/wxWidgets/lib/vc_x64_lib
+^dependencies/wxWidgets/lib/vc_dll/
+^dependencies/wxWidgets/lib/vc_lib/
+^dependencies/wxWidgets/lib/vc_x64_dll/
+^dependencies/wxWidgets/lib/vc_x64_lib/
 # Library object files
-dependencies/wxWidgets/build/msw/vc_mswu
-dependencies/wxWidgets/build/msw/vc_mswud
-dependencies/wxWidgets/build/msw/vc_mswudll
-dependencies/wxWidgets/build/msw/vc_mswuddll
-dependencies/wxWidgets/build/msw/vc_x64_mswu
-dependencies/wxWidgets/build/msw/vc_x64_mswud
-dependencies/wxWidgets/build/msw/vc_x64_mswudll
-dependencies/wxWidgets/build/msw/vc_x64_mswuddll
-# samples
-dependencies/wxWidgets/samples/samples.sln
-dependencies/wxWidgets/samples/*/vc_mswud/
-dependencies/wxWidgets/samples/*/*/vc_mswud/
-dependencies/wxWidgets/samples/*/vc_mswuddll/
-dependencies/wxWidgets/samples/*/*/vc_mswudll/
-dependencies/wxWidgets/samples/*/*.vcxproj
-dependencies/wxWidgets/samples/*/*.vcxproj.filters
-dependencies/wxWidgets/samples/*/*/*.vcxproj
-dependencies/wxWidgets/samples/*/*/*.vcxproj.filters
-
-dependencies/squirrel/doc/*.chw
-
-#
-# Visual Paradigm
-#
-VisualParadigm/*
-
-#
-source/Nutcracker/AutoUI/Nutcracker-autosave.pjd
-
+^dependencies/wxWidgets/build/msw/ipch/
+^dependencies/wxWidgets/build/msw/vc_mswu/
+^dependencies/wxWidgets/build/msw/vc_mswud/
+^dependencies/wxWidgets/build/msw/vc_mswudll/
+^dependencies/wxWidgets/build/msw/vc_mswuddll/
+^dependencies/wxWidgets/build/msw/vc_x64_mswu/
+^dependencies/wxWidgets/build/msw/vc_x64_mswud/
+^dependencies/wxWidgets/build/msw/vc_x64_mswudll/
+^dependencies/wxWidgets/build/msw/vc_x64_mswuddll/
 

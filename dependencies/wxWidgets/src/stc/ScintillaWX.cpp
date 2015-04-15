@@ -32,7 +32,6 @@
 #include "wx/dataobj.h"
 #include "wx/clipbrd.h"
 #include "wx/dnd.h"
-#include "wx/frame.h"
 
 #if !wxUSE_STD_CONTAINERS && !wxUSE_STD_IOSTREAM && !wxUSE_STD_STRING
     #include "wx/beforestd.h"
@@ -60,7 +59,7 @@ public:
         m_swx = swx;
     }
 
-    void Notify() {
+    void Notify() wxOVERRIDE {
         m_swx->DoTick();
     }
 
@@ -92,6 +91,7 @@ void  wxSTCDropTarget::OnLeave() {
 #include "wx/popupwin.h"
 #define wxSTCCallTipBase wxPopupWindow
 #else
+#include "wx/frame.h"
 #define wxSTCCallTipBase wxFrame
 #endif
 
@@ -101,13 +101,7 @@ class wxSTCCallTip : public wxSTCCallTipBase {
 public:
     wxSTCCallTip(wxWindow* parent, CallTip* ct, ScintillaWX* swx) :
 #if wxUSE_POPUPWIN
-        wxSTCCallTipBase(parent, wxBORDER_NONE
-#ifdef __WXMAC__
-                                 // Workaround to avoid crash on OSX.  Remove when the fix lands in wx.
-                                 // See ticket #15765
-                                 | wxFRAME_TOOL_WINDOW  
-#endif
-                                ),
+        wxSTCCallTipBase(parent, wxBORDER_NONE),
 #else
         wxSTCCallTipBase(parent, -1, wxEmptyString, wxDefaultPosition, wxDefaultSize,
                          wxFRAME_NO_TASKBAR
@@ -132,7 +126,7 @@ public:
 #endif
     }
 
-    bool AcceptsFocus() const { return false; }
+    bool AcceptsFocus() const wxOVERRIDE { return false; }
 
     void OnPaint(wxPaintEvent& WXUNUSED(evt))
     {
@@ -160,7 +154,7 @@ public:
 
     virtual void DoSetSize(int x, int y,
                            int width, int height,
-                           int sizeFlags = wxSIZE_AUTO)
+                           int sizeFlags = wxSIZE_AUTO) wxOVERRIDE
     {
         // convert coords to screen coords since we're a top-level window
         if (x != wxDefaultCoord) {
@@ -257,6 +251,17 @@ ScintillaWX::ScintillaWX(wxStyledTextCtrl* win) {
     sysCaretWidth = 0;
     sysCaretHeight = 0;
 #endif
+
+#ifdef wxHAVE_STC_RECT_FORMAT
+#if defined(__WXMSW__)
+    m_clipRectTextFormat = wxDataFormat(wxT("MSDEVColumnSelect"));
+#elif defined(__WXGTK__)
+    m_clipRectTextFormat = wxDataFormat(wxT("SECONDARY"));
+#else
+    #error "Must define rectangular text selection clipboard format."
+#endif
+#endif // wxHAVE_STC_RECT_FORMAT
+
 }
 
 
@@ -289,17 +294,17 @@ void ScintillaWX::Finalise() {
 
 void ScintillaWX::StartDrag() {
 #if wxUSE_DRAG_AND_DROP
-    wxString dragText = stc2wx(drag.s, drag.len);
+    wxString dragText = stc2wx(drag.Data(), drag.Length());
 
     // Send an event to allow the drag text to be changed
     wxStyledTextEvent evt(wxEVT_STC_START_DRAG, stc->GetId());
     evt.SetEventObject(stc);
-    evt.SetDragText(dragText);
+    evt.SetString(dragText);
     evt.SetDragFlags(wxDrag_DefaultMove);
     evt.SetPosition(wxMin(stc->GetSelectionStart(),
                           stc->GetSelectionEnd()));
     stc->GetEventHandler()->ProcessEvent(evt);
-    dragText = evt.GetDragText();
+    dragText = evt.GetString();
 
     if ( !dragText.empty() ) {
         wxDropSource        source(stc);
@@ -426,7 +431,7 @@ bool ScintillaWX::ModifyScrollBars(int nMax, int nPage) {
     int horizEnd = scrollWidth;
     if (horizEnd < 0)
         horizEnd = 0;
-    if (!horizontalScrollBarVisible || (wrapState != eWrapNone))
+    if (!horizontalScrollBarVisible || Wrapping())
         horizEnd = 0;
     int pageWidth = rcText.Width();
 
@@ -493,21 +498,33 @@ void ScintillaWX::Copy() {
 
 void ScintillaWX::Paste() {
     pdoc->BeginUndoAction();
-    ClearSelection();
+    ClearSelection(multiPasteMode == SC_MULTIPASTE_EACH);
 
 #if wxUSE_DATAOBJ
     wxTextDataObject data;
     bool gotData = false;
+    bool isRectangularClipboard = false;
 
     wxTheClipboard->UsePrimarySelection(false);
     if (wxTheClipboard->Open()) {
+#ifdef wxHAVE_STC_RECT_FORMAT
+        isRectangularClipboard = wxTheClipboard->IsSupported(m_clipRectTextFormat);
+#endif
         gotData = wxTheClipboard->GetData(data);
         wxTheClipboard->Close();
     }
     if (gotData) {
         wxString   text = wxTextBuffer::Translate(data.GetText(),
                                                   wxConvertEOLMode(pdoc->eolMode));
-        wxWX2MBbuf buf = (wxWX2MBbuf)wx2stc(text);
+
+        // Send an event to allow the pasted text to be changed
+        wxStyledTextEvent evt(wxEVT_STC_CLIPBOARD_PASTE, stc->GetId());
+        evt.SetEventObject(stc);
+        evt.SetPosition(sel.MainCaret());
+        evt.SetString(text);
+        stc->GetEventHandler()->ProcessEvent(evt);
+
+        wxWX2MBbuf buf = (wxWX2MBbuf)wx2stc(evt.GetString());
 
 #if wxUSE_UNICODE
         // free up the old character buffer in case the text is real big
@@ -515,9 +532,21 @@ void ScintillaWX::Paste() {
         text = wxEmptyString;
 #endif
         int len = strlen(buf);
-        int caretMain = sel.MainCaret();
-        pdoc->InsertString(caretMain, buf, len);
-        SetEmptySelection(caretMain + len);
+        SelectionPosition selStart = sel.IsRectangular() ?
+            sel.Rectangular().Start() :
+            sel.Range(sel.Main()).Start();
+
+        // call the appropriate scintilla paste method if the
+        // depending on whether the text was copied FROM a rectangular selection
+        // or not.
+        if (isRectangularClipboard)
+        {
+            PasteRectangular(selStart, buf, len);
+        }
+        else
+        {
+            InsertPaste(selStart, buf, len);
+        }
     }
 #endif // wxUSE_DATAOBJ
 
@@ -529,13 +558,33 @@ void ScintillaWX::Paste() {
 
 void ScintillaWX::CopyToClipboard(const SelectionText& st) {
 #if wxUSE_CLIPBOARD
-    if ( !st.len )
+    if ( !st.LengthWithTerminator() )
         return;
+
+    // Send an event to allow the copied text to be changed
+    wxStyledTextEvent evt(wxEVT_STC_CLIPBOARD_COPY, stc->GetId());
+    evt.SetEventObject(stc);
+    evt.SetString(wxTextBuffer::Translate(stc2wx(st.Data(), st.Length())));
+    stc->GetEventHandler()->ProcessEvent(evt);
 
     wxTheClipboard->UsePrimarySelection(false);
     if (wxTheClipboard->Open()) {
-        wxString text = wxTextBuffer::Translate(stc2wx(st.s, st.len-1));
-        wxTheClipboard->SetData(new wxTextDataObject(text));
+        wxString text = evt.GetString();
+
+#ifdef wxHAVE_STC_RECT_FORMAT
+        if (st.rectangular)
+        {
+            // when copying the text to the clipboard, add extra meta-data that
+            // tells the Paste() method that the user copied a rectangular
+            // block of text, as opposed to a stream of text.
+            wxDataObjectComposite* composite = new wxDataObjectComposite();
+            composite->Add(new wxTextDataObject(text), true);
+            composite->Add(new wxCustomDataObject(m_clipRectTextFormat));
+            wxTheClipboard->SetData(composite);
+        }
+        else
+#endif // wxHAVE_STC_RECT_FORMAT
+            wxTheClipboard->SetData(new wxTextDataObject(text));
         wxTheClipboard->Close();
     }
 #else
@@ -597,7 +646,7 @@ void ScintillaWX::ClaimSelection() {
         CopySelectionRange(&st);
         wxTheClipboard->UsePrimarySelection(true);
         if (wxTheClipboard->Open()) {
-            wxString text = stc2wx(st.s, st.len);
+            wxString text = stc2wx(st.Data(), st.Length());
             wxTheClipboard->SetData(new wxTextDataObject(text));
             wxTheClipboard->Close();
         }
@@ -892,6 +941,7 @@ void ScintillaWX::DoLoseFocus(){
     SetFocusState(false);
     focusEvent = false;
     DestroySystemCaret();
+    SetTicking(false);
 }
 
 void ScintillaWX::DoGainFocus(){
@@ -900,6 +950,7 @@ void ScintillaWX::DoGainFocus(){
     focusEvent = false;
     DestroySystemCaret();
     CreateSystemCaret();
+    SetTicking(true);
 }
 
 void ScintillaWX::DoSysColourChange() {
@@ -1011,13 +1062,13 @@ int  ScintillaWX::DoKeyDown(const wxKeyEvent& evt, bool* consumed)
     case WXK_ESCAPE:            key = SCK_ESCAPE;   break;
     case WXK_BACK:              key = SCK_BACK;     break;
     case WXK_TAB:               key = SCK_TAB;      break;
-    case WXK_NUMPAD_ENTER:      // fall through
+    case WXK_NUMPAD_ENTER:      wxFALLTHROUGH;
     case WXK_RETURN:            key = SCK_RETURN;   break;
-    case WXK_ADD:               // fall through
+    case WXK_ADD:               wxFALLTHROUGH;
     case WXK_NUMPAD_ADD:        key = SCK_ADD;      break;
-    case WXK_SUBTRACT:          // fall through
+    case WXK_SUBTRACT:          wxFALLTHROUGH;
     case WXK_NUMPAD_SUBTRACT:   key = SCK_SUBTRACT; break;
-    case WXK_DIVIDE:            // fall through
+    case WXK_DIVIDE:            wxFALLTHROUGH;
     case WXK_NUMPAD_DIVIDE:     key = SCK_DIVIDE;   break;
     case WXK_CONTROL:           key = 0; break;
     case WXK_ALT:               key = 0; break;
@@ -1089,13 +1140,13 @@ bool ScintillaWX::DoDropText(long x, long y, const wxString& data) {
     evt.SetX(x);
     evt.SetY(y);
     evt.SetPosition(PositionFromLocation(Point(x,y)));
-    evt.SetDragText(text);
+    evt.SetString(text);
     stc->GetEventHandler()->ProcessEvent(evt);
 
     dragResult = evt.GetDragResult();
     if (dragResult == wxDragMove || dragResult == wxDragCopy) {
         DropAt(SelectionPosition(evt.GetPosition()),
-               wx2stc(evt.GetDragText()),
+               wx2stc(evt.GetString()),
                dragResult == wxDragMove,
                false); // TODO: rectangular?
         return true;
