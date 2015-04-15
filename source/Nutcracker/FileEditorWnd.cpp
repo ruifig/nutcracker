@@ -637,8 +637,10 @@ void FileEditorWnd::OnCharHook(wxKeyEvent& event)
 	}
 	else if (modifiers == wxMOD_CONTROL && keycode == 'R')
 	{
+		/*
 		m_textCtrl->DiscardEdits();
 		m_textCtrl->LoadFile(m_file->fullpath.widen());
+		*/
 	}
 	else if (modifiers == 0 && keycode == WXK_F9)
 	{

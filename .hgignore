@@ -13,6 +13,7 @@ syntax: glob
 *.aps
 *.ilk
 *.ipch
+*.chw
 
 #
 # Note: Patterns using the regexp syntax can be rooted with the prefix ^
@@ -44,4 +45,8 @@ syntax: regexp
 ^dependencies/wxWidgets/build/msw/vc_x64_mswud/
 ^dependencies/wxWidgets/build/msw/vc_x64_mswudll/
 ^dependencies/wxWidgets/build/msw/vc_x64_mswuddll/
+
+^dependencies/wxWidgets/samples/([^/]+/){1,3}[^/]+\.(filters|vcxproj|exe|log|obj|tlog)$
+^dependencies/wxWidgets/samples/samples.sln$
+
 
