@@ -91,7 +91,7 @@ void BaseWatchesWnd::CreateControls()
 	itemPanel1->SetSizer(itemBoxSizer2);
 
 	m_tree = new wxTreeListCtrl(itemPanel1, ID_TREE, wxDefaultPosition, wxSize(200, 150), wxTR_EDIT_LABELS);
-	itemBoxSizer2->Add(m_tree, 1, wxGROW|wxALL|wxADJUST_MINSIZE, 0);
+	itemBoxSizer2->Add(m_tree, 1, wxGROW|wxALL, 0);
 }
 
 

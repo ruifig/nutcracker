@@ -26,6 +26,9 @@
 #
 /dependencies/squirrel/.vs
 /dependencies/squirrelsh/.vs
+/dependencies/czPlatform/**/*.user
+/source/.vs
+/source/**/*.user
 
 #
 # wxWidgets

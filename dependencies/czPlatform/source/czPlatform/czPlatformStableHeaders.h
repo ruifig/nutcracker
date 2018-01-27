@@ -21,7 +21,7 @@
 // platform dependent headers
 #if CZ_PLATFORM==CZ_PLATFORM_WIN32
 
-	#include <SDKDDKVer.h>
+	//#include <SDKDDKVer.h>
 
 	#ifndef WIN32_LEAN_AND_MEAN
 		//#  define WIN32_LEAN_AND_MEAN

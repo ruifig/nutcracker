@@ -590,7 +590,7 @@ std::vector<Filename> findFilesHelper(const UTF8String& dir,  const UTF8String& 
 return res;
 }
 
-std::vector<Filename> findFiles(const UTF8String& dir, bool recursive, std::function<bool(const Filename&)> filter = []{return true; })
+std::vector<Filename> findFiles(const UTF8String& dir, bool recursive, std::function<bool(const Filename&)> filter = [](const Filename&){return true; })
 {
 	return findFilesHelper(dir, "", recursive, filter);
 }

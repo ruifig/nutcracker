@@ -253,7 +253,7 @@ std::vector<Filesystem::FileInfo> Filesystem::getFilesInDirectory(const UTF8Stri
 			LARGE_INTEGER filesize;
 			filesize.LowPart = ffd.nFileSizeLow;
 			filesize.HighPart = ffd.nFileSizeHigh;
-			res.push_back({ Type::File, Filename(ffd.cFileName), filesize.QuadPart });
+			res.push_back({ Type::File, Filename(ffd.cFileName), static_cast<uint64_t>(filesize.QuadPart) });
 		}
 	} while (FindNextFile(hFind, &ffd) != 0);
 

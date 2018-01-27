@@ -114,13 +114,13 @@ void BreakpointsWnd::OnCharHook(wxKeyEvent& evt)
 {
 	if (evt.GetKeyCode() == WXK_DELETE)
 	{
-		int r = m_grid->GetCursorRow();
+		int r = m_grid->GetGridCursorRow();
 		m_selectedRow = r;
 		gWorkspace->removeBreakpoint(r);
 	}
 	else if (evt.GetKeyCode() == WXK_SPACE)
 	{
-		int r = m_grid->GetCursorRow();
+		int r = m_grid->GetGridCursorRow();
 		m_selectedRow = r;
 		gWorkspace->toggleBreakpoint(r);
 	}

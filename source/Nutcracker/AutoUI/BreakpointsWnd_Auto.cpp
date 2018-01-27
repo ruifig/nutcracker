@@ -116,7 +116,7 @@ void BreakpointsWnd_Auto::CreateControls()
 	m_grid->SetColLabelSize(20);
 	m_grid->SetRowLabelSize(0);
 	m_grid->CreateGrid(1, 2, wxGrid::wxGridSelectRows);
-	itemBoxSizer2->Add(m_grid, 1, wxGROW|wxALL|wxADJUST_MINSIZE, 0);
+	itemBoxSizer2->Add(m_grid, 1, wxGROW|wxALL, 0);
 
 ////@end BreakpointsWnd_Auto content construction
 }
