@@ -28,7 +28,7 @@ enum wxFontFamily
     /// between @c wxFONTFAMILY_MODERN and @c wxFONTFAMILY_TELETYPE.
     wxFONTFAMILY_MODERN = wxMODERN,
 
-    /// A teletype (i.e. monospaced) font.
+    /// A teletype (i.e.\ monospaced) font.
     /// Monospace fonts have a fixed width like typewriters and often have strong angular
     /// or block serifs. Monospace font faces are often used code samples and have a simple,
     /// functional font style.
@@ -114,7 +114,7 @@ enum wxFontFlag
     /// Underlined style (not underlined by default).
     wxFONTFLAG_UNDERLINED       = 1 << 6,
 
-    /// Strike-through style (only supported in wxMSW and wxGTK currently).
+    /// Strike-through style (implemented in MSW, GTK, and wxOSX)
     wxFONTFLAG_STRIKETHROUGH    = 1 << 7,
 
     /// the mask of all currently used flags
@@ -138,10 +138,14 @@ enum wxFontFlag
 enum wxFontEncoding
 {
     /// Default system encoding.
-    wxFONTENCODING_SYSTEM = -1,     // system default
+    wxFONTENCODING_SYSTEM = -1,     //!< Default system encoding.
 
-    /// Default application encoding.
-    wxFONTENCODING_DEFAULT,         // current default encoding
+    /**
+        Default application encoding: this is the encoding set by calls to
+        wxFont::SetDefaultEncoding(). Initially, the default application
+        encoding is the same as default system encoding.
+    */
+    wxFONTENCODING_DEFAULT,
 
     // ISO8859 standard defines a number of single-byte charsets
     wxFONTENCODING_ISO8859_1,       //!< West European (Latin1)
@@ -384,7 +388,7 @@ public:
     /**
         Use a strike-through version of the font.
 
-        Currently this is only implemented in wxMSW and wxGTK.
+        Currently this is only implemented in wxMSW, wxGTK, and wxOSX.
      */
     wxFontInfo& Strikethrough(bool strikethrough = true);
 
@@ -472,13 +476,13 @@ public:
         Creates a font object with the specified attributes and size in points.
 
         Notice that the use of this constructor is often more verbose and less
-        readable than the use of constructor from wxFontInfo, e.g. the example
-        in that constructor documentation would need to be written as
+        readable than using wxFont(const wxFontInfo& font), e.g. the example
+        in that constructor documentation would need to be written as:
+
         @code
             wxFont font(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL,
                         wxFONTWEIGHT_BOLD, true);
         @endcode
-        which is longer and less clear.
 
         @param pointSize
             Size in points. See SetPointSize() for more info.
@@ -498,21 +502,9 @@ public:
             An optional string specifying the face name to be used.
             If it is an empty string, a default face name will be chosen based on the family.
         @param encoding
-            An encoding which may be one of the enumeration values of ::wxFontEncoding.
-            Briefly these can be summed up as:
-            <TABLE>
-                <TR><TD>@c wxFONTENCODING_SYSTEM</TD><TD>Default system encoding.</TD></TR>
-                <TR><TD>@c wxFONTENCODING_DEFAULT</TD><TD>
-                    Default application encoding: this is the encoding set by calls to
-                    SetDefaultEncoding() and which may be set to, say, KOI8 to create all
-                    fonts by default with KOI8 encoding. Initially, the default application
-                    encoding is the same as default system encoding.</TD></TR>
-                <TR><TD>@c wxFONTENCODING_ISO8859_1...15</TD><TD>ISO8859 encodings.</TD></TR>
-                <TR><TD>@c wxFONTENCODING_KOI8</TD><TD>The standard Russian encoding for Internet.</TD></TR>
-                <TR><TD>@c wxFONTENCODING_CP1250...1252</TD><TD>Windows encodings similar to ISO8859 (but not identical).</TD></TR>
-            </TABLE>
-            If the specified encoding isn't available, no font is created
-            (see also @ref overview_fontencoding).
+            An encoding which may be one of the enumeration values of
+            ::wxFontEncoding. If the specified encoding isn't available, no font
+            is created (see also @ref overview_fontencoding).
 
         @remarks If the desired font does not exist, the closest match will be
                  chosen. Under Windows, only scalable TrueType fonts are used.
@@ -548,21 +540,9 @@ public:
             An optional string specifying the face name to be used.
             If it is an empty string, a default face name will be chosen based on the family.
         @param encoding
-            An encoding which may be one of the enumeration values of ::wxFontEncoding.
-            Briefly these can be summed up as:
-            <TABLE>
-                <TR><TD>@c wxFONTENCODING_SYSTEM</TD><TD>Default system encoding.</TD></TR>
-                <TR><TD>@c wxFONTENCODING_DEFAULT</TD><TD>
-                    Default application encoding: this is the encoding set by calls to
-                    SetDefaultEncoding() and which may be set to, say, KOI8 to create all
-                    fonts by default with KOI8 encoding. Initially, the default application
-                    encoding is the same as default system encoding.</TD></TR>
-                <TR><TD>@c wxFONTENCODING_ISO8859_1...15</TD><TD>ISO8859 encodings.</TD></TR>
-                <TR><TD>@c wxFONTENCODING_KOI8</TD><TD>The standard Russian encoding for Internet.</TD></TR>
-                <TR><TD>@c wxFONTENCODING_CP1250...1252</TD><TD>Windows encodings similar to ISO8859 (but not identical).</TD></TR>
-            </TABLE>
-            If the specified encoding isn't available, no font is created
-            (see also @ref overview_fontencoding).
+            An encoding which may be one of the enumeration values of
+            ::wxFontEncoding. If the specified encoding isn't available, no font
+            is created (see also @ref overview_fontencoding).
 
         @remarks If the desired font does not exist, the closest match will be
                  chosen. Under Windows, only scalable TrueType fonts are used.
@@ -606,6 +586,14 @@ public:
         @name Getters
     */
     //@{
+
+    /**
+       Returns a font with the same face/size as the given one but with normal
+       weight and style and not underlined nor stricken through.
+
+       @since 3.1.0
+    */
+    wxFont GetBaseFont() const;
 
     /**
         Returns the encoding of this font.
@@ -802,7 +790,7 @@ public:
     /**
         Returns stricken-through version of this font.
 
-        Currently stricken-through fonts are only supported in wxMSW and wxGTK.
+        Currently stricken-through fonts are only supported in wxMSW, wxGTK, and wxOSX.
 
         @see MakeStrikethrough()
 
@@ -864,7 +852,7 @@ public:
     /**
         Changes this font to be stricken-through.
 
-        Currently stricken-through fonts are only supported in wxMSW and wxGTK.
+        Currently stricken-through fonts are only supported in wxMSW, wxGTK, and wxOSX.
 
         @see Strikethrough()
 
@@ -1068,7 +1056,7 @@ public:
     /**
         Sets strike-through attribute of the font.
 
-        Currently stricken-through fonts are only supported in wxMSW and wxGTK.
+        Currently stricken-through fonts are only supported in wxMSW, wxGTK, and wxOSX.
 
         @param strikethrough
             @true to add strike-through style, @false to remove it.

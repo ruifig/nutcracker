@@ -78,7 +78,7 @@ public:
         m_workerFailed = false;
     }
 
-    virtual wxEvent* Clone() const
+    virtual wxEvent* Clone() const wxOVERRIDE
     {
         return new WorkerEvent(*this);
     }
@@ -112,11 +112,11 @@ private:
       EVENTS
     };
 
-    virtual bool OnInit();
-    virtual int OnExit();
+    virtual bool OnInit() wxOVERRIDE;
+    virtual int OnExit() wxOVERRIDE;
 
-    void OnInitCmdLine(wxCmdLineParser& pParser);
-    bool OnCmdLineParsed(wxCmdLineParser& pParser);
+    void OnInitCmdLine(wxCmdLineParser& pParser) wxOVERRIDE;
+    bool OnCmdLineParsed(wxCmdLineParser& pParser) wxOVERRIDE;
 
     void OnSocketEvent(wxSocketEvent& pEvent);
     void OnWorkerEvent(WorkerEvent& pEvent);
@@ -146,7 +146,7 @@ private:
     wxTimer mTimer;
 };
 
-DECLARE_APP(Server);
+wxDECLARE_APP(Server);
 
 // just some common things shared between ThreadWorker and EventWorker
 class WorkerBase
@@ -168,7 +168,7 @@ class ThreadWorker : public wxThread, private WorkerBase
 {
 public:
     ThreadWorker(wxSocketBase* pSocket);
-    virtual ExitCode Entry();
+    virtual ExitCode Entry() wxOVERRIDE;
 
 private:
     wxSocketBase* m_socket;
@@ -201,7 +201,7 @@ private:
 };
 
 /******************* Implementation ******************/
-IMPLEMENT_APP_CONSOLE(Server)
+wxIMPLEMENT_APP_CONSOLE(Server);
 
 #include <wx/listimpl.cpp>
 WX_DEFINE_LIST(TList);
@@ -754,7 +754,7 @@ void  EventWorker::DoWrite()
             m_written += m_socket->LastCount();
         }
         LogWorker(wxString::Format("Written %d of %d bytes, todo %d",
-                  m_socket->LastCount(),m_size,m_size - m_written));
+                  m_written, m_size, m_size - m_written));
     }
     while (!m_socket->Error());
 }

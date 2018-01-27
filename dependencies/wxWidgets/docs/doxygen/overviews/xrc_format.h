@@ -246,17 +246,16 @@ Some examples:
 
 @subsection overview_xrcformat_type_size Size
 
-Sizes and positions have the form of string with two comma-separated integer
-components, with optional "d" suffix. Semi-formally:
+Sizes and positions can be expressed in either @ref wxWindow::FromDIP()
+"DPI-independent pixel values" or in @ref wxWindow::ConvertDialogToPixels()
+"dialog units". The former is the default, to use the latter "d" suffix can be
+added. Semi-formally the format is:
 
   size := x "," y ["d"]
 
 where x and y are integers. Either of the components (or both) may be "-1" to
 signify default value. As a shortcut, empty string is equivalent to "-1,-1"
 (= wxDefaultSize or wxDefaultPosition).
-
-When the "d" suffix is used, integer values are interpreted as
-@ref wxWindow::ConvertDialogToPixels() "dialog units" in the parent window.
 
 Examples:
 @code
@@ -274,7 +273,8 @@ Same as @ref overview_xrcformat_type_size.
 
 Similarly to @ref overview_xrcformat_type_size "sizes", dimensions are expressed
 as integers with optional "d" suffix. When "d" suffix is used, the integer
-preceding it is interpreted as dialog units in the parent window.
+preceding it is interpreted as dialog units in the parent window, otherwise
+it's a DPI-independent pixel value.
 
 
 @subsection overview_xrcformat_type_text Text
@@ -541,6 +541,14 @@ control-specific properties are listed. If the control can have child objects,
 it is documented there too; unless said otherwise, XRC elements for these
 controls cannot have children.
 
+@subsubsection xrc_activityindicator wxActivityIndicator
+
+@beginTable
+@hdr3col{property, type, description}
+@row3col{running, @ref overview_xrcformat_type_bool,
+    If true, start the activity indicator after creating it (default: false).}
+@endTable
+
 @subsubsection xrc_wxanimationctrl wxAnimationCtrl
 
 @beginTable
@@ -593,6 +601,30 @@ later only and you need to explicitly register its handler using
 @endcode
 to use it.
 
+@subsubsection xrc_wxauitoolbar wxAuiToolBar
+
+Building an XRC for wxAuiToolBar is quite similar to wxToolBar.
+The only significant differences are:
+@li the use of the class name wxAuiToolBar
+@li the styles supported are the ones described in the wxAuiToolBar class definition
+@li the 'space' pseudo-class has two optional, mutually exclusive,
+integer properties: 'proportion' and 'width'. If 'width' is specified, a space
+is added using wxAuiToolBar::AddSpacer(); if 'proportion', the value is used in
+wxAuiToolBar::AddStretchSpacer(). If neither are provided, the default is a
+stretch-spacer with a proportion of 1.
+@li there is an additional pseudo-class, 'label', that has a string property.
+See wxAuiToolBar::AddLabel().
+
+Refer to the section @ref xrc_wxtoolbar for more details.
+
+@note The XML Handler should be explicitly registered:
+@code
+    #include <wx/xrc/xh_auitoolb.h>
+
+    AddHandler(new wxAuiToolBarXmlHandler);
+@endcode
+
+@since 3.1.0
 
 @subsubsection xrc_wxbannerwindow wxBannerWindow
 
@@ -1013,9 +1045,9 @@ objects. If sizer child is used, it sets
 @row3col{value, integer,
     Initial value of the control (default: 0).}
 @row3col{shadow, @ref overview_xrcformat_type_dimension,
-    Rendered shadow size (default: none; ignored by most platforms).}
+    Ignored, preserved only for compatibility.}
 @row3col{bezel, @ref overview_xrcformat_type_dimension,
-    Rendered bezel size (default: none; ignored by most platforms).}
+    Ignored, preserved only for compatibility.}
 @endTable
 
 @subsubsection xrc_wxgenericdirctrl wxGenericDirCtrl
@@ -1868,6 +1900,9 @@ No additional properties.
     Initial value of the control (default: empty).}
 @row3col{maxlength, integer,
     Maximum length of the text which can be entered by user (default: unlimited).}
+@row3col{forceupper, @ref overview_xrcformat_type_bool,
+    If true, use wxTextEntry::ForceUpper() to force the control contents to be
+    upper case.}
 @row3col{hint, @ref overview_xrcformat_type_text,
     Hint shown in empty control (new since wxWidgets 3.0.1).}
 @endTable
@@ -2250,13 +2285,17 @@ Example of sizers XRC code:
 @endcode
 
 The sizer classes that can be used are listed below, together with their
-class-specific properties. All classes support the following properties:
+class-specific properties. All classes except wxStdDialogButtonSizer
+support the following properties:
 
 @beginTable
 @hdr3col{property, type, description}
 @row3col{minsize, @ref overview_xrcformat_type_size,
     Minimal size that this sizer will have, see wxSizer::SetMinSize()
     (default: no min size).}
+@row3col{hideitems, @ref overview_xrcformat_type_bool,
+    Whether the sizer will be created with all its items hidden
+    (default: 0).}
 @endTable
 
 @subsection overview_xrcformat_wxboxsizer wxBoxSizer
@@ -2419,16 +2458,15 @@ should be processed on. It is filtered out and ignored on any other platforms.
 Possible elemental values are:
 @beginDefList
 @itemdef{ @c win, Windows }
-@itemdef{ @c mac, Mac OS X (or Mac Classic in wxWidgets version supporting it) }
+@itemdef{ @c mac, OS X (or Mac Classic in wxWidgets version supporting it) }
 @itemdef{ @c unix, Any Unix platform @em except OS X }
-@itemdef{ @c os2, OS/2 }
 @endDefList
 
 Examples:
 @code
 <label platform="win">Windows</label>
 <label platform="unix">Unix</label>
-<label platform="mac">Mac OS X</label>
+<label platform="mac">OS X</label>
 <help platform="mac|unix">Not a Windows machine</help>
 @endcode
 
@@ -2523,7 +2561,7 @@ The subclass must satisfy a number of requirements:
 
  -# It must be derived from the class specified in @c class attribute.
  -# It must be visible in wxWidget's pseudo-RTTI mechanism, i.e. there must be
-    a DECLARE_DYNAMIC_CLASS() entry for it.
+    a wxDECLARE_DYNAMIC_CLASS() entry for it.
  -# It must support two-phase creation. In particular, this means that it has
     to have default constructor.
  -# It cannot provide custom Create() method and must be constructible using

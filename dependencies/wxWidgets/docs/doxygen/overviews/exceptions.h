@@ -72,6 +72,43 @@ the user about the problem (while being careful not to throw any more
 exceptions as otherwise @c std::terminate() will be called).
 
 
+@section overview_exceptions_store_rethrow Handling Exception Inside wxYield()
+
+In some, relatively rare cases, using wxApp::OnExceptionInMainLoop() may not
+be sufficiently flexible. The most common example is using automated GUI tests,
+when test failures are signaled by throwing an exception and these exceptions
+can't be caught in a single central method because their handling depends on
+the test logic, e.g. sometimes an exception is expected while at other times it
+is an actual error. Typically this results in writing code like the following:
+
+@code
+void TestNewDocument()
+{
+    wxUIActionSimulator ui;
+    ui.Char('n', wxMOD_CONTROL); // simulate creating a new file
+
+    // Let wxWidgets dispatch Ctrl+N event, invoke the handler and create the
+    // new document.
+    try {
+        wxYield();
+    } catch ( ... ) {
+        // Handle exceptions as failure in the new document creation test.
+    }
+}
+@endcode
+
+Unfortunately, by default this example only works when using a C++11 compiler
+because the exception can't be safely propagated back to the code handling it
+in @c TestNewDocument() through the system event dispatch functions which are
+not compatible with C++ exceptions and needs to be stored by wxWidgets when it
+is first caught and rethrown later, when it is safe to do it. And such storing
+and rethrowing of exceptions is only possible in C++11, so while everything
+just works if you do use C++11, there is an extra step if you are using C++98:
+In this case you need to override wxApp::StoreCurrentException() and
+wxApp::RethrowStoredException() to help wxWidgets to do this, please see the
+documentation of these functions for more details.
+
+
 @section overview_exceptions_tech Technicalities
 
 To use any kind of exception support in the library you need to build it

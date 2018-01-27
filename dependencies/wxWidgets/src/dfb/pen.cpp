@@ -58,7 +58,7 @@ public:
 
 #define M_PENDATA ((wxPenRefData *)m_refData)
 
-IMPLEMENT_DYNAMIC_CLASS(wxPen, wxGDIObject)
+wxIMPLEMENT_DYNAMIC_CLASS(wxPen, wxGDIObject);
 
 wxPen::wxPen(const wxColour &colour, int width, wxPenStyle style)
 {
@@ -67,12 +67,10 @@ wxPen::wxPen(const wxColour &colour, int width, wxPenStyle style)
     m_refData = new wxPenRefData(colour, style);
 }
 
-#if FUTURE_WXWIN_COMPATIBILITY_3_0
 wxPen::wxPen(const wxColour& col, int width, int style)
 {
     m_refData = new wxPenRefData(col, (wxPenStyle)style);
 }
-#endif
 
 wxPen::wxPen(const wxBitmap& WXUNUSED(stipple), int WXUNUSED(width))
 {

@@ -43,7 +43,7 @@
     #define WXDEBUG_SCROLLBAR
 #endif
 
-#if defined(WXDEBUG_SCROLLBAR) && defined(__WXMSW__) && !defined(__WXMICROWIN__)
+#if defined(WXDEBUG_SCROLLBAR) && defined(__WXMSW__)
 #include "wx/msw/private.h"
 #endif
 
@@ -73,8 +73,8 @@ private:
 // implementation
 // ============================================================================
 
-BEGIN_EVENT_TABLE(wxScrollBar, wxScrollBarBase)
-END_EVENT_TABLE()
+wxBEGIN_EVENT_TABLE(wxScrollBar, wxScrollBarBase)
+wxEND_EVENT_TABLE()
 
 // ----------------------------------------------------------------------------
 // creation
@@ -627,7 +627,7 @@ void wxScrollBar::UpdateThumb()
             dc.DrawRectangle(rect);
 
             // under Unix we use "--sync" X option for this
-            #if defined(__WXMSW__) && !defined(__WXMICROWIN__)
+            #if defined(__WXMSW__)
                 ::GdiFlush();
                 ::Sleep(200);
             #endif // __WXMSW__
@@ -1002,7 +1002,9 @@ bool wxStdScrollBarInputHandler::HandleMouse(wxInputConsumer *consumer,
             {
                 m_btnCapture = btn;
                 m_winCapture = consumer->GetInputWindow();
-                m_winCapture->CaptureMouse();
+
+                if ( !m_winCapture->HasCapture() )
+                    m_winCapture->CaptureMouse();
 
                 // generate the command
                 bool hasAction = true;
@@ -1065,7 +1067,8 @@ bool wxStdScrollBarInputHandler::HandleMouse(wxInputConsumer *consumer,
         {
             if ( m_winCapture )
             {
-                StopScrolling(scrollbar);
+                if ( m_winCapture->HasCapture() )
+                    StopScrolling(scrollbar);
 
                 // if we were dragging the thumb, send the last event
                 if ( m_htLast == wxHT_SCROLLBAR_THUMB )

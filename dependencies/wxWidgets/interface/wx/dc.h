@@ -155,7 +155,7 @@ struct wxFontMetrics
     In general wxDC methods don't support alpha transparency and the alpha
     component of wxColour is simply ignored and you need to use wxGraphicsContext
     for full transparency support. There are, however, a few exceptions: first,
-    under Mac OS X colours with alpha channel are supported in all the normal
+    under OS X colours with alpha channel are supported in all the normal
     wxDC-derived classes as they use wxGraphicsContext internally. Second,
     under all platforms wxSVGFileDC also fully supports alpha channel. In both
     of these cases the instances of wxPen or wxBrush that are built from
@@ -164,9 +164,8 @@ struct wxFontMetrics
 
     @section Support for Transformation Matrix
 
-    On some platforms (currently only under MSW and only on Windows NT, i.e.
-    not Windows 9x/ME, systems) wxDC has support for applying an arbitrary
-    affine transformation matrix to its coordinate system. Call
+    On some platforms (currently only under MSW) wxDC has support for applying 
+    an arbitrary affine transformation matrix to its coordinate system. Call
     CanUseTransformMatrix() to check if this support is available and then call
     SetTransformMatrix() if it is. If the transformation matrix is not
     supported, SetTransformMatrix() always simply returns false and doesn't do
@@ -356,12 +355,14 @@ public:
         @a width and @a height specify the width and height of the rectangle
         that contains the ellipse.
 
-        @a start and @a end specify the start and end of the arc relative to
+        @a start and @a end specify the end points of the arc relative to
         the three-o'clock position from the center of the rectangle. Angles are
         specified in degrees with 0 degree angle corresponding to the positive
-        horizontal axis (3 o'clock) direction. Positive values mean
-        counter-clockwise motion. If @a start is equal to @e end, a complete
-        ellipse will be drawn.
+        horizontal axis (3 o'clock) direction.
+
+        Independently of whether @a start is greater than or less than @a end,
+        the arc is drawn in the counter-clockwise direction. Also, if @a start
+        is equal to @e end, a complete ellipse is drawn.
 
         Notice that unlike DrawArc(), this function does not draw the lines to
         the arc ends, even when using non-transparent brush.
@@ -542,7 +543,10 @@ public:
         Draws the text rotated by @a angle degrees 
         (positive angles are counterclockwise; the full angle is 360 degrees).
 
-        @note Under Win9x only TrueType fonts can be drawn by this function. In
+        Notice that, as with DrawText(), the @a text can contain multiple lines
+        separated by the new line (@c '\\n') characters.
+
+        @note Under MSW only TrueType fonts can be drawn by this function. In
               particular, a font different from @c wxNORMAL_FONT should be used
               as the latter is not a TrueType font. @c wxSWISS_FONT is an
               example of a font which is.
@@ -929,7 +933,7 @@ public:
     //@{
 
     /**
-        Returns the current background mode: @c wxSOLID or @c wxTRANSPARENT.
+        Returns the current background mode: @c wxPENSTYLE_SOLID or @c wxPENSTYLE_TRANSPARENT.
 
         @see SetBackgroundMode()
     */
@@ -969,7 +973,7 @@ public:
     const wxColour& GetTextForeground() const;
 
     /**
-        @a mode may be one of @c wxSOLID and @c wxTRANSPARENT. 
+        @a mode may be one of @c wxPENSTYLE_SOLID and @c wxPENSTYLE_TRANSPARENT.
         
         This setting determines whether text will be drawn with a background 
         colour or not.
@@ -1511,10 +1515,7 @@ public:
         Check if the use of transformation matrix is supported by the current
         system.
 
-        Currently this function always returns @false for non-MSW platforms and
-        may return @false for old (Windows 9x/ME) Windows systems. Normally
-        support for the transformation matrix is always available in any
-        relatively recent Windows versions.
+        Currently this function always returns @false for non-MSW platforms.
 
         @since 2.9.2
     */
@@ -1573,7 +1574,7 @@ public:
        context, if this wxDC has something that could be thought of in that
        way.  (Not all of them do.)
 
-       For example, on Windows the return value is an HDC, on OSX it is a
+       For example, on Windows the return value is an HDC, on OS X it is a
        CGContextRef and on wxGTK it will be a GdkDrawable.  If the DC is a
        wxGCDC then the return value will be the value returned from
        wxGraphicsContext::GetNativeContext.  A value of NULL is returned if
@@ -1590,12 +1591,36 @@ public:
     wxBitmap GetAsBitmap(const wxRect *subrect = NULL) const;
 
 
+    /**
+        Set the scale to use for translating wxDC coordinates to the physical
+        pixels.
+
+        The effect of calling this function is similar to that of calling
+        SetUserScale().
+     */
     void SetLogicalScale(double x, double y);
+
+    /**
+        Return the scale set by the last call to SetLogicalScale().
+     */
     void GetLogicalScale(double *x, double *y) const;
+
+    /**
+        Change the offset used for translating wxDC coordinates.
+
+        @see SetLogicalOrigin(), SetDeviceOrigin()
+     */
     void SetLogicalOrigin(wxCoord x, wxCoord y);
+
+    //@{
+    /**
+        Return the coordinates of the logical point (0, 0).
+
+        @see SetLogicalOrigin()
+     */
     void GetLogicalOrigin(wxCoord *x, wxCoord *y) const;
     wxPoint GetLogicalOrigin() const;
-    
+    //@}
 };
 
 

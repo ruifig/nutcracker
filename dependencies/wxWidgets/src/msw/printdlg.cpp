@@ -167,7 +167,7 @@ wxCreateDevNames(const wxString& driverName,
     return hDev;
 }
 
-IMPLEMENT_CLASS(wxWindowsPrintNativeData, wxPrintNativeDataBase)
+wxIMPLEMENT_CLASS(wxWindowsPrintNativeData, wxPrintNativeDataBase);
 
 wxWindowsPrintNativeData::wxWindowsPrintNativeData()
 {
@@ -451,11 +451,7 @@ void wxWindowsPrintNativeData::InitializeDevMode(const wxString& printerName, Wi
         PRINTDLG pd;
 
         memset(&pd, 0, sizeof(PRINTDLG));
-#ifdef __WXWINCE__
-        pd.cbStruct    = sizeof(PRINTDLG);
-#else
         pd.lStructSize    = sizeof(PRINTDLG);
-#endif
 
         pd.hwndOwner      = NULL;
         pd.hDevMode       = NULL; // Will be created by PrintDlg
@@ -700,7 +696,7 @@ bool wxWindowsPrintNativeData::TransferFrom( const wxPrintData &data )
 // wxPrintDialog
 // ---------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(wxWindowsPrintDialog, wxPrintDialogBase)
+wxIMPLEMENT_CLASS(wxWindowsPrintDialog, wxPrintDialogBase);
 
 wxWindowsPrintDialog::wxWindowsPrintDialog(wxWindow *p, wxPrintDialogData* data)
 {
@@ -747,16 +743,14 @@ int wxWindowsPrintDialog::ShowModal()
 {
     WX_HOOK_MODAL_DIALOG();
 
+    wxWindow* const parent = GetParentForModalDialog(m_parent, GetWindowStyle());
+    WXHWND hWndParent = parent ? GetHwndOf(parent) : NULL;
+
     ConvertToNative( m_printDialogData );
 
     PRINTDLG *pd = (PRINTDLG*) m_printDlg;
 
-    if (m_dialogParent)
-        pd->hwndOwner = (HWND) m_dialogParent->GetHWND();
-    else if (wxTheApp->GetTopWindow())
-        pd->hwndOwner = (HWND) wxTheApp->GetTopWindow()->GetHWND();
-    else
-        pd->hwndOwner = 0;
+    pd->hwndOwner = hWndParent;
 
     bool ret = (PrintDlg( pd ) != 0);
 
@@ -929,7 +923,7 @@ bool wxWindowsPrintDialog::ConvertFromNative( wxPrintDialogData &data )
 // wxWidnowsPageSetupDialog
 // ---------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(wxWindowsPageSetupDialog, wxPageSetupDialogBase)
+wxIMPLEMENT_CLASS(wxWindowsPageSetupDialog, wxPageSetupDialogBase);
 
 wxWindowsPageSetupDialog::wxWindowsPageSetupDialog()
 {

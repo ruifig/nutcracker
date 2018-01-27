@@ -107,6 +107,60 @@ enum wxStockCursor
     wxCURSOR_MAX
 };
 
+/**
+    Flags used by wxControl::Ellipsize function.
+*/
+enum wxEllipsizeFlags
+{
+    /// No special flags.
+    wxELLIPSIZE_FLAGS_NONE = 0,
+
+    /**
+        Take mnemonics into account when calculating the text width.
+
+        With this flag when calculating the size of the passed string,
+        mnemonics characters (see wxControl::SetLabel) will be automatically
+        reduced to a single character. This leads to correct calculations only
+        if the string passed to Ellipsize() will be used with
+        wxControl::SetLabel. If you don't want ampersand to be interpreted as
+        mnemonics (e.g. because you use wxControl::SetLabelText) then don't use
+        this flag.
+     */
+    wxELLIPSIZE_FLAGS_PROCESS_MNEMONICS = 1,
+
+    /**
+        Expand tabs in spaces when calculating the text width.
+
+        This flag tells wxControl::Ellipsize() to calculate the width of tab
+        characters @c '\\t' as 6 spaces.
+     */
+    wxELLIPSIZE_FLAGS_EXPAND_TABS = 2,
+
+    /// The default flags for wxControl::Ellipsize.
+    wxELLIPSIZE_FLAGS_DEFAULT = wxELLIPSIZE_FLAGS_PROCESS_MNEMONICS|
+                                wxELLIPSIZE_FLAGS_EXPAND_TABS
+};
+
+
+/**
+    The different ellipsization modes supported by the
+    wxControl::Ellipsize and wxRendererNative::DrawItemText() functions.
+*/
+enum wxEllipsizeMode
+{
+    /// Don't ellipsize the text at all. @since 2.9.1
+    wxELLIPSIZE_NONE,
+
+    /// Put the ellipsis at the start of the string, if the string needs ellipsization.
+    wxELLIPSIZE_START,
+
+    /// Put the ellipsis in the middle of the string, if the string needs ellipsization.
+    wxELLIPSIZE_MIDDLE,
+
+    /// Put the ellipsis at the end of the string, if the string needs ellipsization.
+    wxELLIPSIZE_END
+};
+
 
 
 /**
@@ -1039,7 +1093,7 @@ const wxSize wxDefaultSize;
 
 /**
     This macro loads a bitmap from either application resources (on the
-    platforms for which they exist, i.e. Windows and OS2) or from an XPM file.
+    platforms for which they exist, i.e.\ Windows) or from an XPM file.
     This can help to avoid using @ifdef_ when creating bitmaps.
 
     @see @ref overview_bitmap, wxICON()
@@ -1117,7 +1171,7 @@ const wxSize wxDefaultSize;
 
 /**
     This macro loads an icon from either application resources (on the
-    platforms for which they exist, i.e. Windows and OS2) or from an XPM file.
+    platforms for which they exist, i.e.\ Windows) or from an XPM file.
     This can help to avoid using @ifdef_ when creating icons.
 
     @see @ref overview_bitmap, wxBITMAP()

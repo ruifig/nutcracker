@@ -290,11 +290,6 @@ enum wxBorder
  * should be passed to wxWindow::SetExtraStyle(), not SetWindowStyle())
  */
 
-/*  by default, TransferDataTo/FromWindow() only work on direct children of the */
-/*  window (compatible behaviour), set this flag to make them recursively */
-/*  descend into all subwindows */
-#define wxWS_EX_VALIDATE_RECURSIVELY    0x00000001
-
 /*  wxCommandEvents and the objects of the derived classes are forwarded to the */
 /*  parent window and so on recursively by default. Using this flag for the */
 /*  given window allows to block this propagation at this window, i.e. prevent */
@@ -916,13 +911,13 @@ enum wxKeyCode
     WXK_CLEAR,
     WXK_SHIFT,
     WXK_ALT,
-    /** Note that under Mac OS X, to improve compatibility with other
+    /** Note that under OS X, to improve compatibility with other
       * systems, 'WXK_CONTROL' represents the 'Command' key. Use this
       * constant to work with keyboard shortcuts. See 'WXK_RAW_CONTROL'
       * to get the state of the actual 'Control' key.
       */
     WXK_CONTROL,
-    /** Under Mac OS X, where the 'Command' key is mapped to 'Control'
+    /** Under OS X, where the 'Command' key is mapped to 'Control'
       * to improve compatibility with other systems, WXK_RAW_CONTROL may
       * be used to obtain the state of the actual 'Control' key
       * ('WXK_CONTROL' would obtain the status of the 'Command' key).
@@ -1020,7 +1015,7 @@ enum wxKeyCode
     WXK_WINDOWS_RIGHT,
     WXK_WINDOWS_MENU ,
     
-    /** This special key code was used to represent the key used for keyboard shortcuts. Under Mac OS X,
+    /** This special key code was used to represent the key used for keyboard shortcuts. Under OS X,
       * this key maps to the 'Command' (aka logo or 'Apple') key, whereas on Linux/Windows/others
       * this is the Control key, with the new semantic of WXK_CONTROL, WXK_COMMAND is not needed anymore
       */
@@ -1046,7 +1041,25 @@ enum wxKeyCode
     WXK_SPECIAL17,
     WXK_SPECIAL18,
     WXK_SPECIAL19,
-    WXK_SPECIAL20
+    WXK_SPECIAL20,
+
+    WXK_BROWSER_BACK = 501,
+    WXK_BROWSER_FORWARD,
+    WXK_BROWSER_REFRESH,
+    WXK_BROWSER_STOP,
+    WXK_BROWSER_SEARCH,
+    WXK_BROWSER_FAVORITES,
+    WXK_BROWSER_HOME,
+    WXK_VOLUME_MUTE,
+    WXK_VOLUME_DOWN,
+    WXK_VOLUME_UP,
+    WXK_MEDIA_NEXT_TRACK,
+    WXK_MEDIA_PREV_TRACK,
+    WXK_MEDIA_STOP,
+    WXK_MEDIA_PLAY_PAUSE,
+    WXK_LAUNCH_MAIL,
+    WXK_LAUNCH_APP1,
+    WXK_LAUNCH_APP2
 };
 
 /**
@@ -1063,7 +1076,7 @@ enum wxKeyModifier
     wxMOD_META      = 0x0008,
     wxMOD_WIN       = wxMOD_META,
     
-    /** used to describe the true Ctrl Key under OSX, 
+    /** used to describe the true Ctrl Key under OS X,
     identic to @c wxMOD_CONTROL on other platforms */
     wxMOD_RAW_CONTROL,
     
@@ -1219,13 +1232,24 @@ enum wxDuplexMode
 };
 
 /**
-    Print quality.
-*/
+    Predefined print quality constants.
+
+    @see ::wxPrintQuality
+ */
 #define wxPRINT_QUALITY_HIGH    -1
 #define wxPRINT_QUALITY_MEDIUM  -2
 #define wxPRINT_QUALITY_LOW     -3
 #define wxPRINT_QUALITY_DRAFT   -4
 
+/**
+    Specifies the print quality as either a predefined level or explicit
+    resolution.
+
+    The print quality may be one of ::wxPRINT_QUALITY_HIGH,
+    ::wxPRINT_QUALITY_MEDIUM, ::wxPRINT_QUALITY_LOW or ::wxPRINT_QUALITY_DRAFT
+    (which are all negative) or express the desired resolution, in DPI, e.g.
+    600.
+ */
 typedef int wxPrintQuality;
 
 /**
@@ -1685,6 +1709,33 @@ template <typename T> wxDELETEA(T*& array);
     @header{wx/defs.h}
 */
 #define wxEXPLICIT
+
+/**
+    @c wxOVERRIDE expands to the C++11 @c override keyword if it's supported by
+    the compiler or nothing otherwise.
+
+    This macro is useful for writing code which may be compiled by both C++11
+    and non-C++11 compilers and still allow the use of @c override for the
+    former.
+
+    Example of using this macro:
+    @code
+        class MyApp : public wxApp {
+        public:
+            virtual bool OnInit() wxOVERRIDE;
+
+            // This would result in an error from a C++11 compiler as the
+            // method doesn't actually override the base class OnExit() due to
+            // a typo in its name.
+            //virtual int OnEzit() wxOVERRIDE;
+        };
+    @endcode
+
+    @header{wx/defs.h}
+
+    @since 3.1.0
+ */
+#define wxOVERRIDE
 
 /**
     GNU C++ compiler gives a warning for any class whose destructor is private

@@ -67,10 +67,10 @@ public:
     {
     }
 
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 
 #if wxUSE_CMDLINE_PARSER
-    virtual void OnInitCmdLine(wxCmdLineParser& parser)
+    virtual void OnInitCmdLine(wxCmdLineParser& parser) wxOVERRIDE
     {
         wxApp::OnInitCmdLine(parser);
 
@@ -79,7 +79,7 @@ public:
                         wxCMD_LINE_PARAM_OPTIONAL);
     }
 
-    virtual bool OnCmdLineParsed(wxCmdLineParser& parser)
+    virtual bool OnCmdLineParsed(wxCmdLineParser& parser) wxOVERRIDE
     {
         if ( !wxApp::OnCmdLineParsed(parser) )
             return false;
@@ -116,6 +116,7 @@ public:
     void OnNewWindow(wxWebViewEvent& evt);
     void OnTitleChanged(wxWebViewEvent& evt);
     void OnViewSourceRequest(wxCommandEvent& evt);
+    void OnViewTextRequest(wxCommandEvent& evt);
     void OnToolsClicked(wxCommandEvent& evt);
     void OnSetZoom(wxCommandEvent& evt);
     void OnError(wxWebViewEvent& evt);
@@ -206,7 +207,7 @@ public:
     SourceViewDialog(wxWindow* parent, wxString source);
 };
 
-IMPLEMENT_APP(WebApp)
+wxIMPLEMENT_APP(WebApp);
 
 // ============================================================================
 // implementation
@@ -346,6 +347,7 @@ WebFrame::WebFrame(const wxString& url) :
     m_tools_menu = new wxMenu();
     wxMenuItem* print = m_tools_menu->Append(wxID_ANY , _("Print"));
     wxMenuItem* viewSource = m_tools_menu->Append(wxID_ANY , _("View Source"));
+    wxMenuItem* viewText = m_tools_menu->Append(wxID_ANY, _("View Text"));
     m_tools_menu->AppendSeparator();
     m_tools_layout = m_tools_menu->AppendCheckItem(wxID_ANY, _("Use Layout Zoom"));
     m_tools_tiny = m_tools_menu->AppendCheckItem(wxID_ANY, _("Tiny"));
@@ -459,7 +461,9 @@ WebFrame::WebFrame(const wxString& url) :
 
     // Connect the menu events
     Connect(viewSource->GetId(), wxEVT_MENU,
-           wxCommandEventHandler(WebFrame::OnViewSourceRequest),  NULL, this );
+            wxCommandEventHandler(WebFrame::OnViewSourceRequest),  NULL, this );
+    Connect(viewText->GetId(), wxEVT_MENU,
+            wxCommandEventHandler(WebFrame::OnViewTextRequest),  NULL, this );
     Connect(print->GetId(), wxEVT_MENU,
             wxCommandEventHandler(WebFrame::OnPrint),  NULL, this );
     Connect(m_tools_layout->GetId(), wxEVT_MENU,
@@ -814,6 +818,22 @@ void WebFrame::OnViewSourceRequest(wxCommandEvent& WXUNUSED(evt))
 {
     SourceViewDialog dlg(this, m_browser->GetPageSource());
     dlg.ShowModal();
+}
+
+/**
+ * Invoked when user selects the "View Text" menu item
+ */
+void WebFrame::OnViewTextRequest(wxCommandEvent& WXUNUSED(evt))
+{
+    wxDialog textViewDialog(this, wxID_ANY, "Page Text",
+                            wxDefaultPosition, wxSize(700,500),
+                            wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER);
+    wxStyledTextCtrl* text = new wxStyledTextCtrl(&textViewDialog, wxID_ANY);
+    text->SetText(m_browser->GetPageText());
+    wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
+    sizer->Add(text, 1, wxEXPAND);
+    SetSizer(sizer);
+    textViewDialog.ShowModal();
 }
 
 /**

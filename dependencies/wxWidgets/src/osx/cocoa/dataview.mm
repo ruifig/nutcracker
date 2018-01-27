@@ -352,7 +352,7 @@ NSTableColumn* CreateNativeColumn(const wxDataViewColumn *column)
     int resizingMask;
     if (column->IsResizeable())
     {
-        resizingMask = NSTableColumnUserResizingMask;
+        resizingMask = NSTableColumnUserResizingMask | NSTableColumnAutoresizingMask;
         [nativeColumn setMinWidth:column->GetMinWidth()];
         [nativeColumn setMaxWidth:column->GetMaxWidth()];
     }
@@ -1039,11 +1039,6 @@ outlineView:(NSOutlineView*)outlineView
 //
 // children handling
 //
--(void) appendChild:(wxPointerObject*)item
-{
-    [children addObject:item];
-}
-
 -(void) clearChildren
 {
     [children removeAllObjects];
@@ -1057,11 +1052,6 @@ outlineView:(NSOutlineView*)outlineView
 -(NSUInteger) getChildCount
 {
     return [children count];
-}
-
--(void) removeChild:(NSUInteger)index
-{
-    [children removeObjectAtIndex:index];
 }
 
 //
@@ -1634,6 +1624,29 @@ outlineView:(NSOutlineView*)outlineView
     dvc->GetEventHandler()->ProcessEvent(event);
 }
 
+// Default enter key behaviour is to begin cell editing. Subclass keyDown to 
+// provide a keyboard wxEVT_DATAVIEW_ITEM_ACTIVATED event and allow the NSEvent
+// to pass if the wxEvent is not processed.
+- (void)keyDown:(NSEvent *)event
+{
+    if( [[event charactersIgnoringModifiers]
+         characterAtIndex: 0] == NSCarriageReturnCharacter )
+    {
+        wxDataViewCtrl* const dvc = implementation->GetDataViewCtrl();
+        
+        wxDataViewEvent eventDV( wxEVT_DATAVIEW_ITEM_ACTIVATED, dvc->GetId() );
+        eventDV.SetEventObject(dvc);
+        eventDV.SetItem( wxDataViewItem( [[self itemAtRow:[self selectedRow]] pointer]) );
+        eventDV.SetModel( dvc->GetModel() );
+        
+        if ( !dvc->GetEventHandler()->ProcessEvent(eventDV) )
+            [super keyDown:event];
+    }
+    else
+    {
+        [super keyDown:event];  // all other keys
+    }
+}
 
 //
 // contextual menus
@@ -1756,7 +1769,7 @@ outlineView:(NSOutlineView*)outlineView
     return NO;
 }
 
--(void) outlineView:(wxCocoaOutlineView*)outlineView
+-(void) outlineView:(NSOutlineView*)outlineView
     willDisplayCell:(id)cell
     forTableColumn:(NSTableColumn*)tableColumn
     item:(id)item
@@ -1783,18 +1796,12 @@ outlineView:(NSOutlineView*)outlineView
     data->SetItem(item);
     data->SetItemCell(cell);
 
-    // use the attributes: notice that we need to do this whether we have them
-    // or not as even if this cell doesn't have any attributes, the previous
-    // one might have had some and then we need to reset them back to default
-    wxDataViewItemAttr attr;
-    model->GetAttr(dvItem, colIdx, attr);
-    renderer->OSXApplyAttr(attr);
-
-    // set the state (enabled/disabled) of the item
-    renderer->OSXApplyEnabled(model->IsEnabled(dvItem, colIdx));
-
-    // and finally do draw it
-    renderer->MacRender();
+    // check if we have anything to render
+    if ( renderer->PrepareForItem(model, dvItem, colIdx) )
+    {
+        // and do render it in this case
+        renderer->MacRender();
+    }
 }
 
 //
@@ -1886,15 +1893,16 @@ outlineView:(NSOutlineView*)outlineView
     dvc->FinishCustomItemEditing();
 
     // now, send the event:
-    wxDataViewEvent
-        event(wxEVT_DATAVIEW_ITEM_EDITING_STARTED,dvc->GetId());
-
-    event.SetEventObject(dvc);
-    event.SetItem(
-            wxDataViewItemFromItem([self itemAtRow:currentlyEditedRow]));
-    event.SetColumn(dvc->GetColumnPosition(col));
-    event.SetDataViewColumn(col);
-    dvc->GetEventHandler()->ProcessEvent(event);
+    wxDataViewRenderer* const renderer = col->GetRenderer();
+    if ( renderer )
+    {
+        renderer->NotifyEditingStarted
+                  (
+                    wxDataViewItemFromItem([self itemAtRow:currentlyEditedRow])
+                  );
+    }
+    //else: we should always have a renderer but don't crash if for some
+    //      unfathomable reason we don't have it
 }
 
 -(void) textDidEndEditing:(NSNotification*)notification
@@ -1976,7 +1984,7 @@ wxCocoaDataViewControl::wxCocoaDataViewControl(wxWindow* peer,
 void wxCocoaDataViewControl::InitOutlineView(long style)
 {
     [m_OutlineView setImplementation:this];
-    [m_OutlineView setColumnAutoresizingStyle:NSTableViewSequentialColumnAutoresizingStyle];
+    [m_OutlineView setColumnAutoresizingStyle:NSTableViewLastColumnOnlyAutoresizingStyle];
     [m_OutlineView setIndentationPerLevel:GetDataViewCtrl()->GetIndent()];
     NSUInteger maskGridStyle(NSTableViewGridNone);
     if (style & wxDV_HORIZ_RULES)
@@ -2673,7 +2681,7 @@ wxDataViewRenderer::OSXOnCellChanged(NSObject *object,
     model->ChangeValue(value, item, col);
 }
 
-void wxDataViewRenderer::OSXApplyAttr(const wxDataViewItemAttr& attr)
+void wxDataViewRenderer::SetAttr(const wxDataViewItemAttr& attr)
 {
     wxDataViewRendererNativeData * const data = GetNativeData();
     NSCell * const cell = data->GetItemCell();
@@ -2722,11 +2730,7 @@ void wxDataViewRenderer::OSXApplyAttr(const wxDataViewItemAttr& attr)
                 data->SaveOriginalTextColour([(id)cell textColor]);
             }
 
-            const wxColour& c = attr.GetColour();
-            colText = [NSColor colorWithCalibratedRed:c.Red() / 255.
-                green:c.Green() / 255.
-                blue:c.Blue() / 255.
-                alpha:c.Alpha() / 255.];
+            colText = attr.GetColour().OSXGetNSColor();
         }
     }
 
@@ -2742,12 +2746,12 @@ void wxDataViewRenderer::OSXApplyAttr(const wxDataViewItemAttr& attr)
         [(id)cell setTextColor:colText];
 }
 
-void wxDataViewRenderer::OSXApplyEnabled(bool enabled)
+void wxDataViewRenderer::SetEnabled(bool enabled)
 {
     [GetNativeData()->GetItemCell() setEnabled:enabled];
 }
 
-IMPLEMENT_ABSTRACT_CLASS(wxDataViewRenderer,wxDataViewRendererBase)
+wxIMPLEMENT_ABSTRACT_CLASS(wxDataViewRenderer, wxDataViewRendererBase);
 
 // ---------------------------------------------------------
 // wxDataViewCustomRenderer
@@ -2770,19 +2774,7 @@ bool wxDataViewCustomRenderer::MacRender()
     return true;
 }
 
-void wxDataViewCustomRenderer::OSXApplyAttr(const wxDataViewItemAttr& attr)
-{
-    // simply save the attribute so that it could be reused from our Render()
-    SetAttr(attr);
-
-    // it's not necessary to call the base class version which sets the cell
-    // properties to correspond to this attribute because we currently don't
-    // use any NSCell methods in custom renderers anyhow but if we ever start
-    // doing this (e.g. override RenderText() here to use NSTextFieldCell
-    // methods), then we should pass it on to wxDataViewRenderer here
-}
-
-IMPLEMENT_ABSTRACT_CLASS(wxDataViewCustomRenderer, wxDataViewRenderer)
+wxIMPLEMENT_ABSTRACT_CLASS(wxDataViewCustomRenderer, wxDataViewRenderer);
 
 // ---------------------------------------------------------
 // wxDataViewTextRenderer
@@ -2803,16 +2795,8 @@ wxDataViewTextRenderer::wxDataViewTextRenderer(const wxString& varianttype,
 
 bool wxDataViewTextRenderer::MacRender()
 {
-    if (GetValue().GetType() == GetVariantType())
-    {
-        [GetNativeData()->GetItemCell() setObjectValue:wxCFStringRef(GetValue().GetString()).AsNSString()];
-        return true;
-    }
-    else
-    {
-        wxFAIL_MSG(wxString("Text renderer cannot render value because of wrong value type; value type: ") << GetValue().GetType());
-        return false;
-    }
+    [GetNativeData()->GetItemCell() setObjectValue:wxCFStringRef(GetValue().GetString()).AsNSString()];
+    return true;
 }
 
 void
@@ -2828,7 +2812,7 @@ wxDataViewTextRenderer::OSXOnCellChanged(NSObject *value,
     model->ChangeValue(valueText, item, col);
 }
 
-IMPLEMENT_CLASS(wxDataViewTextRenderer,wxDataViewRenderer)
+wxIMPLEMENT_CLASS(wxDataViewTextRenderer, wxDataViewRenderer);
 
 // ---------------------------------------------------------
 // wxDataViewBitmapRenderer
@@ -2854,8 +2838,6 @@ wxDataViewBitmapRenderer::wxDataViewBitmapRenderer(const wxString& varianttype,
 // In all other cases the method returns 'false'.
 bool wxDataViewBitmapRenderer::MacRender()
 {
-    wxCHECK_MSG(GetValue().GetType() == GetVariantType(),false,wxString("Bitmap renderer cannot render value; value type: ") << GetValue().GetType());
-
     wxBitmap bitmap;
 
     bitmap << GetValue();
@@ -2864,7 +2846,7 @@ bool wxDataViewBitmapRenderer::MacRender()
     return true;
 }
 
-IMPLEMENT_CLASS(wxDataViewBitmapRenderer,wxDataViewRenderer)
+wxIMPLEMENT_CLASS(wxDataViewBitmapRenderer, wxDataViewRenderer);
 
 // -------------------------------------
 // wxDataViewChoiceRenderer
@@ -2915,19 +2897,11 @@ wxDataViewChoiceRenderer::OSXOnCellChanged(NSObject *value,
 
 bool wxDataViewChoiceRenderer::MacRender()
 {
-    if (GetValue().GetType() == GetVariantType())
-    {
-        [((NSPopUpButtonCell*) GetNativeData()->GetItemCell()) selectItemWithTitle:[[wxCFStringRef(GetValue().GetString()).AsNSString() retain] autorelease]];
-        return true;
-    }
-    else
-    {
-        wxFAIL_MSG(wxString("Choice renderer cannot render value because of wrong value type; value type: ") << GetValue().GetType());
-        return false;
-    }
+    [((NSPopUpButtonCell*) GetNativeData()->GetItemCell()) selectItemWithTitle:[[wxCFStringRef(GetValue().GetString()).AsNSString() retain] autorelease]];
+    return true;
 }
 
-IMPLEMENT_CLASS(wxDataViewChoiceRenderer,wxDataViewRenderer)
+wxIMPLEMENT_CLASS(wxDataViewChoiceRenderer, wxDataViewRenderer);
 
 // ---------------------------------------------------------
 // wxDataViewDateRenderer
@@ -2955,61 +2929,50 @@ wxDataViewDateRenderer::wxDataViewDateRenderer(const wxString& varianttype,
 
 bool wxDataViewDateRenderer::MacRender()
 {
-    if (GetValue().GetType() == GetVariantType())
-    {
-        if (GetValue().GetDateTime().IsValid())
-        {
-            // -- find best fitting style to show the date --
-            // as the style should be identical for all cells a reference date
-            // instead of the actual cell's date value is used for all cells;
-            // this reference date is stored in the renderer's native data
-            // section for speed purposes; otherwise, the reference date's
-            // string has to be recalculated for each item that may become
-            // timewise long if a lot of rows using dates exist; the algorithm
-            // has the preference to display as much information as possible
-            // in the first instance; but as this is often impossible due to
-            // space restrictions the style is shortened per loop; finally, if
-            // the shortest time and date format does not fit into the cell
-            // the time part is dropped; remark: the time part itself is not
-            // modified per iteration loop and only uses the short style,
-            // means that only the hours and minutes are being shown
-
-            // GetObject() returns a date for testing the size of a date object
-            [GetNativeData()->GetItemCell() setObjectValue:GetNativeData()->GetObject()];
-            [[GetNativeData()->GetItemCell() formatter] setTimeStyle:NSDateFormatterShortStyle];
-            for (int dateFormatterStyle=4; dateFormatterStyle>0; --dateFormatterStyle)
-            {
-                [[GetNativeData()->GetItemCell() formatter] setDateStyle:(NSDateFormatterStyle)dateFormatterStyle];
-                if (dateFormatterStyle == 1)
-                {
-                    // if the shortest style for displaying the date and time
-                    // is too long to be fully visible remove the time part of
-                    // the date:
-                    if ([GetNativeData()->GetItemCell() cellSize].width > [GetNativeData()->GetColumnPtr() width])
-                        [[GetNativeData()->GetItemCell() formatter] setTimeStyle:NSDateFormatterNoStyle];
-                    {
-                        // basically not necessary as the loop would end anyway
-                        // but let's save the last comparison
-                        break;
-                    }
-                }
-                else if ([GetNativeData()->GetItemCell() cellSize].width <= [GetNativeData()->GetColumnPtr() width])
-                    break;
-            }
-            // set data (the style is set by the previous loop); on OSX the
-            // date has to be specified with respect to UTC; in wxWidgets the
-            // date is always entered in the local timezone; so, we have to do
-            // a conversion from the local to UTC timezone when adding the
-            // seconds to 1970-01-01 UTC:
-            [GetNativeData()->GetItemCell() setObjectValue:[NSDate dateWithTimeIntervalSince1970:GetValue().GetDateTime().ToUTC().Subtract(wxDateTime(1,wxDateTime::Jan,1970)).GetSeconds().ToDouble()]];
-        }
+    if (!GetValue().GetDateTime().IsValid())
         return true;
-    }
-    else
+
+    // -- find best fitting style to show the date --
+    // as the style should be identical for all cells a reference date
+    // instead of the actual cell's date value is used for all cells;
+    // this reference date is stored in the renderer's native data
+    // section for speed purposes; otherwise, the reference date's
+    // string has to be recalculated for each item that may become
+    // timewise long if a lot of rows using dates exist; the algorithm
+    // has the preference to display as much information as possible
+    // in the first instance; but as this is often impossible due to
+    // space restrictions the style is shortened per loop; finally, if
+    // the shortest time and date format does not fit into the cell
+    // the time part is dropped
+
+    // GetObject() returns a date for testing the size of a date object
+    [GetNativeData()->GetItemCell() setObjectValue:GetNativeData()->GetObject()];
+
+    bool formatFound = false;
+    int  dateFormatterStyle = kCFDateFormatterFullStyle;
+    while ( !formatFound && (dateFormatterStyle > 0) )
     {
-        wxFAIL_MSG(wxString("Date renderer cannot render value because of wrong value type; value type: ") << GetValue().GetType());
-        return false;
+        int timeFormatterStyle = dateFormatterStyle;
+
+        while ( !formatFound && (timeFormatterStyle >= dateFormatterStyle - 1) )
+        {
+            [[GetNativeData()->GetItemCell() formatter] setDateStyle:(NSDateFormatterStyle)dateFormatterStyle];
+            [[GetNativeData()->GetItemCell() formatter] setTimeStyle:(NSDateFormatterStyle)timeFormatterStyle];
+            if ( [GetNativeData()->GetItemCell() cellSize].width <= [GetNativeData()->GetColumnPtr() width] )
+                formatFound = true;
+            else
+                --timeFormatterStyle;
+        }
+        --dateFormatterStyle;
     }
+    // set data (the style is set by the previous loop); on OSX the
+    // date has to be specified with respect to UTC; in wxWidgets the
+    // date is always entered in the local timezone; so, we have to do
+    // a conversion from the local to UTC timezone when adding the
+    // seconds to 1970-01-01 UTC:
+    [GetNativeData()->GetItemCell() setObjectValue:[NSDate dateWithTimeIntervalSince1970:GetValue().GetDateTime().ToUTC().Subtract(wxDateTime(1,wxDateTime::Jan,1970)).GetSeconds().ToDouble()]];
+
+    return true;
 }
 
 void
@@ -3025,7 +2988,7 @@ wxDataViewDateRenderer::OSXOnCellChanged(NSObject *value,
     model->ChangeValue(valueDate, item, col);
 }
 
-IMPLEMENT_ABSTRACT_CLASS(wxDataViewDateRenderer,wxDataViewRenderer)
+wxIMPLEMENT_ABSTRACT_CLASS(wxDataViewDateRenderer, wxDataViewRenderer);
 
 // ---------------------------------------------------------
 // wxDataViewIconTextRenderer
@@ -3046,26 +3009,18 @@ wxDataViewIconTextRenderer::wxDataViewIconTextRenderer(const wxString& variantty
 
 bool wxDataViewIconTextRenderer::MacRender()
 {
-    if (GetValue().GetType() == GetVariantType())
-    {
-        wxDataViewIconText iconText;
+    wxDataViewIconText iconText;
 
-        wxImageTextCell* cell;
+    wxImageTextCell* cell;
 
-        cell = (wxImageTextCell*) GetNativeData()->GetItemCell();
-        iconText << GetValue();
-        if (iconText.GetIcon().IsOk())
-            [cell setImage:[[wxBitmap(iconText.GetIcon()).GetNSImage() retain] autorelease]];
-        else
-            [cell setImage:nil];
-        [cell setStringValue:[[wxCFStringRef(iconText.GetText()).AsNSString() retain] autorelease]];
-        return true;
-    }
+    cell = (wxImageTextCell*) GetNativeData()->GetItemCell();
+    iconText << GetValue();
+    if (iconText.GetIcon().IsOk())
+        [cell setImage:[[wxBitmap(iconText.GetIcon()).GetNSImage() retain] autorelease]];
     else
-    {
-        wxFAIL_MSG(wxString("Icon & text renderer cannot render value because of wrong value type; value type: ") << GetValue().GetType());
-        return false;
-    }
+        [cell setImage:nil];
+    [cell setStringValue:[[wxCFStringRef(iconText.GetText()).AsNSString() retain] autorelease]];
+    return true;
 }
 
 void
@@ -3083,7 +3038,7 @@ wxDataViewIconTextRenderer::OSXOnCellChanged(NSObject *value,
     model->ChangeValue(valueIconText, item, col);
 }
 
-IMPLEMENT_ABSTRACT_CLASS(wxDataViewIconTextRenderer,wxDataViewRenderer)
+wxIMPLEMENT_ABSTRACT_CLASS(wxDataViewIconTextRenderer,wxDataViewRenderer);
 
 // ---------------------------------------------------------
 // wxDataViewToggleRenderer
@@ -3106,16 +3061,8 @@ wxDataViewToggleRenderer::wxDataViewToggleRenderer(const wxString& varianttype,
 
 bool wxDataViewToggleRenderer::MacRender()
 {
-    if (GetValue().GetType() == GetVariantType())
-    {
-        [GetNativeData()->GetItemCell() setIntValue:GetValue().GetLong()];
-        return true;
-    }
-    else
-    {
-        wxFAIL_MSG(wxString("Toggle renderer cannot render value because of wrong value type; value type: ") << GetValue().GetType());
-        return false;
-    }
+    [GetNativeData()->GetItemCell() setIntValue:GetValue().GetLong()];
+    return true;
 }
 
 void
@@ -3131,7 +3078,7 @@ wxDataViewToggleRenderer::OSXOnCellChanged(NSObject *value,
     model->ChangeValue(valueToggle, item, col);
 }
 
-IMPLEMENT_ABSTRACT_CLASS(wxDataViewToggleRenderer,wxDataViewRenderer)
+wxIMPLEMENT_ABSTRACT_CLASS(wxDataViewToggleRenderer, wxDataViewRenderer);
 
 // ---------------------------------------------------------
 // wxDataViewProgressRenderer
@@ -3155,16 +3102,8 @@ wxDataViewProgressRenderer::wxDataViewProgressRenderer(const wxString& label,
 
 bool wxDataViewProgressRenderer::MacRender()
 {
-    if (GetValue().GetType() == GetVariantType())
-    {
-        [GetNativeData()->GetItemCell() setIntValue:GetValue().GetLong()];
-        return true;
-    }
-    else
-    {
-        wxFAIL_MSG(wxString("Progress renderer cannot render value because of wrong value type; value type: ") << GetValue().GetType());
-        return false;
-    }
+    [GetNativeData()->GetItemCell() setIntValue:GetValue().GetLong()];
+    return true;
 }
 
 void
@@ -3180,7 +3119,7 @@ wxDataViewProgressRenderer::OSXOnCellChanged(NSObject *value,
     model->ChangeValue(valueProgress, item, col);
 }
 
-IMPLEMENT_ABSTRACT_CLASS(wxDataViewProgressRenderer,wxDataViewRenderer)
+wxIMPLEMENT_ABSTRACT_CLASS(wxDataViewProgressRenderer, wxDataViewRenderer);
 
 // ---------------------------------------------------------
 // wxDataViewColumn
@@ -3200,6 +3139,7 @@ wxDataViewColumn::wxDataViewColumn(const wxString& title,
     if (renderer && !renderer->IsCustomRenderer() &&
         (renderer->GetAlignment() == wxDVR_DEFAULT_ALIGNMENT))
         renderer->SetAlignment(align);
+    SetResizeable((flags & wxDATAVIEW_COL_RESIZABLE) != 0);
 }
 
 wxDataViewColumn::wxDataViewColumn(const wxBitmap& bitmap,
@@ -3284,7 +3224,7 @@ void wxDataViewColumn::SetResizeable(bool resizable)
 {
     wxDataViewColumnBase::SetResizeable(resizable);
     if (resizable)
-        [m_NativeDataPtr->GetNativeColumnPtr() setResizingMask:NSTableColumnUserResizingMask];
+        [m_NativeDataPtr->GetNativeColumnPtr() setResizingMask:NSTableColumnUserResizingMask | NSTableColumnAutoresizingMask];
     else
         [m_NativeDataPtr->GetNativeColumnPtr() setResizingMask:NSTableColumnNoResizing];
 }
@@ -3334,20 +3274,24 @@ void wxDataViewColumn::SetWidth(int width)
 {
     m_width = width;
 
+    if ( !GetOwner() )
+    {
+        // can't set the real width yet
+        return;
+    }
+
     switch ( width )
     {
         case wxCOL_WIDTH_AUTOSIZE:
-            if ( GetOwner() )
             {
                 wxCocoaDataViewControl *peer = static_cast<wxCocoaDataViewControl*>(GetOwner()->GetPeer());
                 peer->FitColumnWidthToContent(GetOwner()->GetColumnPosition(this));
                 break;
             }
-            // fall through if not yet settable
 
         case wxCOL_WIDTH_DEFAULT:
             width = wxDVC_DEFAULT_WIDTH;
-            // fall through
+            wxFALLTHROUGH;
 
         default:
             [m_NativeDataPtr->GetNativeColumnPtr() setWidth:width];

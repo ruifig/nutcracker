@@ -85,11 +85,7 @@
         bitmap but uses a standard id would display a label too.
     @style{wxBORDER_NONE}
         Creates a button without border. This is currently implemented in MSW,
-        GTK2 and OSX/Cocoa and OSX/Carbon ports but in the latter only applies
-        to buttons with bitmaps and using bitmap of one of the standard sizes
-        only, namely 128*128, 48*48, 24*24 or 16*16. In all the other cases
-        wxBORDER_NONE is ignored under OSX/Carbon (these restrictions don't
-        exist in OSX/Cocoa however).
+        GTK2 and OSX/Cocoa.
     @endStyleTable
 
     @beginEventEmissionTable{wxCommandEvent}
@@ -119,7 +115,7 @@ public:
         @ref page_stockitems "this list", a standard label will be used. In
         other words, if you use a predefined @c wxID_XXX constant, just omit
         the label completely rather than specifying it. In particular, help
-        buttons (the ones with @a id of @c wxID_HELP) under Mac OS X can't
+        buttons (the ones with @a id of @c wxID_HELP) under OS X can't
         display any label at all and while wxButton will detect if the standard
         "Help" label is used and ignore it, using any other label will prevent
         the button from correctly appearing as a help button and so should be

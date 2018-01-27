@@ -41,6 +41,11 @@
     #include "wx/xrc/xh_ribbon.h"
 #endif // wxUSE_RIBBON
 
+#if wxUSE_AUI
+    #include "wx/xrc/xh_auinotbk.h"
+    #include "wx/xrc/xh_auitoolb.h"
+#endif // wxUSE_AUI
+
 #include "wx/cshelp.h"              // wxSimpleHelpProvider for helptext
 
 #include "myframe.h"
@@ -54,7 +59,7 @@
 // static object for many reasons) and also declares the accessor function
 // wxGetApp() which will return the reference of the right type (i.e. the_app and
 // not wxApp).
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 //-----------------------------------------------------------------------------
 // Public methods
@@ -83,6 +88,11 @@ bool MyApp::OnInit()
 
 #if wxUSE_RIBBON
     wxXmlResource::Get()->AddHandler(new wxRibbonXmlHandler);
+#endif
+
+#if wxUSE_AUI
+    wxXmlResource::Get()->AddHandler(new wxAuiNotebookXmlHandler);
+    wxXmlResource::Get()->AddHandler(new wxAuiToolBarXmlHandler);
 #endif
 
     // Load all of the XRC files that will be used. You can put everything

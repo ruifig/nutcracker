@@ -55,7 +55,7 @@
 class MyApp: public wxApp
 {
 public:
-    bool OnInit();
+    bool OnInit() wxOVERRIDE;
 };
 
 // a text ctrl which allows to call different wxTextCtrl functions
@@ -84,6 +84,7 @@ public:
     void OnTextPaste(wxClipboardTextEvent & event);
 
     void OnMouseEvent(wxMouseEvent& event);
+    void OnContextMenu(wxContextMenuEvent& event);
 
     void OnSetFocus(wxFocusEvent& event);
     void OnKillFocus(wxFocusEvent& event);
@@ -390,7 +391,7 @@ private:
 // main()
 //----------------------------------------------------------------------
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 //----------------------------------------------------------------------
 // MyApp
@@ -573,6 +574,7 @@ wxBEGIN_EVENT_TABLE(MyTextCtrl, wxTextCtrl)
     EVT_TEXT_PASTE(wxID_ANY, MyTextCtrl::OnTextPaste)
 
     EVT_MOUSE_EVENTS(MyTextCtrl::OnMouseEvent)
+    EVT_CONTEXT_MENU(MyTextCtrl::OnContextMenu)
 
     EVT_SET_FOCUS(MyTextCtrl::OnSetFocus)
     EVT_KILL_FOCUS(MyTextCtrl::OnKillFocus)
@@ -690,6 +692,23 @@ void MyTextCtrl::LogKeyEvent(const wxChar *name, wxKeyEvent& event) const
             case WXK_NUMPAD_SEPARATOR: key = wxT("NUMPAD_SEPARATOR"); break;
             case WXK_NUMPAD_SUBTRACT: key = wxT("NUMPAD_SUBTRACT"); break;
             case WXK_NUMPAD_DECIMAL: key = wxT("NUMPAD_DECIMAL"); break;
+            case WXK_BROWSER_BACK: key = wxT("BROWSER_BACK"); break;
+            case WXK_BROWSER_FORWARD: key = wxT("BROWSER_FORWARD"); break;
+            case WXK_BROWSER_REFRESH: key = wxT("BROWSER_REFRESH"); break;
+            case WXK_BROWSER_STOP: key = wxT("BROWSER_STOP"); break;
+            case WXK_BROWSER_SEARCH: key = wxT("BROWSER_SEARCH"); break;
+            case WXK_BROWSER_FAVORITES: key = wxT("BROWSER_FAVORITES"); break;
+            case WXK_BROWSER_HOME: key = wxT("BROWSER_HOME"); break;
+            case WXK_VOLUME_MUTE: key = wxT("VOLUME_MUTE"); break;
+            case WXK_VOLUME_DOWN: key = wxT("VOLUME_DOWN"); break;
+            case WXK_VOLUME_UP: key = wxT("VOLUME_UP"); break;
+            case WXK_MEDIA_NEXT_TRACK: key = wxT("MEDIA_NEXT_TRACK"); break;
+            case WXK_MEDIA_PREV_TRACK: key = wxT("MEDIA_PREV_TRACK"); break;
+            case WXK_MEDIA_STOP: key = wxT("MEDIA_STOP"); break;
+            case WXK_MEDIA_PLAY_PAUSE: key = wxT("MEDIA_PLAY_PAUSE"); break;
+            case WXK_LAUNCH_MAIL: key = wxT("LAUNCH_MAIL"); break;
+            case WXK_LAUNCH_APP1: key = wxT("LAUNCH_APP1"); break;
+            case WXK_LAUNCH_APP2: key = wxT("LAUNCH_APP2"); break;
 
             default:
             {
@@ -774,7 +793,7 @@ void MyTextCtrl::OnMouseEvent(wxMouseEvent& ev)
     if ( !ms_logMouse )
         return;
 
-    if ( !ev.Moving() )
+    if ( ev.GetEventType() != wxEVT_MOTION )
     {
         wxString msg;
         if ( ev.Entering() )
@@ -814,6 +833,17 @@ void MyTextCtrl::OnMouseEvent(wxMouseEvent& ev)
         wxLogMessage(msg);
     }
     //else: we're not interested in mouse move events
+}
+
+void MyTextCtrl::OnContextMenu(wxContextMenuEvent& ev)
+{
+    ev.Skip();
+
+    if ( !ms_logMouse )
+        return;
+
+    const wxPoint pos = ev.GetPosition();
+    wxLogMessage("Context menu event at (%d, %d)", pos.x, pos.y);
 }
 
 void MyTextCtrl::OnSetFocus(wxFocusEvent& event)
@@ -1080,6 +1110,10 @@ MyPanel::MyPanel( wxFrame *frame, int x, int y, int w, int h )
     wxSize size2 = m_limited->GetSizeFromTextSize(m_limited->GetTextExtent("WWWWWWWW"));
     m_limited->SetSizeHints(size2, size2);
 
+    wxTextCtrl* upperOnly = new MyTextCtrl(this, wxID_ANY, "Only upper case",
+                                           wxDefaultPosition, wxDefaultSize);
+    upperOnly->ForceUpper();
+
     // multi line text controls
 
     wxString string3L("Read only\nMultiline\nFitted size");
@@ -1091,6 +1125,7 @@ MyPanel::MyPanel( wxFrame *frame, int x, int y, int w, int h )
 
     m_horizontal = new MyTextCtrl( this, wxID_ANY, wxT("Multiline text control with a horizontal scrollbar.\n"),
       wxPoint(10,170), wxSize(140,70), wxTE_MULTILINE | wxHSCROLL);
+    m_horizontal->SetHint("Enter multiline text here");
 
     // a little hack to use the command line argument for encoding testing
     if ( wxTheApp->argc == 2 )
@@ -1098,23 +1133,23 @@ MyPanel::MyPanel( wxFrame *frame, int x, int y, int w, int h )
         switch ( (wxChar)wxTheApp->argv[1][0] )
         {
             case '2':
-                m_horizontal->SetFont(wxFont(18, wxSWISS, wxNORMAL, wxNORMAL,
-                                             false, wxT(""),
-                                             wxFONTENCODING_ISO8859_2));
+                m_horizontal->SetFont(wxFontInfo(18)
+                                        .Family(wxFONTFAMILY_SWISS)
+                                        .Encoding(wxFONTENCODING_ISO8859_2));
                 m_horizontal->AppendText(wxT("\256lu\273ou\350k\375 k\371\362 zb\354sile \350e\271tina \253\273"));
                 break;
 
             case '1':
-                m_horizontal->SetFont(wxFont(18, wxSWISS, wxNORMAL, wxNORMAL,
-                                             false, wxT(""),
-                                             wxFONTENCODING_CP1251));
+                m_horizontal->SetFont(wxFontInfo(18)
+                                        .Family(wxFONTFAMILY_SWISS)
+                                        .Encoding(wxFONTENCODING_CP1251));
                 m_horizontal->AppendText(wxT("\317\360\350\342\345\362!"));
                 break;
 
             case '8':
-                m_horizontal->SetFont(wxFont(18, wxSWISS, wxNORMAL, wxNORMAL,
-                                             false, wxT(""),
-                                             wxFONTENCODING_CP1251));
+                m_horizontal->SetFont(wxFontInfo(18)
+                                        .Family(wxFONTFAMILY_SWISS)
+                                        .Encoding(wxFONTENCODING_CP1251));
 #if wxUSE_UNICODE
                 m_horizontal->AppendText(L"\x0412\x0430\x0434\x0438\x043c \x0426");
 #else
@@ -1142,15 +1177,15 @@ MyPanel::MyPanel( wxFrame *frame, int x, int y, int w, int h )
 #endif
 
     m_tab = new MyTextCtrl( this, 100, wxT("Multiline, allow <TAB> processing."),
-      wxPoint(180,90), wxDefaultSize, wxTE_MULTILINE |  wxTE_PROCESS_TAB );
+      wxPoint(180,90), wxSize(200,70), wxTE_MULTILINE |  wxTE_PROCESS_TAB );
     m_tab->SetClientData((void *)wxT("tab"));
 
     m_enter = new MyTextCtrl( this, 100, wxT("Multiline, allow <ENTER> processing."),
-      wxPoint(180,170), wxSize(200,70), wxTE_MULTILINE);
+      wxPoint(180,170), wxSize(200,70), wxTE_MULTILINE | wxTE_PROCESS_ENTER );
     m_enter->SetClientData((void *)wxT("enter"));
 
     m_textrich = new MyTextCtrl(this, wxID_ANY, wxT("Allows more than 30Kb of text\n")
-                                wxT("(even under broken Win9x)\n")
+                                wxT("(on all Windows versions)\n")
                                 wxT("and a very very very very very ")
                                 wxT("very very very long line to test ")
                                 wxT("wxHSCROLL style\n")
@@ -1180,6 +1215,7 @@ MyPanel::MyPanel( wxFrame *frame, int x, int y, int w, int h )
     column1->Add( m_password, 0, wxALL | wxEXPAND, 10 );
     column1->Add( m_readonly, 0, wxALL, 10 );
     column1->Add( m_limited, 0, wxALL, 10 );
+    column1->Add( upperOnly, 0, wxALL, 10 );
     column1->Add( m_horizontal, 1, wxALL | wxEXPAND, 10 );
 
     wxBoxSizer *column2 = new wxBoxSizer(wxVERTICAL);
@@ -1531,7 +1567,7 @@ void MyFrame::OnFileSave(wxCommandEvent& WXUNUSED(event))
     if ( m_panel->m_textrich->SaveFile(wxT("dummy.txt")) )
     {
 #if wxUSE_FILE
-        // verify that the fil length is correct (it wasn't under Win95)
+        // verify that the file length is correct
         wxFile file(wxT("dummy.txt"));
         wxLogStatus(this,
                     wxT("Successfully saved file (text len = %lu, file size = %ld)"),
@@ -1923,12 +1959,12 @@ void RichTextFrame::OnIdle(wxIdleEvent& WXUNUSED(event))
 
             if (attr.HasFont())
             {
-                if (attr.GetFont().GetWeight() == wxBOLD)
+                if (attr.GetFont().GetWeight() == wxFONTWEIGHT_BOLD)
                     msg += wxT(" BOLD");
-                else if (attr.GetFont().GetWeight() == wxNORMAL)
+                else if (attr.GetFont().GetWeight() == wxFONTWEIGHT_NORMAL)
                     msg += wxT(" NORMAL");
 
-                if (attr.GetFont().GetStyle() == wxITALIC)
+                if (attr.GetFont().GetStyle() == wxFONTSTYLE_ITALIC)
                     msg += wxT(" ITALIC");
 
                 if (attr.GetFont().GetUnderlined())

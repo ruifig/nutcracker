@@ -46,9 +46,9 @@
 #include "wx/mstream.h"
 
 // Create a new application object
-IMPLEMENT_APP    (MyApp)
+wxIMPLEMENT_APP(MyApp);
 
-IMPLEMENT_DYNAMIC_CLASS    (MyApp, wxApp)
+wxIMPLEMENT_DYNAMIC_CLASS(MyApp, wxApp);
 
 wxBEGIN_EVENT_TABLE(MyApp, wxApp)
     EVT_MENU(TYPES_VARIANT,   MyApp::DoVariantDemo)
@@ -1044,7 +1044,8 @@ void MyApp::DoVariantDemo(wxCommandEvent& WXUNUSED(event) )
         textCtrl << wxT("var1[") << (int) i << wxT("] (type ") << var1[i].GetType() << wxT(") = ") << var1[i].MakeString() << wxT("\n");
     }
 
-    var1 = wxVariant(new wxFont(wxSystemSettings::GetFont(wxSYS_OEM_FIXED_FONT)));
+    wxFont* sysFont = new wxFont(wxSystemSettings::GetFont(wxSYS_OEM_FIXED_FONT));
+    var1 = wxVariant(sysFont);
     textCtrl << wxT("var1 = (wxfont)\"");
     wxFont* font = wxGetVariantCast(var1,wxFont);
     if (font)
@@ -1055,6 +1056,8 @@ void MyApp::DoVariantDemo(wxCommandEvent& WXUNUSED(event) )
     {
         textCtrl << wxT("(null)\"\n");
     }
+
+    delete sysFont;
 }
 
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)

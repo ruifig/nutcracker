@@ -88,6 +88,7 @@ private:
         CPPUNIT_TEST( Labels );
         CPPUNIT_TEST( RadioItems );
         CPPUNIT_TEST( RemoveAdd );
+        CPPUNIT_TEST( ChangeBitmap );
         WXUISIM_TEST( Events );
     CPPUNIT_TEST_SUITE_END();
 
@@ -100,6 +101,7 @@ private:
     void Labels();
     void RadioItems();
     void RemoveAdd();
+    void ChangeBitmap();
     void Events();
 
     wxFrame* m_frame;
@@ -118,7 +120,7 @@ private:
     // The menu containing the item with MenuTestCase_Bar id.
     wxMenu* m_menuWithBar;
 
-    DECLARE_NO_COPY_CLASS(MenuTestCase)
+    wxDECLARE_NO_COPY_CLASS(MenuTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -405,6 +407,28 @@ void MenuTestCase::RemoveAdd()
     menu0->Delete(item);
 }
 
+void MenuTestCase::ChangeBitmap()
+{
+    wxMenu *menu = new wxMenu;
+
+    wxMenuItem *item = new wxMenuItem(menu, wxID_ANY, "Item");
+    menu->Append(item);
+
+    // On Windows Vista (and later) calling SetBitmap, *after* the menu
+    // item has already been added, used to result in a stack overflow:
+    // [Do]SetBitmap can call GetHBitmapForMenu which will call SetBitmap
+    // again etc...
+    item->SetBitmap( wxBitmap(1, 1) );
+
+
+    // Force owner drawn usage by having a bitmap that's wider than the
+    // standard size. This results in rearranging the parent menu which
+    // hasn't always worked properly and lead to a null pointer exception.
+    item->SetBitmap( wxBitmap(512, 1) );
+
+    wxDELETE(menu);
+}
+
 void MenuTestCase::Events()
 {
 #ifdef __WXGTK__
@@ -474,6 +498,12 @@ void MenuTestCase::Events()
     m_frame->Show();
     m_frame->SetFocus();
     wxYield();
+
+#ifdef __WXGTK__
+    // This is another test which fails with wxGTK without this delay because
+    // the frame doesn't appear on screen in time.
+    wxMilliSleep(50);
+#endif // __WXGTK__
 
     wxUIActionSimulator sim;
     sim.KeyDown(WXK_F1);

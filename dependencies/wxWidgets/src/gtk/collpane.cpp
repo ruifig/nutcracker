@@ -34,7 +34,7 @@ const char wxCollapsiblePaneNameStr[] = "collapsiblePane";
 
 wxDEFINE_EVENT( wxEVT_COLLAPSIBLEPANE_CHANGED, wxCollapsiblePaneEvent );
 
-IMPLEMENT_DYNAMIC_CLASS(wxCollapsiblePaneEvent, wxCommandEvent)
+wxIMPLEMENT_DYNAMIC_CLASS(wxCollapsiblePaneEvent, wxCommandEvent);
 
 // ============================================================================
 // implementation
@@ -163,11 +163,11 @@ void wxCollapsiblePane::AddChildGTK(wxWindowGTK* child)
 // wxCollapsiblePane
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC_CLASS(wxCollapsiblePane, wxControl)
+wxIMPLEMENT_DYNAMIC_CLASS(wxCollapsiblePane, wxControl);
 
-BEGIN_EVENT_TABLE(wxCollapsiblePane, wxCollapsiblePaneBase)
+wxBEGIN_EVENT_TABLE(wxCollapsiblePane, wxCollapsiblePaneBase)
     EVT_SIZE(wxCollapsiblePane::OnSize)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 bool wxCollapsiblePane::Create(wxWindow *parent,
                                wxWindowID id,
@@ -220,16 +220,9 @@ wxSize wxCollapsiblePane::DoGetBestSize() const
 {
     wxASSERT_MSG( m_widget, wxT("DoGetBestSize called before creation") );
 
-    GtkRequisition req;
-#ifdef __WXGTK3__
-    gtk_widget_get_preferred_size(m_widget, NULL, &req);
-#else
-    GTK_WIDGET_GET_CLASS(m_widget)->size_request(m_widget, &req);
-#endif
-
     // notice that we do not cache our best size here as it changes
     // all times the user expands/hide our pane
-    return wxSize(req.width, req.height);
+    return GTKGetPreferredSize(m_widget);
 }
 
 void wxCollapsiblePane::Collapse(bool collapse)

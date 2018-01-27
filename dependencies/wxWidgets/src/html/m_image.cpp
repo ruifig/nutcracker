@@ -17,6 +17,7 @@
 #ifndef WX_PRECOMP
     #include "wx/dynarray.h"
     #include "wx/dc.h"
+    #include "wx/dcprint.h"
     #include "wx/scrolwin.h"
     #include "wx/timer.h"
     #include "wx/dcmemory.h"
@@ -61,11 +62,11 @@ class wxHtmlImageMapAreaCell : public wxHtmlCell
         int radius;
     public:
         wxHtmlImageMapAreaCell( celltype t, wxString &coords, double pixel_scale = 1.0);
-        virtual wxHtmlLinkInfo *GetLink( int x = 0, int y = 0 ) const;
+        virtual wxHtmlLinkInfo *GetLink( int x = 0, int y = 0 ) const wxOVERRIDE;
         void Draw(wxDC& WXUNUSED(dc),
                   int WXUNUSED(x), int WXUNUSED(y),
                   int WXUNUSED(view_y1), int WXUNUSED(view_y2),
-                  wxHtmlRenderingInfo& WXUNUSED(info)) {}
+                  wxHtmlRenderingInfo& WXUNUSED(info)) wxOVERRIDE {}
 
 
     wxDECLARE_NO_COPY_CLASS(wxHtmlImageMapAreaCell);
@@ -239,12 +240,12 @@ class wxHtmlImageMapCell : public wxHtmlCell
     protected:
         wxString m_Name;
     public:
-        virtual wxHtmlLinkInfo *GetLink( int x = 0, int y = 0 ) const;
-        virtual const wxHtmlCell *Find( int cond, const void *param ) const;
+        virtual wxHtmlLinkInfo *GetLink( int x = 0, int y = 0 ) const wxOVERRIDE;
+        virtual const wxHtmlCell *Find( int cond, const void *param ) const wxOVERRIDE;
         void Draw(wxDC& WXUNUSED(dc),
                   int WXUNUSED(x), int WXUNUSED(y),
                   int WXUNUSED(view_y1), int WXUNUSED(view_y2),
-                  wxHtmlRenderingInfo& WXUNUSED(info)) {}
+                  wxHtmlRenderingInfo& WXUNUSED(info)) wxOVERRIDE {}
 
     wxDECLARE_NO_COPY_CLASS(wxHtmlImageMapCell);
 };
@@ -293,19 +294,20 @@ public:
                     const wxString& mapname = wxEmptyString);
     virtual ~wxHtmlImageCell();
     void Draw(wxDC& dc, int x, int y, int view_y1, int view_y2,
-              wxHtmlRenderingInfo& info);
-    virtual wxHtmlLinkInfo *GetLink(int x = 0, int y = 0) const;
+              wxHtmlRenderingInfo& info) wxOVERRIDE;
+    virtual wxHtmlLinkInfo *GetLink(int x = 0, int y = 0) const wxOVERRIDE;
 
     void SetImage(const wxImage& img);
 
     // If "alt" text is set, it will be used when converting this cell to text.
     void SetAlt(const wxString& alt);
-    virtual wxString ConvertToText(wxHtmlSelection *sel) const;
+    virtual wxString ConvertToText(wxHtmlSelection *sel) const wxOVERRIDE;
 
 #if wxUSE_GIF && wxUSE_TIMER
     void AdvanceAnimation(wxTimer *timer);
-    virtual void Layout(int w);
 #endif
+
+    virtual void Layout(int w) wxOVERRIDE;
 
 private:
     wxBitmap           *m_bitmap;
@@ -334,7 +336,7 @@ class wxGIFTimer : public wxTimer
 {
     public:
         wxGIFTimer(wxHtmlImageCell *cell) : m_cell(cell) {}
-        virtual void Notify()
+        virtual void Notify() wxOVERRIDE
         {
             m_cell->AdvanceAnimation(this);
         }
@@ -464,17 +466,7 @@ void wxHtmlImageCell::SetImage(const wxImage& img)
         if ( m_bmpH == wxDefaultCoord)
             m_bmpH = hh;
 
-        // Only scale the bitmap at the rendering stage,
-        // so we don't lose quality twice
-/*
-        if ((m_bmpW != ww) || (m_bmpH != hh))
-        {
-            wxImage img2 = img.Scale(m_bmpW, m_bmpH);
-            m_bitmap = new wxBitmap(img2);
-        }
-        else
-*/
-            m_bitmap = new wxBitmap(img);
+        m_bitmap = new wxBitmap(img);
     }
 #endif
 }
@@ -538,6 +530,7 @@ void wxHtmlImageCell::AdvanceAnimation(wxTimer *timer)
         delay = 1;
     timer->Start(delay, true);
 }
+#endif
 
 void wxHtmlImageCell::Layout(int w)
 {
@@ -571,10 +564,10 @@ void wxHtmlImageCell::Layout(int w)
     }
 
     wxHtmlCell::Layout(w);
+#if wxUSE_GIF && wxUSE_TIMER
     m_physX = m_physY = wxDefaultCoord;
-}
-
 #endif
+}
 
 wxHtmlImageCell::~wxHtmlImageCell()
 {
@@ -603,6 +596,23 @@ void wxHtmlImageCell::Draw(wxDC& dc, int x, int y,
         // and height, so we only do the scaling once.
         double imageScaleX = 1.0;
         double imageScaleY = 1.0;
+
+        // Optimisation for Windows: WIN32 scaling for window DCs is very poor,
+        // so unless we're using a printer DC, do the scaling ourselves.
+#if defined(__WXMSW__) && wxUSE_IMAGE
+        if (m_Width >= 0 && m_Width != m_bitmap->GetWidth() && !dc.IsKindOf(CLASSINFO(wxPrinterDC)))
+        {
+            wxImage image(m_bitmap->ConvertToImage());
+            if (image.HasMask())
+            {
+                // Convert the mask to an alpha channel or scaling won't work correctly
+                image.InitAlpha();
+            }
+            image.Rescale(m_Width, m_Height, wxIMAGE_QUALITY_HIGH);
+            (*m_bitmap) = wxBitmap(image);
+        }
+#endif 
+
         if (m_Width != m_bitmap->GetWidth())
             imageScaleX = (double) m_Width / (double) m_bitmap->GetWidth();
         if (m_Height != m_bitmap->GetHeight())

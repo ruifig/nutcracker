@@ -56,10 +56,10 @@ static bool wxIsNumeric(const wxString& val)
 // wxTextValidator
 // ----------------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC_CLASS(wxTextValidator, wxValidator)
-BEGIN_EVENT_TABLE(wxTextValidator, wxValidator)
+wxIMPLEMENT_DYNAMIC_CLASS(wxTextValidator, wxValidator);
+wxBEGIN_EVENT_TABLE(wxTextValidator, wxValidator)
     EVT_CHAR(wxTextValidator::OnChar)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 wxTextValidator::wxTextValidator(long style, wxString *val)
 {
@@ -162,9 +162,9 @@ bool wxTextValidator::Validate(wxWindow *parent)
     if ( HasFlag(wxFILTER_EMPTY) && val.empty() )
         errormsg = _("Required information entry is empty.");
     else if ( HasFlag(wxFILTER_INCLUDE_LIST) && m_includes.Index(val) == wxNOT_FOUND )
-        errormsg = wxString::Format(_("'%s' is invalid"), val);
+        errormsg = wxString::Format(_("'%s' is not one of the valid strings"), val);
     else if ( HasFlag(wxFILTER_EXCLUDE_LIST) && m_excludes.Index(val) != wxNOT_FOUND )
-        errormsg = wxString::Format(_("'%s' is invalid"), val);
+        errormsg = wxString::Format(_("'%s' is one of the invalid strings"), val);
     else if ( !(errormsg = IsValid(val)).empty() )
     {
         // NB: this format string should always contain exactly one '%s'
@@ -251,9 +251,9 @@ wxString wxTextValidator::IsValid(const wxString& val) const
     if ( HasFlag(wxFILTER_NUMERIC) && !wxIsNumeric(val) )
         return _("'%s' should be numeric.");
     if ( HasFlag(wxFILTER_INCLUDE_CHAR_LIST) && !ContainsOnlyIncludedCharacters(val) )
-        return _("'%s' is invalid");
+        return _("'%s' doesn't consist only of valid characters");
     if ( HasFlag(wxFILTER_EXCLUDE_CHAR_LIST) && ContainsExcludedCharacters(val) )
-        return _("'%s' is invalid");
+        return _("'%s' contains illegal characters");
 
     return wxEmptyString;
 }
@@ -302,32 +302,34 @@ void wxTextValidator::SetCharExcludes(const wxString& chars)
 
 void wxTextValidator::OnChar(wxKeyEvent& event)
 {
-    if (!m_validatorWindow)
-    {
-        event.Skip();
-        return;
-    }
+    // Let the event propagate by default.
+    event.Skip();
 
+    if (!m_validatorWindow)
+        return;
+
+#if wxUSE_UNICODE
+    // We only filter normal, printable characters.
+    int keyCode = event.GetUnicodeKey();
+#else // !wxUSE_UNICODE
     int keyCode = event.GetKeyCode();
+    if (keyCode > WXK_START)
+        return;
+#endif // wxUSE_UNICODE/!wxUSE_UNICODE
 
     // we don't filter special keys and delete
-    if (keyCode < WXK_SPACE || keyCode == WXK_DELETE || keyCode >= WXK_START)
-    {
-        event.Skip();
+    if (keyCode < WXK_SPACE || keyCode == WXK_DELETE)
         return;
-    }
 
     wxString str((wxUniChar)keyCode, 1);
-    if (!IsValid(str).empty())
-    {
-        if ( !wxValidator::IsSilent() )
-            wxBell();
-
-        // eat message
+    if (IsValid(str).empty())
         return;
-    }
-    else
-        event.Skip();
+
+    if ( !wxValidator::IsSilent() )
+        wxBell();
+
+    // eat message
+    event.Skip(false);
 }
 
 

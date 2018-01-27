@@ -22,6 +22,7 @@ LIBS = @LIBS@
 LDFLAGS_GUI = @LDFLAGS_GUI@
 CXX = @CXX@
 CXXFLAGS = @CXXFLAGS@
+OBJCXXFLAGS = @OBJCXXFLAGS@
 CPPFLAGS = @CPPFLAGS@
 LDFLAGS = @LDFLAGS@
 WX_LIB_FLAVOUR = @WX_LIB_FLAVOUR@
@@ -36,20 +37,25 @@ EXTRALIBS_SDL = @EXTRALIBS_SDL@
 CXXWARNINGS = @CXXWARNINGS@
 HOST_SUFFIX = @HOST_SUFFIX@
 SAMPLES_RPATH_FLAG = @SAMPLES_RPATH_FLAG@
+SAMPLES_CXXFLAGS = @SAMPLES_CXXFLAGS@
 wx_top_builddir = @wx_top_builddir@
 
 ### Variables: ###
 
 DESTDIR = 
-WX_RELEASE = 3.0
-WX_VERSION = $(WX_RELEASE).2
+WX_RELEASE = 3.1
+WX_VERSION = $(WX_RELEASE).0
 LIBDIRNAME = $(wx_top_builddir)/lib
 WIDGETS_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) $(__DEBUG_DEFINE_p) \
 	$(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) $(__THREAD_DEFINE_p) \
 	-I$(srcdir) $(__DLLFLAG_p) -I$(srcdir)/../../samples $(CXXWARNINGS) \
-	$(CPPFLAGS) $(CXXFLAGS)
+	$(SAMPLES_CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS)
+WIDGETS_OBJCXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
+	$(__DEBUG_DEFINE_p) $(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) \
+	$(__THREAD_DEFINE_p) -I$(srcdir) $(__DLLFLAG_p) -I$(srcdir)/../../samples \
+	$(CPPFLAGS) $(OBJCXXFLAGS)
 WIDGETS_OBJECTS =  \
-	$(__widgets_os2_lib_res) \
+	widgets_activityindicator.o \
 	widgets_bmpcombobox.o \
 	widgets_button.o \
 	widgets_checkbox.o \
@@ -67,6 +73,8 @@ WIDGETS_OBJECTS =  \
 	widgets_hyperlnk.o \
 	widgets_itemcontainer.o \
 	widgets_listbox.o \
+	$(__NATIVE_OBJCPP_SRC_OBJECTS) \
+	widgets_native.o \
 	widgets_notebook.o \
 	widgets_odcombobox.o \
 	widgets_radiobox.o \
@@ -117,8 +125,6 @@ COND_PLATFORM_OS2_1___widgets___os2_emxbindcmd = $(NM) widgets$(EXEEXT) | if \
 @COND_PLATFORM_OS2_1@__widgets___os2_emxbindcmd = $(COND_PLATFORM_OS2_1___widgets___os2_emxbindcmd)
 @COND_TOOLKIT_MSW@__RCDEFDIR_p_1 = --include-dir \
 @COND_TOOLKIT_MSW@	$(LIBDIRNAME)/wx/include/$(TOOLCHAIN_FULLNAME)
-@COND_PLATFORM_OS2_1@__widgets_os2_lib_res = \
-@COND_PLATFORM_OS2_1@	$(top_srcdir)/include/wx/os2/wx.res
 @COND_PLATFORM_MACOSX_1@__widgets_app_Contents_PkgInfo___depname \
 @COND_PLATFORM_MACOSX_1@	= widgets.app/Contents/PkgInfo
 @COND_PLATFORM_MACOSX_1@__widgets_bundle___depname = widgets_bundle
@@ -132,6 +138,8 @@ COND_PLATFORM_OS2_1___widgets___os2_emxbindcmd = $(NM) widgets$(EXEEXT) | if \
 @COND_TOOLKIT_OSX_IPHONE@	= $(__widgets_app_Contents_PkgInfo___depname)
 @COND_TOOLKIT_COCOA@____widgets_BUNDLE_TGT_REF_DEP = \
 @COND_TOOLKIT_COCOA@	$(__widgets_app_Contents_PkgInfo___depname)
+@COND_TOOLKIT_OSX_COCOA_WXUNIV_0@__NATIVE_OBJCPP_SRC_OBJECTS \
+@COND_TOOLKIT_OSX_COCOA_WXUNIV_0@	= widgets_native_wrapper.o
 COND_MONOLITHIC_0___WXLIB_ADV_p = \
 	-lwx_$(PORTNAME)$(WXUNIVNAME)$(WXUNICODEFLAG)$(WXDEBUGFLAG)$(WX_LIB_FLAVOUR)_adv-$(WX_RELEASE)$(HOST_SUFFIX)
 @COND_MONOLITHIC_0@__WXLIB_ADV_p = $(COND_MONOLITHIC_0___WXLIB_ADV_p)
@@ -212,6 +220,9 @@ widgets$(EXEEXT): $(WIDGETS_OBJECTS) $(__widgets___win32rc)
 
 @COND_PLATFORM_MACOSX_1@widgets_bundle: $(____widgets_BUNDLE_TGT_REF_DEP)
 
+widgets_activityindicator.o: $(srcdir)/activityindicator.cpp
+	$(CXXC) -c -o $@ $(WIDGETS_CXXFLAGS) $(srcdir)/activityindicator.cpp
+
 widgets_bmpcombobox.o: $(srcdir)/bmpcombobox.cpp
 	$(CXXC) -c -o $@ $(WIDGETS_CXXFLAGS) $(srcdir)/bmpcombobox.cpp
 
@@ -263,6 +274,12 @@ widgets_itemcontainer.o: $(srcdir)/itemcontainer.cpp
 widgets_listbox.o: $(srcdir)/listbox.cpp
 	$(CXXC) -c -o $@ $(WIDGETS_CXXFLAGS) $(srcdir)/listbox.cpp
 
+widgets_native_wrapper.o: $(srcdir)/native_wrapper.mm
+	$(CXXC) -c -o $@ $(WIDGETS_OBJCXXFLAGS) $(srcdir)/native_wrapper.mm
+
+widgets_native.o: $(srcdir)/native.cpp
+	$(CXXC) -c -o $@ $(WIDGETS_CXXFLAGS) $(srcdir)/native.cpp
+
 widgets_notebook.o: $(srcdir)/notebook.cpp
 	$(CXXC) -c -o $@ $(WIDGETS_CXXFLAGS) $(srcdir)/notebook.cpp
 
@@ -300,7 +317,7 @@ widgets_widgets.o: $(srcdir)/widgets.cpp
 	$(CXXC) -c -o $@ $(WIDGETS_CXXFLAGS) $(srcdir)/widgets.cpp
 
 widgets_sample_rc.o: $(srcdir)/../sample.rc
-	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_2) $(__DEBUG_DEFINE_p_2)  $(__EXCEPTIONS_DEFINE_p_2) $(__RTTI_DEFINE_p_2) $(__THREAD_DEFINE_p_2)   --include-dir $(srcdir) $(__DLLFLAG_p_2) --include-dir $(srcdir)/../../samples $(__RCDEFDIR_p_1) --include-dir $(top_srcdir)/include
+	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_2) $(__DEBUG_DEFINE_p_2)  $(__EXCEPTIONS_DEFINE_p_2) $(__RTTI_DEFINE_p_2) $(__THREAD_DEFINE_p_2)  --include-dir $(srcdir) $(__DLLFLAG_p_2) --include-dir $(srcdir)/../../samples $(__RCDEFDIR_p_1) --include-dir $(top_srcdir)/include
 
 
 # Include dependency info, if present:

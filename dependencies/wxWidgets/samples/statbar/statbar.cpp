@@ -81,7 +81,7 @@ public:
     // this one is called on application startup and is a good place for the app
     // initialization (doing it here and not in the ctor allows to have an error
     // return: if OnInit() returns false, the application terminates)
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 };
 
 // A custom status bar which contains controls, icons &c
@@ -227,7 +227,6 @@ enum
 };
 
 static const int BITMAP_SIZE_X = 32;
-static const int BITMAP_SIZE_Y = 15;
 
 // ----------------------------------------------------------------------------
 // event tables and other macros for wxWidgets
@@ -290,7 +289,7 @@ wxEND_EVENT_TABLE()
 // static object for many reasons) and also declares the accessor function
 // wxGetApp() which will return the reference of the right type (i.e. MyApp and
 // not wxApp)
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 // ============================================================================
 // implementation

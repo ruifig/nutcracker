@@ -39,7 +39,7 @@
 				PrecompiledHeaderThrough="wx/wxprec.h"
 				PrecompiledHeaderFile="vc_mswud\wxprec_corelib.pch"
 				ObjectFile="vc_mswud\core\"
-				ProgramDataBaseFileName="..\..\lib\vc_lib\wxmsw30ud_core.pdb"
+				ProgramDataBaseFileName="..\..\lib\vc_lib\wxmsw31ud_core.pdb"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -48,7 +48,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\vc_lib\wxmsw30ud_core.lib"
+				OutputFile="..\..\lib\vc_lib\wxmsw31ud_core.lib"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -96,7 +96,7 @@
 				PrecompiledHeaderThrough="wx/wxprec.h"
 				PrecompiledHeaderFile="vc_mswu\wxprec_corelib.pch"
 				ObjectFile="vc_mswu\core\"
-				ProgramDataBaseFileName="..\..\lib\vc_lib\wxmsw30u_core.pdb"
+				ProgramDataBaseFileName="..\..\lib\vc_lib\wxmsw31u_core.pdb"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -105,7 +105,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="..\..\lib\vc_lib\wxmsw30u_core.lib"
+				OutputFile="..\..\lib\vc_lib\wxmsw31u_core.lib"
 				SuppressStartupBanner="TRUE"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -156,7 +156,7 @@
 				PrecompiledHeaderThrough="wx/wxprec.h"
 				PrecompiledHeaderFile="vc_mswuddll\wxprec_coredll.pch"
 				ObjectFile="vc_mswuddll\core\"
-				ProgramDataBaseFileName="..\..\lib\vc_dll\wxmsw30ud_core_vc_custom.pdb"
+				ProgramDataBaseFileName="..\..\lib\vc_dll\wxmsw310ud_core_vc_custom.pdb"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -166,14 +166,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="wxtiffd.lib wxjpegd.lib wxpngd.lib   wxzlibd.lib wxregexud.lib wxexpatd.lib    kernel32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib winmm.lib shell32.lib comctl32.lib ole32.lib oleaut32.lib uuid.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib ..\..\lib\vc_dll\wxbase30ud.lib"
-				OutputFile="..\..\lib\vc_dll\wxmsw30ud_core_vc_custom.dll"
+				AdditionalDependencies="wxtiffd.lib wxjpegd.lib wxpngd.lib   wxzlibd.lib wxregexud.lib wxexpatd.lib   kernel32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib winmm.lib shell32.lib comctl32.lib ole32.lib oleaut32.lib uuid.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib ..\..\lib\vc_dll\wxbase31ud.lib"
+				OutputFile="..\..\lib\vc_dll\wxmsw310ud_core_vc_custom.dll"
 				LinkIncremental="2"
-				ImportLibrary="..\..\lib\vc_dll\wxmsw30ud_core.lib"
+				ImportLibrary="..\..\lib\vc_dll\wxmsw31ud_core.lib"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\lib\vc_dll"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="..\..\lib\vc_dll\wxmsw30ud_core_vc_custom.pdb"
+				ProgramDatabaseFile="..\..\lib\vc_dll\wxmsw310ud_core_vc_custom.pdb"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"
@@ -187,7 +187,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG;__WXMSW__;_UNICODE;WXBUILDING;WXDLLNAME=wxmsw30ud_core_vc_custom;WXUSINGDLL;WXMAKINGDLL_CORE;wxUSE_BASE=0"
+				PreprocessorDefinitions="_DEBUG;__WXMSW__;_UNICODE;WXBUILDING;WXDLLNAME=wxmsw310ud_core_vc_custom;WXUSINGDLL;WXMAKINGDLL_CORE;wxUSE_BASE=0"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..\lib\vc_dll\mswud;..\..\include;..\..\src\tiff\libtiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib"/>
 			<Tool
@@ -221,7 +221,7 @@
 				PrecompiledHeaderThrough="wx/wxprec.h"
 				PrecompiledHeaderFile="vc_mswudll\wxprec_coredll.pch"
 				ObjectFile="vc_mswudll\core\"
-				ProgramDataBaseFileName="..\..\lib\vc_dll\wxmsw30u_core_vc_custom.pdb"
+				ProgramDataBaseFileName="..\..\lib\vc_dll\wxmsw310u_core_vc_custom.pdb"
 				WarningLevel="4"
 				SuppressStartupBanner="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
@@ -231,14 +231,14 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions=""
-				AdditionalDependencies="wxtiff.lib wxjpeg.lib wxpng.lib   wxzlib.lib wxregexu.lib wxexpat.lib    kernel32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib winmm.lib shell32.lib comctl32.lib ole32.lib oleaut32.lib uuid.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib ..\..\lib\vc_dll\wxbase30u.lib"
-				OutputFile="..\..\lib\vc_dll\wxmsw30u_core_vc_custom.dll"
+				AdditionalDependencies="wxtiff.lib wxjpeg.lib wxpng.lib   wxzlib.lib wxregexu.lib wxexpat.lib   kernel32.lib user32.lib gdi32.lib comdlg32.lib winspool.lib winmm.lib shell32.lib comctl32.lib ole32.lib oleaut32.lib uuid.lib rpcrt4.lib advapi32.lib wsock32.lib wininet.lib ..\..\lib\vc_dll\wxbase31u.lib"
+				OutputFile="..\..\lib\vc_dll\wxmsw310u_core_vc_custom.dll"
 				LinkIncremental="1"
-				ImportLibrary="..\..\lib\vc_dll\wxmsw30u_core.lib"
+				ImportLibrary="..\..\lib\vc_dll\wxmsw31u_core.lib"
 				SuppressStartupBanner="TRUE"
 				AdditionalLibraryDirectories="..\..\lib\vc_dll"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="..\..\lib\vc_dll\wxmsw30u_core_vc_custom.pdb"
+				ProgramDatabaseFile="..\..\lib\vc_dll\wxmsw310u_core_vc_custom.pdb"
 				TargetMachine="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"/>
@@ -254,7 +254,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="__WXMSW__;NDEBUG;_UNICODE;WXBUILDING;WXDLLNAME=wxmsw30u_core_vc_custom;WXUSINGDLL;WXMAKINGDLL_CORE;wxUSE_BASE=0"
+				PreprocessorDefinitions="__WXMSW__;NDEBUG;_UNICODE;WXBUILDING;WXDLLNAME=wxmsw310u_core_vc_custom;WXUSINGDLL;WXMAKINGDLL_CORE;wxUSE_BASE=0"
 				Culture="1033"
 				AdditionalIncludeDirectories="..\..\lib\vc_dll\mswu;..\..\include;..\..\src\tiff\libtiff;..\..\src\jpeg;..\..\src\png;..\..\src\zlib;..\..\src\regex;..\..\src\expat\lib"/>
 			<Tool
@@ -716,6 +716,9 @@
 				RelativePath="..\..\src\msw\app.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\msw\appprogress.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\msw\artmsw.cpp">
 			</File>
 			<File
@@ -854,6 +857,9 @@
 				RelativePath="..\..\src\msw\graphics.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\msw\graphicsd2d.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\msw\headerctrl.cpp">
 			</File>
 			<File
@@ -897,9 +903,6 @@
 			</File>
 			<File
 				RelativePath="..\..\src\msw\msgdlg.cpp">
-			</File>
-			<File
-				RelativePath="..\..\src\msw\mslu.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\msw\nativdlg.cpp">
@@ -989,6 +992,12 @@
 				RelativePath="..\..\src\msw\statusbar.cpp">
 			</File>
 			<File
+				RelativePath="..\..\src\msw\systhemectrl.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\msw\taskbarbutton.cpp">
+			</File>
+			<File
 				RelativePath="..\..\src\msw\textctrl.cpp">
 			</File>
 			<File
@@ -1042,6 +1051,9 @@
 			<File
 				RelativePath="..\..\src\msw\window.cpp">
 			</File>
+			<File
+				RelativePath="..\..\src\msw\rt\utilsrt.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Generic Sources"
@@ -1060,6 +1072,9 @@
 			</File>
 			<File
 				RelativePath="..\..\src\generic\clrpickerg.cpp">
+			</File>
+			<File
+				RelativePath="..\..\src\generic\collheaderctrlg.cpp">
 			</File>
 			<File
 				RelativePath="..\..\src\generic\collpaneg.cpp">
@@ -1240,6 +1255,9 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wx\msw\app.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\msw\appprogress.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\msw\ole\automtn.h">
@@ -1491,10 +1509,10 @@
 				RelativePath="..\..\include\wx\msw\notebook.h">
 			</File>
 			<File
-				RelativePath="..\..\include\wx\msw\notifmsg.h">
+				RelativePath="..\..\include\wx\msw\ole\oleutils.h">
 			</File>
 			<File
-				RelativePath="..\..\include\wx\msw\ole\oleutils.h">
+				RelativePath="..\..\include\wx\msw\ownerdrawnbutton.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\msw\ownerdrw.h">
@@ -1572,6 +1590,9 @@
 				RelativePath="..\..\include\wx\msw\taskbar.h">
 			</File>
 			<File
+				RelativePath="..\..\include\wx\msw\taskbarbutton.h">
+			</File>
+			<File
 				RelativePath="..\..\include\wx\msw\textctrl.h">
 			</File>
 			<File
@@ -1616,6 +1637,9 @@
 			<File
 				RelativePath="..\..\include\wx\msw\window.h">
 			</File>
+			<File
+				RelativePath="..\..\include\wx\msw\rt\utils.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Generic Headers"
@@ -1625,6 +1649,9 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wx\generic\accel.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\generic\activityindicator.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\generic\animate.h">
@@ -1648,10 +1675,10 @@
 				RelativePath="..\..\include\wx\generic\clrpickerg.h">
 			</File>
 			<File
-				RelativePath="..\..\include\wx\generic\collpaneg.h">
+				RelativePath="..\..\include\wx\generic\collheaderctrl.h">
 			</File>
 			<File
-				RelativePath="..\..\include\wx\generic\colrdlgg.h">
+				RelativePath="..\..\include\wx\generic\collpaneg.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\generic\combo.h">
@@ -1790,6 +1817,9 @@
 			Name="wxHTML Headers"
 			UniqueIdentifier="{B4103426-A5DB-5CF0-A30E-BC9546513AAF}">
 			<File
+				RelativePath="..\..\include\wx\html\forcelnk.h">
+			</File>
+			<File
 				RelativePath="..\..\include\wx\html\helpctrl.h">
 			</File>
 			<File
@@ -1851,6 +1881,12 @@
 				RelativePath="..\..\include\wx\access.h">
 			</File>
 			<File
+				RelativePath="..\..\include\wx\activityindicator.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\addremovectrl.h">
+			</File>
+			<File
 				RelativePath="..\..\include\wx\propgrid\advprops.h">
 			</File>
 			<File
@@ -1870,6 +1906,9 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wx\anybutton.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\appprogress.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\ribbon\art.h">
@@ -1894,6 +1933,9 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wx\ribbon\bar.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\aui\barartmsw.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\bitmap.h">
@@ -1954,6 +1996,9 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wx\cmndata.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\collheaderctrl.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\collpane.h">
@@ -2550,13 +2595,22 @@
 				RelativePath="..\..\include\wx\stc\stc.h">
 			</File>
 			<File
+				RelativePath="..\..\include\wx\systhemectrl.h">
+			</File>
+			<File
 				RelativePath="..\..\include\wx\aui\tabart.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\aui\tabartmsw.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\aui\tabmdi.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\taskbar.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\taskbarbutton.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\tbarbase.h">
@@ -2688,6 +2742,9 @@
 				RelativePath="..\..\include\wx\wxhtml.h">
 			</File>
 			<File
+				RelativePath="..\..\include\wx\xrc\xh_activityindicator.h">
+			</File>
+			<File
 				RelativePath="..\..\include\wx\xrc\xh_all.h">
 			</File>
 			<File
@@ -2695,6 +2752,9 @@
 			</File>
 			<File
 				RelativePath="..\..\include\wx\xrc\xh_auinotbk.h">
+			</File>
+			<File
+				RelativePath="..\..\include\wx\xrc\xh_auitoolb.h">
 			</File>
 			<File
 				RelativePath="..\..\include\wx\xrc\xh_bannerwindow.h">

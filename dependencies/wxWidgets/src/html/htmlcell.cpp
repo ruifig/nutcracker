@@ -73,7 +73,7 @@ GetSelectedTextBgColour(const wxColour& WXUNUSED(clr))
 // wxHtmlCell
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlCell, wxObject)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlCell, wxObject);
 
 wxHtmlCell::wxHtmlCell() : wxObject()
 {
@@ -107,66 +107,11 @@ void wxHtmlCell::SetScriptMode(wxHtmlScriptMode mode, long previousBase)
     m_Descent += m_ScriptBaseline;
 }
 
-#if WXWIN_COMPATIBILITY_2_6
-
-struct wxHtmlCellOnMouseClickCompatHelper;
-
-static wxHtmlCellOnMouseClickCompatHelper *gs_helperOnMouseClick = NULL;
-
-// helper for routing calls to new ProcessMouseClick() method to deprecated
-// OnMouseClick() method
-struct wxHtmlCellOnMouseClickCompatHelper
-{
-    wxHtmlCellOnMouseClickCompatHelper(wxHtmlWindowInterface *window_,
-                                       const wxPoint& pos_,
-                                       const wxMouseEvent& event_)
-        : window(window_), pos(pos_), event(event_), retval(false)
-    {
-    }
-
-    bool CallOnMouseClick(wxHtmlCell *cell)
-    {
-        wxHtmlCellOnMouseClickCompatHelper *oldHelper = gs_helperOnMouseClick;
-        gs_helperOnMouseClick = this;
-        cell->OnMouseClick
-              (
-                window ? window->GetHTMLWindow() : NULL,
-                pos.x, pos.y,
-                event
-              );
-        gs_helperOnMouseClick = oldHelper;
-        return retval;
-    }
-
-    wxHtmlWindowInterface *window;
-    const wxPoint& pos;
-    const wxMouseEvent& event;
-    bool retval;
-};
-#endif // WXWIN_COMPATIBILITY_2_6
-
 bool wxHtmlCell::ProcessMouseClick(wxHtmlWindowInterface *window,
                                    const wxPoint& pos,
                                    const wxMouseEvent& event)
 {
     wxCHECK_MSG( window, false, wxT("window interface must be provided") );
-
-#if WXWIN_COMPATIBILITY_2_6
-    // NB: this hack puts the body of ProcessMouseClick() into OnMouseClick()
-    //     (for which it has to pass the arguments and return value via a
-    //     helper variable because these two methods have different
-    //     signatures), so that old code overriding OnMouseClick will continue
-    //     to work
-    wxHtmlCellOnMouseClickCompatHelper compat(window, pos, event);
-    return compat.CallOnMouseClick(this);
-}
-
-void wxHtmlCell::OnMouseClick(wxWindow *, int, int, const wxMouseEvent& event)
-{
-    wxCHECK_RET( gs_helperOnMouseClick, wxT("unexpected call to OnMouseClick") );
-    wxHtmlWindowInterface *window = gs_helperOnMouseClick->window;
-    const wxPoint& pos = gs_helperOnMouseClick->pos;
-#endif // WXWIN_COMPATIBILITY_2_6
 
     wxHtmlLinkInfo *lnk = GetLink(pos.x, pos.y);
     bool retval = false;
@@ -181,19 +126,8 @@ void wxHtmlCell::OnMouseClick(wxWindow *, int, int, const wxMouseEvent& event)
         retval = true;
     }
 
-#if WXWIN_COMPATIBILITY_2_6
-    gs_helperOnMouseClick->retval = retval;
-#else
     return retval;
-#endif // WXWIN_COMPATIBILITY_2_6
 }
-
-#if WXWIN_COMPATIBILITY_2_6
-wxCursor wxHtmlCell::GetCursor() const
-{
-    return wxNullCursor;
-}
-#endif // WXWIN_COMPATIBILITY_2_6
 
 wxCursor
 wxHtmlCell::GetMouseCursor(wxHtmlWindowInterface* WXUNUSED(window)) const
@@ -207,17 +141,6 @@ wxCursor
 wxHtmlCell::GetMouseCursorAt(wxHtmlWindowInterface *window,
                              const wxPoint& relPos) const
 {
-#if WXWIN_COMPATIBILITY_2_6
-    // NB: Older versions of wx used GetCursor() virtual method in place of
-    //     GetMouseCursor(interface). This code ensures that user code that
-    //     overridden GetCursor() continues to work. The trick is that the base
-    //     wxHtmlCell::GetCursor() method simply returns wxNullCursor, so we
-    //     know that GetCursor() was overridden iff it returns valid cursor.
-    wxCursor cur = GetCursor();
-    if (cur.IsOk())
-        return cur;
-#endif // WXWIN_COMPATIBILITY_2_6
-
     const wxCursor curCell = GetMouseCursor(window);
     if ( curCell.IsOk() )
       return curCell;
@@ -368,7 +291,7 @@ bool wxHtmlCell::IsBefore(wxHtmlCell *cell) const
 // wxHtmlWordCell
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlWordCell, wxHtmlCell)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlWordCell, wxHtmlCell);
 
 wxHtmlWordCell::wxHtmlWordCell(const wxString& word, const wxDC& dc) : wxHtmlCell()
 {
@@ -426,8 +349,6 @@ void wxHtmlWordCell::Split(const wxDC& dc,
 
     // before selection:
     // (include character under caret only if in first half of width)
-#ifdef __WXMAC__
-    // implementation using PartialExtents to support fractional widths
     wxArrayInt widths ;
     dc.GetPartialTextExtents(m_Word,widths) ;
     while( i < len && pt1.x >= widths[i] )
@@ -438,24 +359,10 @@ void wxHtmlWordCell::Split(const wxDC& dc,
         if ( widths[i] - pt1.x < charW/2 )
             i++;
     }
-#else // !__WXMAC__
-    wxCoord charW, charH;
-    while ( pt1.x > 0 && i < len )
-    {
-        dc.GetTextExtent(m_Word[i], &charW, &charH);
-        pt1.x -= charW;
-        if ( pt1.x >= -charW/2 )
-        {
-            pos1 += charW;
-            i++;
-        }
-    }
-#endif // __WXMAC__/!__WXMAC__
 
     // in selection:
     // (include character under caret only if in first half of width)
     unsigned j = i;
-#ifdef __WXMAC__
     while( j < len && pt2.x >= widths[j] )
         j++ ;
     if ( j < len )
@@ -464,20 +371,6 @@ void wxHtmlWordCell::Split(const wxDC& dc,
         if ( widths[j] - pt2.x < charW/2 )
             j++;
     }
-#else // !__WXMAC__
-    pos2 = pos1;
-    pt2.x -= pos2;
-    while ( pt2.x > 0 && j < len )
-    {
-        dc.GetTextExtent(m_Word[j], &charW, &charH);
-        pt2.x -= charW;
-        if ( pt2.x >= -charW/2 )
-        {
-            pos2 += charW;
-            j++;
-        }
-    }
-#endif // __WXMAC__/!__WXMAC__
 
     pos1 = i;
     pos2 = j;
@@ -512,8 +405,7 @@ static void SwitchSelState(wxDC& dc, wxHtmlRenderingInfo& info,
         dc.SetBackgroundMode(wxSOLID);
         dc.SetTextForeground(info.GetStyle().GetSelectedTextColour(fg));
         dc.SetTextBackground(info.GetStyle().GetSelectedTextBgColour(bg));
-        dc.SetBackground(wxBrush(info.GetStyle().GetSelectedTextBgColour(bg),
-                                 wxBRUSHSTYLE_SOLID));
+        dc.SetBackground(info.GetStyle().GetSelectedTextBgColour(bg));
     }
     else
     {
@@ -522,7 +414,7 @@ static void SwitchSelState(wxDC& dc, wxHtmlRenderingInfo& info,
         dc.SetTextForeground(fg);
         dc.SetTextBackground(bg);
         if ( mode != wxTRANSPARENT )
-            dc.SetBackground(wxBrush(bg, mode));
+            dc.SetBackground(bg);
     }
 }
 
@@ -588,6 +480,25 @@ void wxHtmlWordCell::Draw(wxDC& dc, int x, int y,
         wxHtmlSelectionState selstate = info.GetState().GetSelectionState();
         // Not changing selection state, draw the word in single mode:
         SwitchSelState(dc, info, selstate != wxHTML_SEL_OUT);
+
+        // This is a quite horrible hack but it fixes a nasty user-visible
+        // problem: when drawing underlined text, which is common in wxHTML as
+        // all links are underlined, there is a 1 pixel gap between the
+        // underlines because we draw separate words in separate DrawText()
+        // calls. The right thing to do would be to draw all of them appearing
+        // on the same line at once (this would probably be more efficient as
+        // well), but this doesn't seem simple to do, so instead we just draw
+        // an extra space at a negative offset to ensure that the underline
+        // spans the previous pixel and so overlaps the one from the previous
+        // word, if any.
+        const bool prevUnderlined = info.WasPreviousUnderlined();
+        const bool thisUnderlined = dc.GetFont().GetUnderlined();
+        if ( prevUnderlined && thisUnderlined )
+        {
+            dc.DrawText(wxS(" "), x + m_PosX - 1, y + m_PosY);
+        }
+        info.SetCurrentUnderlined(thisUnderlined);
+
         dc.DrawText(m_Word, x + m_PosX, y + m_PosY);
         drawSelectionAfterCell = (selstate != wxHTML_SEL_OUT);
     }
@@ -717,7 +628,7 @@ wxString wxHtmlWordWithTabsCell::GetPartAsText(int begin, int end) const
 // wxHtmlContainerCell
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlContainerCell, wxHtmlCell)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlContainerCell, wxHtmlCell);
 
 wxHtmlContainerCell::wxHtmlContainerCell(wxHtmlContainerCell *parent) : wxHtmlCell()
 {
@@ -819,17 +730,10 @@ void wxHtmlContainerCell::Layout(int w)
 
     // VS: Any attempt to layout with negative or zero width leads to hell,
     // but we can't ignore such attempts completely, since it sometimes
-    // happen (e.g. when trying how small a table can be). The best thing we
-    // can do is to set the width of child cells to zero
+    // happen (e.g. when trying how small a table can be), so use at least one
+    // pixel width, this will at least give us the correct height sometimes.
     if (w < 1)
-    {
-       m_Width = 0;
-       for (wxHtmlCell *cell = m_Cells; cell; cell = cell->GetNext())
-            cell->Layout(0);
-            // this does two things: it recursively calls this code on all
-            // child contrainers and resets children's position to (0,0)
-       return;
-    }
+        w = 1;
 
     wxHtmlCell *nextCell;
     long xpos = 0, ypos = m_IndentTop;
@@ -1375,29 +1279,12 @@ bool wxHtmlContainerCell::ProcessMouseClick(wxHtmlWindowInterface *window,
                                             const wxPoint& pos,
                                             const wxMouseEvent& event)
 {
-#if WXWIN_COMPATIBILITY_2_6
-    wxHtmlCellOnMouseClickCompatHelper compat(window, pos, event);
-    return compat.CallOnMouseClick(this);
-}
-
-void wxHtmlContainerCell::OnMouseClick(wxWindow*,
-                                       int, int, const wxMouseEvent& event)
-{
-    wxCHECK_RET( gs_helperOnMouseClick, wxT("unexpected call to OnMouseClick") );
-    wxHtmlWindowInterface *window = gs_helperOnMouseClick->window;
-    const wxPoint& pos = gs_helperOnMouseClick->pos;
-#endif // WXWIN_COMPATIBILITY_2_6
-
     bool retval = false;
     wxHtmlCell *cell = FindCellByPos(pos.x, pos.y);
     if ( cell )
         retval = cell->ProcessMouseClick(window, pos, event);
 
-#if WXWIN_COMPATIBILITY_2_6
-    gs_helperOnMouseClick->retval = retval;
-#else
     return retval;
-#endif // WXWIN_COMPATIBILITY_2_6
 }
 
 
@@ -1525,7 +1412,7 @@ void wxHtmlContainerCell::RemoveExtraSpacing(bool top, bool bottom)
 // wxHtmlColourCell
 // --------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlColourCell, wxHtmlCell)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlColourCell, wxHtmlCell);
 
 void wxHtmlColourCell::Draw(wxDC& dc,
                             int x, int y,
@@ -1579,7 +1466,7 @@ void wxHtmlColourCell::DrawInvisible(wxDC& dc,
 // wxHtmlFontCell
 // ---------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlFontCell, wxHtmlCell)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlFontCell, wxHtmlCell);
 
 void wxHtmlFontCell::Draw(wxDC& dc,
                           int WXUNUSED(x), int WXUNUSED(y),
@@ -1606,7 +1493,7 @@ void wxHtmlFontCell::DrawInvisible(wxDC& dc, int WXUNUSED(x), int WXUNUSED(y),
 // wxHtmlWidgetCell
 // ---------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlWidgetCell, wxHtmlCell)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlWidgetCell, wxHtmlCell);
 
 wxHtmlWidgetCell::wxHtmlWidgetCell(wxWindow *wnd, int w)
 {

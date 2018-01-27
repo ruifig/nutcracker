@@ -34,7 +34,7 @@
 // resources
 // ----------------------------------------------------------------------------
 
-// the application icon (under Windows and OS/2 it is in resources)
+// the application icon (under Windows it is in resources)
 #ifndef wxHAS_IMAGES_IN_RESOURCES
     #include "../sample.xpm"
 #endif
@@ -48,7 +48,7 @@
 class MyApp : public wxApp
 {
 public:
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 };
 
 
@@ -81,6 +81,7 @@ public:
 
 private:
     bool CreateSound(wxSound& snd) const;
+    wxSound* TryCreateSound() const;
 
     wxSound*    m_sound;
     wxString    m_soundFile;
@@ -148,7 +149,7 @@ wxEND_EVENT_TABLE()
 // static object for many reasons) and also implements the accessor function
 // wxGetApp() which will return the reference of the right type (i.e. MyApp and
 // not wxApp)
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 // ============================================================================
 // implementation
@@ -975,6 +976,17 @@ bool MyFrame::CreateSound(wxSound& snd) const
     return snd.Create(m_soundFile);
 }
 
+wxSound* MyFrame::TryCreateSound() const
+{
+    wxSound* const sound = new wxSound;
+    if ( !CreateSound(*sound) )
+    {
+        delete sound;
+        return NULL;
+    }
+
+    return sound;
+}
 
 void MyFrame::NotifyUsingFile(const wxString& name)
 {
@@ -1054,12 +1066,9 @@ void MyFrame::OnPlaySync(wxCommandEvent& WXUNUSED(event))
 {
     wxBusyCursor busy;
     if ( !m_sound )
-    {
-        m_sound = new wxSound;
-        CreateSound(*m_sound);
-    }
+        m_sound = TryCreateSound();
 
-    if (m_sound->IsOk())
+    if (m_sound)
         m_sound->Play(wxSOUND_SYNC);
 }
 
@@ -1067,12 +1076,9 @@ void MyFrame::OnPlayAsync(wxCommandEvent& WXUNUSED(event))
 {
     wxBusyCursor busy;
     if ( !m_sound )
-    {
-        m_sound = new wxSound;
-        CreateSound(*m_sound);
-    }
+        m_sound = TryCreateSound();
 
-    if (m_sound->IsOk())
+    if (m_sound)
         m_sound->Play(wxSOUND_ASYNC);
 }
 
@@ -1089,10 +1095,7 @@ void MyFrame::OnPlayLoop(wxCommandEvent& WXUNUSED(event))
 {
     wxBusyCursor busy;
     if ( !m_sound )
-    {
-        m_sound = new wxSound;
-        CreateSound(*m_sound);
-    }
+        m_sound = TryCreateSound();
 
     if (m_sound->IsOk())
         m_sound->Play(wxSOUND_ASYNC | wxSOUND_LOOP);

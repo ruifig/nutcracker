@@ -568,9 +568,14 @@ wxString wxHtmlPrintout::TranslateHeader(const wxString& instr, int page)
     num.Printf(wxT("%lu"), (unsigned long)(m_PageBreaks.GetCount() - 1));
     r.Replace(wxT("@PAGESCNT@"), num);
 
+#if wxUSE_DATETIME
     const wxDateTime now = wxDateTime::Now();
     r.Replace(wxT("@DATE@"), now.FormatDate());
     r.Replace(wxT("@TIME@"), now.FormatTime());
+#else
+    r.Replace(wxT("@DATE@"), wxEmptyString);
+    r.Replace(wxT("@TIME@"), wxEmptyString);
+#endif
 
     r.Replace(wxT("@TITLE@"), GetTitle());
 
@@ -827,14 +832,14 @@ wxHtmlPrintout *wxHtmlEasyPrinting::CreatePrintout()
 
 class wxHtmlPrintingModule: public wxModule
 {
-DECLARE_DYNAMIC_CLASS(wxHtmlPrintingModule)
+    wxDECLARE_DYNAMIC_CLASS(wxHtmlPrintingModule);
 public:
     wxHtmlPrintingModule() : wxModule() {}
-    bool OnInit() { return true; }
-    void OnExit() { wxHtmlPrintout::CleanUpStatics(); }
+    bool OnInit() wxOVERRIDE { return true; }
+    void OnExit() wxOVERRIDE { wxHtmlPrintout::CleanUpStatics(); }
 };
 
-IMPLEMENT_DYNAMIC_CLASS(wxHtmlPrintingModule, wxModule)
+wxIMPLEMENT_DYNAMIC_CLASS(wxHtmlPrintingModule, wxModule);
 
 
 // This hack forces the linker to always link in m_* files

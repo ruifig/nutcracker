@@ -20,6 +20,7 @@
 #include "wx/ribbon/art.h"
 #include "wx/ribbon/bar.h"
 #include "wx/dcbuffer.h"
+#include "wx/scopedptr.h"
 
 #ifndef WX_PRECOMP
 #endif
@@ -59,19 +60,20 @@ public:
 wxDEFINE_EVENT(wxEVT_RIBBONTOOLBAR_CLICKED, wxRibbonToolBarEvent);
 wxDEFINE_EVENT(wxEVT_RIBBONTOOLBAR_DROPDOWN_CLICKED, wxRibbonToolBarEvent);
 
-IMPLEMENT_DYNAMIC_CLASS(wxRibbonToolBarEvent, wxCommandEvent)
-IMPLEMENT_CLASS(wxRibbonToolBar, wxRibbonControl)
+wxIMPLEMENT_DYNAMIC_CLASS(wxRibbonToolBarEvent, wxCommandEvent);
+wxIMPLEMENT_CLASS(wxRibbonToolBar, wxRibbonControl);
 
-BEGIN_EVENT_TABLE(wxRibbonToolBar, wxRibbonControl)
+wxBEGIN_EVENT_TABLE(wxRibbonToolBar, wxRibbonControl)
     EVT_ENTER_WINDOW(wxRibbonToolBar::OnMouseEnter)
     EVT_ERASE_BACKGROUND(wxRibbonToolBar::OnEraseBackground)
     EVT_LEAVE_WINDOW(wxRibbonToolBar::OnMouseLeave)
     EVT_LEFT_DOWN(wxRibbonToolBar::OnMouseDown)
+    EVT_LEFT_DCLICK(wxRibbonToolBar::OnMouseDown)
     EVT_LEFT_UP(wxRibbonToolBar::OnMouseUp)
     EVT_MOTION(wxRibbonToolBar::OnMouseMove)
     EVT_PAINT(wxRibbonToolBar::OnPaint)
     EVT_SIZE(wxRibbonToolBar::OnSize)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 wxRibbonToolBar::wxRibbonToolBar()
 {
@@ -244,7 +246,7 @@ wxRibbonToolBarToolBase* wxRibbonToolBar::InsertTool(
     wxASSERT(bitmap.IsOk());
 
     // Create the wxRibbonToolBarToolBase with parameters
-    wxRibbonToolBarToolBase* tool = new wxRibbonToolBarToolBase;
+    wxScopedPtr<wxRibbonToolBarToolBase> tool(new wxRibbonToolBarToolBase);
     tool->id = tool_id;
     tool->bitmap = bitmap;
     if(bitmap_disabled.IsOk())
@@ -270,8 +272,10 @@ wxRibbonToolBarToolBase* wxRibbonToolBar::InsertTool(
         size_t tool_count = group->tools.GetCount();
         if(pos <= tool_count)
         {
-            group->tools.Insert(tool, pos);
-            return tool;
+            // Give the ownership of the tool to group->tools
+            wxRibbonToolBarToolBase* const p = tool.release();
+            group->tools.Insert(p, pos);
+            return p;
         }
         pos -= tool_count + 1;
     }

@@ -22,6 +22,7 @@
 
 #include <gtk/gtk.h>
 #include "wx/gtk/private.h"
+#include "wx/gtk/private/eventsdisabler.h"
 #include "wx/gtk/private/list.h"
 
 extern bool      g_blockEventsOnDrag;
@@ -46,7 +47,7 @@ wxDEFINE_EVENT( wxEVT_TOGGLEBUTTON, wxCommandEvent );
 // wxBitmapToggleButton
 // ------------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC_CLASS(wxBitmapToggleButton, wxToggleButton)
+wxIMPLEMENT_DYNAMIC_CLASS(wxBitmapToggleButton, wxToggleButton);
 
 bool wxBitmapToggleButton::Create(wxWindow *parent, wxWindowID id,
                             const wxBitmap &bitmap, const wxPoint &pos,
@@ -75,7 +76,7 @@ bool wxBitmapToggleButton::Create(wxWindow *parent, wxWindowID id,
 // wxToggleButton
 // ------------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC_CLASS(wxToggleButton, wxControl)
+wxIMPLEMENT_DYNAMIC_CLASS(wxToggleButton, wxControl);
 
 bool wxToggleButton::Create(wxWindow *parent, wxWindowID id,
                             const wxString &label, const wxPoint &pos,
@@ -145,11 +146,9 @@ void wxToggleButton::SetValue(bool state)
     if (state == GetValue())
         return;
 
-    GTKDisableEvents();
+    wxGtkEventsDisabler<wxToggleButton> noEvents(this);
 
     gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(m_widget), state);
-
-    GTKEnableEvents();
 }
 
 // bool GetValue() const

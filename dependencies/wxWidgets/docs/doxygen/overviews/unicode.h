@@ -126,8 +126,7 @@ Since wxWidgets 3.0 Unicode support is always enabled and while building the
 library without it is still possible, it is not recommended any longer and will
 cease to be supported in the near future. This means that internally only
 Unicode strings are used and that, under Microsoft Windows, Unicode system API
-is used which means that wxWidgets programs require the Microsoft Layer for
-Unicode to run on Windows 95/98/ME.
+is used.
 
 However, unlike the Unicode build mode of the previous versions of wxWidgets, this
 support is mostly transparent: you can still continue to work with the @b narrow
@@ -183,7 +182,7 @@ aware of the potential problems covered by the following section.
 wxWidgets uses the system @c wchar_t in wxString implementation by default
 under all systems. Thus, under Microsoft Windows, UCS-2 (simplified version of
 UTF-16 without support for surrogate characters) is used as @c wchar_t is 2
-bytes on this platform. Under Unix systems, including Mac OS X, UCS-4 (also
+bytes on this platform. Under Unix systems, including OS X, UCS-4 (also
 known as UTF-32) is used by default, however it is also possible to build
 wxWidgets to use UTF-8 internally by passing @c --enable-utf8 option to
 configure.

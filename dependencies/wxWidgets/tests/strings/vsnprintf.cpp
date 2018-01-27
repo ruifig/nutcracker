@@ -182,7 +182,7 @@ private:
     void GlibcMisc1();
     void GlibcMisc2();
 
-    DECLARE_NO_COPY_CLASS(VsnprintfTestCase)
+    wxDECLARE_NO_COPY_CLASS(VsnprintfTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -435,19 +435,6 @@ void VsnprintfTestCase::WrongFormatStrings()
 {
     // test how wxVsnprintf() behaves with wrong format string:
 
-#if 0
-    // NB: the next 2 tests currently return an error but it would be nice
-    //     if they didn't (see ticket #9367)
-
-    // two positionals with the same index:
-    r = wxSnprintf(buf, MAX_TEST_LEN, wxT("%1$s %1$s"), "hello");
-    CPPUNIT_ASSERT(r != -1);
-
-    // three positionals with the same index mixed with other pos args:
-    r = wxSnprintf(buf, MAX_TEST_LEN, wxT("%4$d %2$f %1$s %2$s %3$d"), "hello", "world", 3, 4);
-    CPPUNIT_ASSERT(r != -1);
-#endif
-
     // a missing positional arg should result in an assert
     WX_ASSERT_FAILS_WITH_ASSERT(
             wxSnprintf(buf, MAX_TEST_LEN, wxT("%1$d %3$d"), 1, 2, 3) );
@@ -514,8 +501,6 @@ void VsnprintfTestCase::DoBigToSmallBuffer(T *buffer, int size)
 
 void VsnprintfTestCase::BigToSmallBuffer()
 {
-    // VC6 can't compile this code
-#if !defined(__VISUALC__) || (__VISUALC__ >= 1310)
 #if wxUSE_UNICODE
     wchar_t bufw[1024], bufw2[16], bufw3[4], bufw4;
     DoBigToSmallBuffer(bufw, 1024);
@@ -529,7 +514,6 @@ void VsnprintfTestCase::BigToSmallBuffer()
     DoBigToSmallBuffer(bufa2, 16);
     DoBigToSmallBuffer(bufa3, 4);
     DoBigToSmallBuffer(&bufa4, 1);
-#endif // !VC6
 }
 
 // Miscellaneous() test case helper:

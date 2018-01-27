@@ -86,7 +86,7 @@ enum Positions
 class MyApp : public wxApp
 {
 public:
-    bool OnInit();
+    bool OnInit() wxOVERRIDE;
 };
 
 // Define a new frame
@@ -123,6 +123,8 @@ public:
     void OnDeletePrint(wxCommandEvent& WXUNUSED(event)) { DoDeletePrint(); }
     void OnInsertPrint(wxCommandEvent& event);
     void OnChangeToolTip(wxCommandEvent& event);
+    void OnIncToolSpacing(wxCommandEvent& event);
+    void OnDecToolSpacing(wxCommandEvent& event);
     void OnToggleHelp(wxCommandEvent& WXUNUSED(event)) { DoToggleHelp(); }
     void OnToggleSearch(wxCommandEvent& event);
     void OnToggleRadioBtn(wxCommandEvent& event);
@@ -221,6 +223,8 @@ enum
     IDM_TOOLBAR_TOGGLERADIOBTN2,
     IDM_TOOLBAR_TOGGLERADIOBTN3,
     IDM_TOOLBAR_CHANGE_TOOLTIP,
+    IDM_TOOLBAR_INC_TOOL_SPACING,
+    IDM_TOOLBAR_DEC_TOOL_SPACING,
 
     ID_COMBO = 1000
 };
@@ -256,6 +260,8 @@ wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU_RANGE(IDM_TOOLBAR_TOGGLERADIOBTN1, IDM_TOOLBAR_TOGGLERADIOBTN3,
                    MyFrame::OnToggleRadioBtn)
     EVT_MENU(IDM_TOOLBAR_CHANGE_TOOLTIP, MyFrame::OnChangeToolTip)
+    EVT_MENU(IDM_TOOLBAR_INC_TOOL_SPACING, MyFrame::OnIncToolSpacing)
+    EVT_MENU(IDM_TOOLBAR_DEC_TOOL_SPACING, MyFrame::OnDecToolSpacing)
 
     EVT_MENU_RANGE(IDM_TOOLBAR_SHOW_TEXT, IDM_TOOLBAR_SHOW_BOTH,
                    MyFrame::OnToolbarStyle)
@@ -289,7 +295,7 @@ wxEND_EVENT_TABLE()
 // MyApp
 // ----------------------------------------------------------------------------
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 // The `main program' equivalent, creating the windows and returning the
 // main frame
@@ -316,12 +322,6 @@ bool MyApp::OnInit()
 
 void MyFrame::RecreateToolbar()
 {
-#ifdef __WXWINCE__
-    // On Windows CE, we should not delete the
-    // previous toolbar in case it contains the menubar.
-    // We'll try to accommodate this usage in due course.
-    wxToolBar* toolBar = CreateToolBar();
-#else
     // delete and recreate the toolbar
     wxToolBarBase *toolBar = GetToolBar();
     long style = toolBar ? toolBar->GetWindowStyle() : TOOLBAR_STYLE;
@@ -363,7 +363,6 @@ void MyFrame::RecreateToolbar()
         style |= wxTB_HORZ_LAYOUT;
 
     toolBar = CreateToolBar(style, ID_TOOLBAR);
-#endif
 
     PopulateToolbar(toolBar);
 }
@@ -481,6 +480,8 @@ void MyFrame::PopulateToolbar(wxToolBarBase* toolBar)
                          wxT("Delete this tool. This is a very long tooltip to test whether it does the right thing when the tooltip is more than Windows can cope with."));
     }
 
+    m_nPrint = 1;
+
     // add a stretchable space before the "Help" button to make it
     // right-aligned
     toolBar->AddStretchableSpace();
@@ -530,7 +531,7 @@ MyFrame::MyFrame(wxFrame* parent,
     m_searchTool = NULL;
 
     m_rows = 1;
-    m_nPrint = 1;
+    m_nPrint = 0; // set to 1 in PopulateToolbar()
 
 #if wxUSE_STATUSBAR
     // Give it a status line
@@ -605,6 +606,9 @@ MyFrame::MyFrame(wxFrame* parent,
     toolMenu->Append(IDM_TOOLBAR_TOGGLERADIOBTN3, wxT("Toggle &3rd radio button\tCtrl-3"));
     toolMenu->AppendSeparator();
     toolMenu->Append(IDM_TOOLBAR_CHANGE_TOOLTIP, wxT("Change tooltip of \"New\""));
+    toolMenu->AppendSeparator();
+    toolMenu->Append(IDM_TOOLBAR_INC_TOOL_SPACING, wxT("Increase spacing\tCtrl-+"));
+    toolMenu->Append(IDM_TOOLBAR_DEC_TOOL_SPACING, wxT("Decrease spacing\tCtrl--"));
 
     wxMenu *fileMenu = new wxMenu;
     fileMenu->Append(wxID_EXIT, wxT("E&xit\tAlt-X"), wxT("Quit toolbar sample") );
@@ -638,7 +642,8 @@ MyFrame::MyFrame(wxFrame* parent,
     PopulateToolbar(m_extraToolBar);
 #endif
 
-    m_textWindow = new wxTextCtrl(m_panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE);
+    // Use a read-only text control; Cut tool will not cut selected text anyway.
+    m_textWindow = new wxTextCtrl(m_panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE|wxTE_READONLY);
 
     wxBoxSizer* sizer = new wxBoxSizer(wxVERTICAL);
     m_panel->SetSizer(sizer);
@@ -810,9 +815,9 @@ void MyFrame::OnQuit(wxCommandEvent& WXUNUSED(event))
 void MyFrame::OnAbout(wxCommandEvent& event)
 {
     if ( event.IsChecked() )
-        m_textWindow->WriteText( wxT("Help button down now.\n") );
+        m_textWindow->AppendText( wxT("Help button down now.\n") );
     else
-        m_textWindow->WriteText( wxT("Help button up now.\n") );
+        m_textWindow->AppendText( wxT("Help button up now.\n") );
 
     (void)wxMessageBox(wxT("wxWidgets toolbar sample"), wxT("About wxToolBar"));
 }
@@ -821,7 +826,7 @@ void MyFrame::OnToolLeftClick(wxCommandEvent& event)
 {
     wxString str;
     str.Printf( wxT("Clicked on tool %d\n"), event.GetId());
-    m_textWindow->WriteText( str );
+    m_textWindow->AppendText( str );
 
     if (event.GetId() == wxID_COPY)
     {
@@ -858,6 +863,7 @@ void MyFrame::DoEnablePrint()
 
     wxToolBarBase *tb = GetToolBar();
     tb->EnableTool(wxID_PRINT, !tb->GetToolEnabled(wxID_PRINT));
+    m_textWindow->AppendText("Print tool state changed.\n");
 }
 
 void MyFrame::DoDeletePrint()
@@ -867,6 +873,7 @@ void MyFrame::DoDeletePrint()
 
     wxToolBarBase *tb = GetToolBar();
     tb->DeleteTool( wxID_PRINT );
+    m_textWindow->AppendText("Print tool was deleted.\n");
 
     m_nPrint--;
 }
@@ -875,6 +882,7 @@ void MyFrame::DoToggleHelp()
 {
     wxToolBarBase *tb = GetToolBar();
     tb->ToggleTool( wxID_HELP, !tb->GetToolState( wxID_HELP ) );
+    m_textWindow->AppendText("Help tool was toggled.\n");
 }
 
 void MyFrame::OnToggleSearch(wxCommandEvent& WXUNUSED(event))
@@ -921,6 +929,18 @@ void MyFrame::OnUpdateToggleHorzText(wxUpdateUIEvent& event)
 void MyFrame::OnChangeToolTip(wxCommandEvent& WXUNUSED(event))
 {
     GetToolBar()->SetToolShortHelp(wxID_NEW, wxT("New toolbar button"));
+}
+
+void MyFrame::OnIncToolSpacing(wxCommandEvent& WXUNUSED(event))
+{
+    wxToolBar *tb = GetToolBar();
+    tb->SetToolPacking(tb->GetToolPacking()+1);
+}
+
+void MyFrame::OnDecToolSpacing(wxCommandEvent& WXUNUSED(event))
+{
+    wxToolBar *tb = GetToolBar();
+    tb->SetToolPacking(tb->GetToolPacking()-1);
 }
 
 void MyFrame::OnToolbarStyle(wxCommandEvent& event)
@@ -995,7 +1015,7 @@ void MyFrame::OnToolDropdown(wxCommandEvent& event)
 {
     wxString str;
     str.Printf( wxT("Dropdown on tool %d\n"), event.GetId());
-    m_textWindow->WriteText( str );
+    m_textWindow->AppendText( str );
 
     event.Skip();
 }

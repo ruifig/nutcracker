@@ -142,13 +142,44 @@ public:
         corner of a dialog) and the Close entry of the system menu (most often
         in the left upper corner of the dialog).
 
-        Currently only implemented for wxMSW and wxGTK.
-
         Returns @true if operation was successful. This may be wrong on X11
         (including GTK+) where the window manager may not support this operation
         and there is no way to find out.
     */
     virtual bool EnableCloseButton(bool enable = true);
+
+    /**
+        Enables or disables the Maximize button (in the right or left upper
+        corner of a frame or dialog).
+
+        Currently only implemented for wxMSW and wxOSX.
+
+        The window style must contain wxMAXIMIZE_BOX.
+
+        Returns @true if operation was successful. Note that a successful
+        operation does not change the window style flags.
+
+        @since 3.1.0
+    */
+    virtual bool EnableMaximizeButton(bool enable = true);
+
+    /**
+        Enables or disables the Minimize button (in the right or left upper
+        corner of a frame or dialog).
+
+        Currently only implemented for wxMSW and wxOSX.
+
+        The window style must contain wxMINIMIZE_BOX.
+
+        Note that in wxMSW a successful operation will change the window
+        style flags.
+
+        Returns @true if operation was successful. Note that a successful
+        operation does not change the window style flags.
+
+        @since 3.1.0
+    */
+    virtual bool EnableMinimizeButton(bool enable = true);
 
     /**
         Returns a pointer to the button which is the default for this window, or
@@ -195,20 +226,12 @@ public:
     virtual wxString GetTitle() const;
 
     /**
-        Unique to the wxWinCE port. Responds to showing/hiding SIP (soft input
-        panel) area and resize window accordingly. Override this if you want to
-        avoid resizing or do additional operations.
-    */
-    virtual bool HandleSettingChange(WXWPARAM wParam,
-                                     WXLPARAM lParam);
-
-    /**
         Iconizes or restores the window.
 
         @param iconize
             If @true, iconizes the window; if @false, shows and restores it.
 
-        @see IsIconized(), Maximize(), wxIconizeEvent.
+        @see IsIconized(), Restore()(), wxIconizeEvent.
     */
     virtual void Iconize(bool iconize = true);
 
@@ -265,7 +288,7 @@ public:
         @param maximize
             If @true, maximizes the window, otherwise it restores it.
 
-        @see Iconize()
+        @see Restore(), Iconize()
     */
     virtual void Maximize(bool maximize = true);
 
@@ -316,6 +339,18 @@ public:
     virtual void RequestUserAttention(int flags = wxUSER_ATTENTION_INFO);
 
     /**
+        Restore a previously iconized or maximized window to its normal state.
+
+        In wxGTK this method currently doesn't return the maximized window to
+        its normal state and you must use Maximize() with @false argument
+        explicitly for this. In the other ports, it both unmaximizes the
+        maximized windows and uniconizes the iconized ones.
+
+        @see Iconize(), Maximize()
+     */
+    void Restore();
+
+    /**
         Changes the default item for the panel, usually @a win is a button.
 
         @see GetDefaultItem()
@@ -360,24 +395,6 @@ public:
     virtual void SetIcons(const wxIconBundle& icons);
 
     /**
-        Sets action or menu activated by pressing left hardware button on the
-        smart phones. Unavailable on full keyboard machines.
-
-        @param id
-            Identifier for this button.
-        @param label
-            Text to be displayed on the screen area dedicated to this hardware
-            button.
-        @param subMenu
-            The menu to be opened after pressing this hardware button.
-
-        @see SetRightMenu().
-    */
-    void SetLeftMenu(int id = wxID_ANY,
-                     const wxString& label = wxEmptyString,
-                     wxMenu* subMenu = NULL);
-
-    /**
         A simpler interface for setting the size hints than SetSizeHints().
     */
     virtual void SetMaxSize(const wxSize& size);
@@ -386,24 +403,6 @@ public:
         A simpler interface for setting the size hints than SetSizeHints().
     */
     virtual void SetMinSize(const wxSize& size);
-
-    /**
-        Sets action or menu activated by pressing right hardware button on the
-        smart phones. Unavailable on full keyboard machines.
-
-        @param id
-            Identifier for this button.
-        @param label
-            Text to be displayed on the screen area dedicated to this hardware
-            button.
-        @param subMenu
-            The menu to be opened after pressing this hardware button.
-
-        @see SetLeftMenu().
-    */
-    void SetRightMenu(int id = wxID_ANY,
-                      const wxString& label = wxEmptyString,
-                      wxMenu* subMenu = NULL);
 
     /**
         Allows specification of minimum and maximum window sizes, and window
@@ -522,7 +521,36 @@ public:
         focus.
      */
     virtual void ShowWithoutActivating();
-    
+
+    /**
+        Enables the maximize button to toggle full screen mode. Prior to 
+        OS X 10.10 a full screen button is added to the right upper corner
+        of a window's title bar.
+
+        Currently only available for wxOSX/Cocoa.
+
+        @param enable
+            If @true (default) adds the full screen button in the title bar;
+            if @false the button is removed.
+
+        @return @true if the button was added or removed, @false if running
+        under another OS.
+
+        @note Having the button is also required to let ShowFullScreen()
+        make use of the full screen API available since OS X 10.7: a full
+        screen window gets its own space and entering and exiting the mode
+        is animated.
+        If the button is not present the old way of switching to full screen
+        is used.
+
+        @onlyfor{wxosx}
+
+        @see ShowFullScreen()
+
+        @since 3.1.0
+    */
+    virtual bool EnableFullScreenView(bool enable = true);
+
     /**
         Depending on the value of @a show parameter the window is either shown
         full screen or restored to its normal state. @a style is a bit list
@@ -541,7 +569,7 @@ public:
         @note Showing a window full screen also actually @ref wxWindow::Show()
               "Show()"s the window if it isn't shown.
 
-        @see IsFullScreen()
+        @see EnableFullScreenView(), IsFullScreen()
     */
     virtual bool ShowFullScreen(bool show, long style = wxFULLSCREEN_ALL);
 

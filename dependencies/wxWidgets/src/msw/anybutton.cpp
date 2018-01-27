@@ -44,6 +44,7 @@
 #include "wx/stockitem.h"
 #include "wx/msw/private/button.h"
 #include "wx/msw/private/dc.h"
+#include "wx/msw/uxtheme.h"
 #include "wx/private/window.h"
 
 #if wxUSE_MARKUP
@@ -53,8 +54,6 @@
 using namespace wxMSWImpl;
 
 #if wxUSE_UXTHEME
-    #include "wx/msw/uxtheme.h"
-
     // no need to include tmschema.h
     #ifndef BP_PUSHBUTTON
         #define BP_PUSHBUTTON 1
@@ -519,8 +518,9 @@ void wxAnyButton::AdjustForBitmapSize(wxSize &size) const
 {
     wxCHECK_RET( m_imageData, wxT("shouldn't be called if no image") );
 
-    // account for the bitmap size
-    const wxSize sizeBmp = m_imageData->GetBitmap(State_Normal).GetSize();
+    // account for the bitmap size, including the user-specified margins
+    const wxSize sizeBmp = m_imageData->GetBitmap(State_Normal).GetSize()
+                                + 2*m_imageData->GetBitmapMargins();
     const wxDirection dirBmp = m_imageData->GetBitmapPosition();
     if ( dirBmp == wxLEFT || dirBmp == wxRIGHT )
     {
@@ -534,9 +534,6 @@ void wxAnyButton::AdjustForBitmapSize(wxSize &size) const
         if ( sizeBmp.x > size.x )
             size.x = sizeBmp.x;
     }
-
-    // account for the user-specified margins
-    size += 2*m_imageData->GetBitmapMargins();
 
     // and also for the margins we always add internally (unless we have no
     // border at all in which case the button has exactly the same size as
@@ -1206,6 +1203,11 @@ bool wxAnyButton::SetForegroundColour(const wxColour &colour)
     return true;
 }
 
+bool wxAnyButton::MSWIsPushed() const
+{
+    return (SendMessage(GetHwnd(), BM_GETSTATE, 0, 0) & BST_PUSHED) != 0;
+}
+
 bool wxAnyButton::MSWOnDraw(WXDRAWITEMSTRUCT *wxdis)
 {
     LPDRAWITEMSTRUCT lpDIS = (LPDRAWITEMSTRUCT)wxdis;
@@ -1227,7 +1229,7 @@ bool wxAnyButton::MSWOnDraw(WXDRAWITEMSTRUCT *wxdis)
             break;
     }
 
-    bool pushed = (SendMessage(GetHwnd(), BM_GETSTATE, 0, 0) & BST_PUSHED) != 0;
+    bool pushed = MSWIsPushed();
 
     RECT rectBtn;
     CopyRect(&rectBtn, &lpDIS->rcItem);
@@ -1281,7 +1283,13 @@ bool wxAnyButton::MSWOnDraw(WXDRAWITEMSTRUCT *wxdis)
             }
         }
     }
-
+    else
+    {
+        // clear the background (and erase any previous bitmap)
+        COLORREF colBg = wxColourToRGB(GetBackgroundColour());
+        AutoHBRUSH hbrushBackground(colBg);
+        FillRect(hdc, &rectBtn, hbrushBackground);
+    }
 
     // draw the image, if any
     if ( m_imageData )

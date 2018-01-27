@@ -82,7 +82,7 @@ public:
 // display and display factory classes
 // ----------------------------------------------------------------------------
 
-class WXDLLEXPORT wxDisplayImplX11 : public wxDisplayImpl
+class wxDisplayImplX11 : public wxDisplayImpl
 {
 public:
     wxDisplayImplX11(unsigned n, const ScreenInfo& info)
@@ -91,8 +91,8 @@ public:
     {
     }
 
-    virtual wxRect GetGeometry() const { return m_rect; }
-    virtual wxRect GetClientArea() const
+    virtual wxRect GetGeometry() const wxOVERRIDE { return m_rect; }
+    virtual wxRect GetClientArea() const wxOVERRIDE
     {
         // we intentionally don't cache the result here because the client
         // display area may change (e.g. the user resized or hid a panel) and
@@ -100,11 +100,11 @@ public:
         return IsPrimary() ? wxGetClientDisplayRect() : m_rect;
     }
 
-    virtual wxString GetName() const { return wxString(); }
+    virtual wxString GetName() const wxOVERRIDE { return wxString(); }
 
-    virtual wxArrayVideoModes GetModes(const wxVideoMode& mode) const;
-    virtual wxVideoMode GetCurrentMode() const;
-    virtual bool ChangeMode(const wxVideoMode& mode);
+    virtual wxArrayVideoModes GetModes(const wxVideoMode& mode) const wxOVERRIDE;
+    virtual wxVideoMode GetCurrentMode() const wxOVERRIDE;
+    virtual bool ChangeMode(const wxVideoMode& mode) wxOVERRIDE;
 
 private:
     wxRect m_rect;
@@ -118,9 +118,9 @@ class wxDisplayFactoryX11 : public wxDisplayFactory
 public:
     wxDisplayFactoryX11() { }
 
-    virtual wxDisplayImpl *CreateDisplay(unsigned n);
-    virtual unsigned GetCount();
-    virtual int GetFromPoint(const wxPoint& pt);
+    virtual wxDisplayImpl *CreateDisplay(unsigned n) wxOVERRIDE;
+    virtual unsigned GetCount() wxOVERRIDE;
+    virtual int GetFromPoint(const wxPoint& pt) wxOVERRIDE;
 
 protected:
     wxDECLARE_NO_COPY_CLASS(wxDisplayFactoryX11);
@@ -159,58 +159,7 @@ wxDisplayImpl *wxDisplayFactoryX11::CreateDisplay(unsigned n)
 
     return n < screens.GetCount() ? new wxDisplayImplX11(n, screens[n]) : NULL;
 }
-#else // __WXGTK20__
-
-// Provide stubs for the functions which were (wrongly!) part of ABI in 3.0.0.
-// They should never be actually used by anybody, but still keep them present,
-// just to be certain we don't prevent some programs referencing, but not
-// using, them from running with later 3.0.x versions.
-class WXDLLEXPORT wxDisplayImplX11 : public wxDisplayImpl
-{
-public:
-    wxDisplayImplX11(unsigned n) : wxDisplayImpl(n) { }
-
-    // These are inline because they were inline in 3.0.0 too.
-    virtual wxRect GetGeometry() const { return wxRect(); }
-    virtual wxRect GetClientArea() const { return wxRect(); }
-    virtual wxString GetName() const { return wxString(); }
-
-    // And those were not.
-    virtual wxArrayVideoModes GetModes(const wxVideoMode& mode) const;
-    virtual wxVideoMode GetCurrentMode() const;
-    virtual bool ChangeMode(const wxVideoMode& mode);
-
-private:
-    // We must also have the same data fields as in 3.0.0, even if they are
-    // unused, to avoid ABI checker warnings.
-    wxRect m_rect;
-    int m_depth;
-};
-
-wxArrayVideoModes
-wxDisplayImplX11::GetModes(const wxVideoMode& WXUNUSED(mode)) const
-{
-    return wxArrayVideoModes();
-}
-
-wxVideoMode wxDisplayImplX11::GetCurrentMode() const
-{
-    return wxVideoMode();
-}
-
-bool wxDisplayImplX11::ChangeMode(const wxVideoMode& WXUNUSED(mode))
-{
-    return false;
-}
-
-// We need to reference this class, otherwise our stubs will be simply
-// discarded. Notice that this function just needs to exist, not be called.
-extern wxDisplayImpl* wxDisplayImplX11Use(unsigned n)
-{
-    return new wxDisplayImplX11(n);
-}
-
-#endif // !__WXGTK20__/__WXGTK20__
+#endif // !__WXGTK20__
 
 // ============================================================================
 // wxDisplayImplX11 implementation

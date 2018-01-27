@@ -68,7 +68,17 @@
              These flags are used to specify which side(s) of the sizer item
              the border width will apply to.}
     @itemdef{wxEXPAND,
-             The item will be expanded to fill the space assigned to the item.}
+             The item will be expanded to fill the space assigned to the item.
+             When used for the items of wxBoxSizer, the expansion only happens
+             in the transversal direction of the sizer as only the item
+             proportion governs its behaviour in the principal sizer direction.
+             But when it is used for the items of wxGridSizer, this flag can be
+             combined with the alignment flags which override it in the
+             corresponding direction if specified, e.g. @c wxEXPAND |
+             wxALIGN_CENTRE_VERTICAL would expand the item only horizontally
+             but center it vertically. Notice that this doesn't work for the
+             default left/top alignment and @c wxEXPAND still applies in both
+             directions if it is combined with @c wxALIGN_LEFT or @c wxALIGN_TOP.}
     @itemdef{wxSHAPED,
              The item will be expanded as much as possible while also
              maintaining its aspect ratio.}
@@ -948,7 +958,7 @@ public:
     and ordering defined by the platform or toolkit's user interface guidelines
     (if such things exist). By using this class, you can ensure that all your
     standard dialogs look correct on all major platforms. Currently it conforms to
-    the Windows, GTK+ and Mac OS X human interface guidelines.
+    the Windows, GTK+ and OS X human interface guidelines.
 
     When there aren't interface guidelines defined for a particular platform or
     toolkit, wxStdDialogButtonSizer reverts to the Windows implementation.
@@ -959,9 +969,9 @@ public:
     and then call Realize in order to create the actual button layout used.
     Other than these special operations, this sizer works like any other sizer.
 
-    If you add a button with wxID_SAVE, on Mac OS X the button will be renamed to
+    If you add a button with wxID_SAVE, on OS X the button will be renamed to
     "Save" and the wxID_NO button will be renamed to "Don't Save" in accordance
-    with the Mac OS X Human Interface Guidelines.
+    with the OS X Human Interface Guidelines.
 
     @library{wxcore}
     @category{winlayout}
@@ -1362,6 +1372,10 @@ public:
     /**
         Sets the wxSizerFlags to have a border of a number of pixels specified
         by @a borderinpixels with the directions specified by @a direction.
+
+        Prefer to use the overload below or DoubleBorder() or TripleBorder()
+        versions instead of hard-coding the border value in pixels to avoid too
+        small borders on devices with high DPI displays.
     */
     wxSizerFlags& Border(int direction, int borderinpixels);
 
@@ -1392,6 +1406,44 @@ public:
         Center() for people with the other dialect of English.
     */
     wxSizerFlags& Centre();
+
+    /**
+        Same as CentreHorizontal().
+
+        @since 3.1.0
+     */
+    wxSizerFlags& CenterHorizontal();
+
+    /**
+        Same as CentreVertical().
+
+        @since 3.1.0
+     */
+    wxSizerFlags& CenterVertical();
+
+    /**
+        Center an item only in horizontal direction.
+
+        This is mostly useful for 2D sizers as for the 1D ones it is shorter to
+        just use Centre() as the alignment is only used in one direction with
+        them anyhow. For 2D sizers, centering an item in one direction is quite
+        different from centering it in both directions however.
+
+        @see CentreVertical()
+
+        @since 3.1.0
+     */
+    wxSizerFlags& CentreHorizontal();
+
+    /**
+        Center an item only in vertical direction.
+
+        The remarks in CentreHorizontal() documentation also apply to this
+        function.
+
+        @since 3.1.0
+     */
+    wxSizerFlags& CentreVertical();
 
     /**
         Sets the border in the given @a direction having twice the default
@@ -1430,6 +1482,10 @@ public:
 
     /**
         Returns the border used by default in Border() method.
+
+        This value is scaled appropriately for the current DPI on the systems
+        where physical pixel values are used for the control positions and
+        sizes, i.e. not with wxGTK or wxOSX.
     */
     static int GetDefaultBorder();
 

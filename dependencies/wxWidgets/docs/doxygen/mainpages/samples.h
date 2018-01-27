@@ -46,7 +46,7 @@ subdirectory of the library distribution. When a @c foobar sample is mentioned
 below, its sources can be found in @c samples/foobar directory of your
 wxWidgets tree. If you installed wxWidgets from a binary package, you might not
 have this directory. In this case, you may view the samples online at
-http://svn.wxwidgets.org/viewvc/wx/wxWidgets/trunk/samples/ but you need to
+https://github.com/wxWidgets/wxWidgets/tree/master/samples/ but you need to
 download the source distribution in order to be able to build them (highly
 recommended).
 
@@ -132,37 +132,6 @@ See @ref overview_config for the descriptions of all features of this class.
 @sampleabout{a console program}
 
 @sampledir{console}
-
-@section page_samples_controls Controls Sample
-
-The controls sample is the main test program for most simple controls used in
-wxWidgets. The sample tests their basic functionality, events, placement,
-modification in terms of colour and font as well as the possibility to change
-the controls programmatically, such as adding an item to a list box etc. Apart
-from that, the sample uses a wxNotebook and tests most
-features of this special control (using bitmap in the tabs, using
-wxSizer instances and wxLayoutConstraints within notebook pages, advancing pages
-programmatically and vetoing a page change by intercepting the wxNotebookEvent.
-
-The various controls tested are listed here:
-
-@li wxButton
-@li wxBitmapButton
-@li wxCheckBox
-@li wxChoice
-@li wxComboBox
-@li wxGauge
-@li wxStaticBox
-@li wxListBox
-@li wxSpinCtrl
-@li wxSpinButton
-@li wxStaticText
-@li wxStaticBitmap
-@li wxRadioBox
-@li wxRadioButton
-@li wxSlider
-
-@sampledir{controls}
 
 @section page_samples_dataview wxDataViewCtrl Sample
 
@@ -584,6 +553,8 @@ commands through the menu.
     Arrow keys rotate the cube. Space bar toggles spinning.
 @li @b isosurf Draws a surface by reading coordinates from a DAT file.
 @li @b penguin Draws a rotatable penguin by reading data from a DXF file.
+@li @b pyramid Draws a rotatable tetrahedron and some strings.
+    It uses OpenGL 3.2 Core Profile context.
 
 @sampledir{opengl}
 

@@ -127,9 +127,9 @@ void wxNotebook::AddChildGTK(wxWindowGTK* child)
 // wxNotebook
 //-----------------------------------------------------------------------------
 
-BEGIN_EVENT_TABLE(wxNotebook, wxBookCtrlBase)
+wxBEGIN_EVENT_TABLE(wxNotebook, wxBookCtrlBase)
     EVT_NAVIGATION_KEY(wxNotebook::OnNavigationKey)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 void wxNotebook::Init()
 {
@@ -596,8 +596,7 @@ GdkWindow *wxNotebook::GTKGetWindow(wxArrayGdkWindows& windows) const
 {
     windows.push_back(gtk_widget_get_window(m_widget));
 #ifdef __WXGTK3__
-    GdkWindow* wxGTKFindWindow(GtkWidget* widget);
-    GdkWindow* window = wxGTKFindWindow(m_widget);
+    GdkWindow* window = GTKFindWindow(m_widget);
     if (window)
         windows.push_back(window);
 #else

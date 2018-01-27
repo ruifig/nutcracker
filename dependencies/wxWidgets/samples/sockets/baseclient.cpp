@@ -52,7 +52,7 @@ public:
     void setFailed() { m_isFailed = true; }
     bool isFailed() const { return m_isFailed; }
 
-    virtual wxEvent* Clone() const
+    virtual wxEvent* Clone() const wxOVERRIDE
     {
         return new WorkerEvent(*this);
     }
@@ -94,11 +94,11 @@ private:
     wxString m_host;
     long m_stressWorkers;
 
-    virtual bool OnInit();
-    virtual int OnRun();
-    virtual int OnExit();
-    void OnInitCmdLine(wxCmdLineParser& pParser);
-    bool OnCmdLineParsed(wxCmdLineParser& pParser);
+    virtual bool OnInit() wxOVERRIDE;
+    virtual int OnRun() wxOVERRIDE;
+    virtual int OnExit() wxOVERRIDE;
+    void OnInitCmdLine(wxCmdLineParser& pParser) wxOVERRIDE;
+    bool OnCmdLineParsed(wxCmdLineParser& pParser) wxOVERRIDE;
     void OnWorkerEvent(WorkerEvent& pEvent);
     void OnTimerEvent(wxTimerEvent& pEvent);
 
@@ -121,13 +121,13 @@ private:
     wxTimer mTimer;
 };
 
-DECLARE_APP(Client);
+wxDECLARE_APP(Client);
 
 class ThreadWorker : public wxThread
 {
 public:
     ThreadWorker(const wxString& p_host, char* p_buf, int p_size);
-    virtual ExitCode Entry();
+    virtual ExitCode Entry() wxOVERRIDE;
 private:
     wxString m_host;
     wxSocketClient* m_clientSocket;
@@ -164,7 +164,7 @@ private:
 };
 
 /******************* Implementation ******************/
-IMPLEMENT_APP_CONSOLE(Client);
+wxIMPLEMENT_APP_CONSOLE(Client);
 
 #include <wx/listimpl.cpp>
 WX_DEFINE_LIST(TList);
@@ -182,7 +182,7 @@ Client::OnInitCmdLine(wxCmdLineParser& pParser)
     wxApp::OnInitCmdLine(pParser);
     pParser.AddSwitch(wxT("e"),wxT("event"),_("Use event based worker (default)"),wxCMD_LINE_PARAM_OPTIONAL);
     pParser.AddSwitch(wxT("t"),wxT("thread"),_("Use thread based worker"),wxCMD_LINE_PARAM_OPTIONAL);
-    pParser.AddSwitch(wxT("r"),wxT("random"),_("Send radnom data (default)"),wxCMD_LINE_PARAM_OPTIONAL);
+    pParser.AddSwitch(wxT("r"),wxT("random"),_("Send random data (default)"),wxCMD_LINE_PARAM_OPTIONAL);
     pParser.AddOption(wxT("m"),wxT("message"),_("Send message from <str>"),wxCMD_LINE_VAL_STRING,wxCMD_LINE_PARAM_OPTIONAL);
     pParser.AddOption(wxT("f"),wxT("file"),_("Send contents of <file>"),wxCMD_LINE_VAL_STRING,wxCMD_LINE_PARAM_OPTIONAL);
     pParser.AddOption(wxT("H"),wxT("hostname"),_("IP or name of host to connect to"),wxCMD_LINE_VAL_STRING,wxCMD_LINE_PARAM_OPTIONAL);
@@ -220,7 +220,7 @@ Client::OnCmdLineParsed(wxCmdLineParser& pParser)
             return false;
         };
         if (!file.ReadAll(&m_message)) {
-            wxLogError(wxT("Cannot read conten of file %s"),fname.c_str());
+            wxLogError(wxT("Cannot read content of file %s"),fname.c_str());
             return false;
         };
         m_sendType = SEND_MESSAGE;
@@ -319,9 +319,9 @@ Client::CreateBuffer(int* msgsize)
     //test3 for compatibility with GUI server sample
     if ((*msgsize) > 250)
     {
-        //send at least one kb of data
+        //send at least one KB of data
         int size = (*msgsize)/1024 + 1;
-        //returned buffer will contain test indicator, message size in kb and data
+        //returned buffer will contain test indicator, message size in KB and data
         bufsize = size*1024+2;
         buf = new char[bufsize];
         buf[0] = (unsigned char)0xDE; //second byte contains size in kilobytes
@@ -330,7 +330,7 @@ Client::CreateBuffer(int* msgsize)
     }
     else
     {
-        //returned buffer will contain test indicator, message size in kb and data
+        //returned buffer will contain test indicator, message size in KB and data
         bufsize = (*msgsize)+2;
         buf = new char[bufsize];
         buf[0] = (unsigned char)0xBE; //second byte contains size in bytes

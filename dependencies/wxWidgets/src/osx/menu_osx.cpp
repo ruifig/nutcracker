@@ -37,7 +37,7 @@
 // ----------------------
 #include <string.h>
 
-IMPLEMENT_ABSTRACT_CLASS( wxMenuImpl , wxObject )
+wxIMPLEMENT_ABSTRACT_CLASS(wxMenuImpl, wxObject);
 
 wxMenuImpl::~wxMenuImpl()
 {
@@ -75,18 +75,7 @@ void wxMenu::Init()
 
 wxMenu::~wxMenu()
 {
-#if wxOSX_USE_CARBON
-    // when destroying the empty menu bar from the static scoped ptr
-    // the peer destructor removes an association from an already deleted
-    // hashmap leading to crashes. The guard avoids this, accepting some leaks...
-    static bool finalmenubar = false;
-    
-    if ( this == gs_emptyMenuBar.get() )
-        finalmenubar = true;
-    
-    if ( !finalmenubar )
-#endif
-        delete m_peer;
+    delete m_peer;
 }
 
 WXHMENU wxMenu::GetHMenu() const
@@ -465,32 +454,6 @@ bool wxMenu::HandleCommandUpdateStatus( wxMenuItem* item, wxWindow* senderWindow
         if (event.GetSetEnabled())
             Enable(menuid, event.GetEnabled());
     }
-    else
-    {
-#if wxOSX_USE_CARBON
-        // these two items are also managed by the Carbon Menu Manager, therefore we must
-        // always reset them ourselves
-        UInt32 cmd = 0;
-
-        if ( menuid == wxApp::s_macExitMenuItemId )
-        {
-            cmd = kHICommandQuit;
-        }
-        else if (menuid == wxApp::s_macPreferencesMenuItemId )
-        {
-            cmd = kHICommandPreferences;
-        }
-
-        if ( cmd != 0 )
-        {
-            if ( !item->IsEnabled() || wxDialog::OSXHasModalDialogsOpen() )
-                DisableMenuCommand( NULL , cmd ) ;
-            else
-                EnableMenuCommand( NULL , cmd ) ;
-
-        }
-#endif
-    }
 
     return processed;
 }
@@ -529,7 +492,7 @@ void wxMenu::HandleMenuItemHighlighted( wxMenuItem* item )
 {
     int menuid = item ? item->GetId() : 0;
     wxMenuEvent wxevent(wxEVT_MENU_HIGHLIGHT, menuid, this);
-    DoHandleMenuEvent( wxevent );
+    ProcessMenuEvent(this, wxevent, GetWindow());
 }
 
 void wxMenu::DoHandleMenuOpenedOrClosed(wxEventType evtType)
@@ -540,7 +503,7 @@ void wxMenu::DoHandleMenuOpenedOrClosed(wxEventType evtType)
     // Set the id to allow wxMenuEvent::IsPopup() to work correctly.
     int menuid = this == wxCurrentPopupMenu ? wxID_ANY : 0;
     wxMenuEvent wxevent(evtType, menuid, this);
-    DoHandleMenuEvent( wxevent );
+    ProcessMenuEvent(this, wxevent, GetWindow());
 }
 
 void wxMenu::HandleMenuOpened()
@@ -551,26 +514,6 @@ void wxMenu::HandleMenuOpened()
 void wxMenu::HandleMenuClosed()
 {
     DoHandleMenuOpenedOrClosed(wxEVT_MENU_CLOSE);
-}
-
-bool wxMenu::DoHandleMenuEvent(wxEvent& wxevent)
-{
-    wxevent.SetEventObject(this);
-    wxEvtHandler* handler = GetEventHandler();
-    if (handler && handler->ProcessEvent(wxevent))
-    {
-        return true;
-    }
-    else
-    {
-        wxWindow *win = GetWindow();
-        if (win)
-        {
-            if ( win->HandleWindowEvent(wxevent) )
-                return true;
-        }
-    }
-    return false;
 }
 
 // Menu Bar
@@ -619,7 +562,6 @@ static wxMenu *CreateAppleMenu()
         appleMenu->AppendSeparator();
     }
 
-#if !wxOSX_USE_CARBON
     if ( wxApp::s_macPreferencesMenuItemId != wxID_NONE )
     {
         appleMenu->Append( wxApp::s_macPreferencesMenuItemId,
@@ -642,7 +584,6 @@ static wxMenu *CreateAppleMenu()
     wxString quitLabel;
     quitLabel = wxString::Format(_("Quit %s"), wxTheApp ? wxTheApp->GetAppDisplayName() : _("Application"));
     appleMenu->Append( wxApp::s_macExitMenuItemId, quitLabel + "\tCtrl+Q" );
-#endif // !wxOSX_USE_CARBON
 
     return appleMenu;
 }
@@ -692,11 +633,7 @@ wxMenuBar::~wxMenuBar()
     if (s_macCommonMenuBar == this)
         s_macCommonMenuBar = NULL;
 
-    if (s_macInstalledMenuBar == this)
-    {
-        gs_emptyMenuBar->GetPeer()->MakeRoot();
-        s_macInstalledMenuBar = NULL;
-    }
+    MacUninstallMenuBar();
     wxDELETE( m_rootMenu );
     // apple menu is a submenu, therefore we don't have to delete it
     m_appleMenu = NULL;
@@ -709,6 +646,15 @@ wxMenuBar::~wxMenuBar()
 void wxMenuBar::Refresh(bool WXUNUSED(eraseBackground), const wxRect *WXUNUSED(rect))
 {
     wxCHECK_RET( IsAttached(), wxT("can't refresh unatteched menubar") );
+}
+
+void wxMenuBar::MacUninstallMenuBar()
+{
+  if (s_macInstalledMenuBar == this)
+  {
+    gs_emptyMenuBar->GetPeer()->MakeRoot();
+    s_macInstalledMenuBar = NULL;
+  }
 }
 
 void wxMenuBar::MacInstallMenuBar()
@@ -1032,5 +978,35 @@ void wxMenuBar::Attach(wxFrame *frame)
 {
     wxMenuBarBase::Attach( frame ) ;
 }
+
+void wxMenuBar::DoGetPosition(int *x, int *y) const
+{
+    int _x,_y,_width,_height;
+    
+    m_rootMenu->GetPeer()->GetMenuBarDimensions(_x, _y, _width, _height);
+
+    if (x)
+        *x = _x;
+    if (y)
+        *y = _y;
+}
+
+void wxMenuBar::DoGetSize(int *width, int *height) const
+{
+    int _x,_y,_width,_height;
+    
+    m_rootMenu->GetPeer()->GetMenuBarDimensions(_x, _y, _width, _height);
+
+    if (width)
+        *width = _width;
+    if (height)
+        *height = _height;
+}
+
+void wxMenuBar::DoGetClientSize(int *width, int *height) const
+{
+    DoGetSize(width, height);
+}
+
 
 #endif // wxUSE_MENUS

@@ -103,12 +103,12 @@ class BitmapComboBoxWidgetsPage : public ItemContainerWidgetsPage
 public:
     BitmapComboBoxWidgetsPage(WidgetsBookCtrl *book, wxImageList *imaglist);
 
-    virtual wxControl *GetWidget() const { return m_combobox; }
-    virtual wxItemContainer* GetContainer() const { return m_combobox; }
-    virtual void RecreateWidget() { CreateCombo(); }
+    virtual wxWindow *GetWidget() const wxOVERRIDE { return m_combobox; }
+    virtual wxItemContainer* GetContainer() const wxOVERRIDE { return m_combobox; }
+    virtual void RecreateWidget() wxOVERRIDE { CreateCombo(); }
 
     // lazy creation of the content
-    virtual void CreateContent();
+    virtual void CreateContent() wxOVERRIDE;
 
 protected:
     // event handlers
@@ -322,7 +322,7 @@ void BitmapComboBoxWidgetsPage::CreateContent()
     wxButton *btn = new wxButton(this, BitmapComboBoxPage_Reset, wxT("&Reset"));
     sizerStyle->Add(btn, 0, wxALIGN_CENTRE_HORIZONTAL | wxALL, 3);
 
-    sizerLeft->Add(sizerStyle, 0, wxGROW | wxALIGN_CENTRE_HORIZONTAL);
+    sizerLeft->Add(sizerStyle, wxSizerFlags().Expand());
     sizerLeft->Add(m_radioKind, 0, wxGROW | wxALL, 5);
 
     // left pane - other options box
@@ -336,7 +336,7 @@ void BitmapComboBoxWidgetsPage::CreateContent()
     m_textChangeHeight->SetSize(20, wxDefaultCoord);
     sizerOptions->Add(sizerRow, 0, wxALL | wxFIXED_MINSIZE /*| wxGROW*/, 5);
 
-    sizerLeft->Add(sizerOptions, 0, wxGROW | wxALIGN_CENTRE_HORIZONTAL | wxTOP, 2);
+    sizerLeft->Add( sizerOptions, wxSizerFlags().Expand().Border(wxTOP, 2));
 
     // middle pane
     wxStaticBox *box2 = new wxStaticBox(this, wxID_ANY,
@@ -422,7 +422,7 @@ void BitmapComboBoxWidgetsPage::Reset()
 
 void BitmapComboBoxWidgetsPage::CreateCombo()
 {
-    int flags = ms_defaultFlags;
+    int flags = GetAttrs().m_defaultFlags;
 
     if ( m_chkSort->GetValue() )
         flags |= wxCB_SORT;

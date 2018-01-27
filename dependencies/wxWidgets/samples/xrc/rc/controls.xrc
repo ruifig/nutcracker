@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 
-<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.3.0.1">
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
 
 <object class="wxDialog" name="controls_dialog">
     <title>Controls Example</title>
@@ -20,6 +20,48 @@
             <border>5</border>
             <object class="wxChoicebook" name="controls_book">
                 <size>550,250</size>
+
+                <object class="choicebookpage">
+                    <label>wxActivityIndicator</label>
+                    <object class="wxPanel">
+                        <object class="wxFlexGridSizer">
+                            <cols>2</cols>
+                            <rows>2</rows>
+
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTRE|wxALL</flag>
+                                <border>5</border>
+                                <object class="wxStaticText">
+                                    <label>Small indicator</label>
+                                </object>
+                            </object>
+
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTRE|wxALL</flag>
+                                <border>5</border>
+                                <object class="wxActivityIndicator">
+                                    <variant>small</variant>
+                                </object>
+                            </object>
+
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTRE|wxALL</flag>
+                                <border>5</border>
+                                <object class="wxStaticText">
+                                    <label>Active indicator</label>
+                                </object>
+                            </object>
+
+                            <object class="sizeritem">
+                                <flag>wxALIGN_CENTRE|wxALL</flag>
+                                <border>5</border>
+                                <object class="wxActivityIndicator">
+                                    <running>1</running>
+                                </object>
+                            </object>
+                        </object>
+                    </object>
+                </object>
 
                 <object class="choicebookpage">
                     <label>wxAnimationCtrl</label>

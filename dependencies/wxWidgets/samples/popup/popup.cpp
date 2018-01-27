@@ -36,7 +36,7 @@
 // resources
 // ----------------------------------------------------------------------------
 
-// the application icon (under Windows and OS/2 it is in resources and even
+// the application icon (under Windows it is in resources and even
 // though we could still include the XPM here it would be unused)
 #ifndef wxHAS_IMAGES_IN_RESOURCES
     #include "../sample.xpm"
@@ -69,10 +69,10 @@ public:
     virtual ~SimpleTransientPopup();
 
     // wxPopupTransientWindow virtual methods are all overridden to log them
-    virtual void Popup(wxWindow *focus = NULL);
-    virtual void OnDismiss();
-    virtual bool ProcessLeftDown(wxMouseEvent& event);
-    virtual bool Show( bool show = true );
+    virtual void Popup(wxWindow *focus = NULL) wxOVERRIDE;
+    virtual void OnDismiss() wxOVERRIDE;
+    virtual bool ProcessLeftDown(wxMouseEvent& event) wxOVERRIDE;
+    virtual bool Show( bool show = true ) wxOVERRIDE;
 
 private:
     wxScrolledWindow *m_panel;
@@ -96,7 +96,7 @@ private:
 //----------------------------------------------------------------------------
 // SimpleTransientPopup
 //----------------------------------------------------------------------------
-IMPLEMENT_CLASS(SimpleTransientPopup,wxPopupTransientWindow)
+wxIMPLEMENT_CLASS(SimpleTransientPopup,wxPopupTransientWindow);
 
 wxBEGIN_EVENT_TABLE(SimpleTransientPopup,wxPopupTransientWindow)
     EVT_MOUSE_EVENTS( SimpleTransientPopup::OnMouse )
@@ -294,7 +294,7 @@ private:
 class MyApp : public wxApp
 {
 public:
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 
     MyFrame *m_frame;
 };
@@ -304,7 +304,7 @@ public:
 // ----------------------------------------------------------------------------
 
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 // 'Main program' equivalent: the program execution "starts" here
 bool MyApp::OnInit()

@@ -48,7 +48,7 @@ GLboolean g_lighting = GL_TRUE;
 // MyApp
 //---------------------------------------------------------------------------
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
@@ -118,7 +118,7 @@ MyFrame::MyFrame(wxFrame *frame, const wxString& title, const wxPoint& pos,
         { WX_GL_RGBA, WX_GL_MIN_RED, 1, WX_GL_MIN_GREEN, 1,
         WX_GL_MIN_BLUE, 1, WX_GL_DEPTH_SIZE, 1,
         WX_GL_DOUBLEBUFFER,
-#  if defined(__WXMAC__) || defined(__WXCOCOA__)
+#  if defined(__WXMAC__)  || defined(__WXQT__)
         GL_NONE };
 #  else
         None };

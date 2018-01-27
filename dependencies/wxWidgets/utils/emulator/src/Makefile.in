@@ -39,7 +39,7 @@ wx_top_builddir = @wx_top_builddir@
 ### Variables: ###
 
 DESTDIR = 
-WX_RELEASE = 3.0
+WX_RELEASE = 3.1
 LIBDIRNAME = $(wx_top_builddir)/lib
 WXEMULATOR_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	$(__DEBUG_DEFINE_p) $(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) \
@@ -47,7 +47,6 @@ WXEMULATOR_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	-I$(srcdir)/../../../samples $(CXXWARNINGS) $(CPPFLAGS) $(CXXFLAGS)
 WXEMULATOR_OBJECTS =  \
 	$(__wxemulator___win32rc) \
-	$(__wxemulator_os2_lib_res) \
 	wxemulator_emulator.o
 
 ### Conditionally set variables: ###
@@ -86,8 +85,6 @@ COND_PLATFORM_OS2_1___wxemulator___os2_emxbindcmd = $(NM) wxemulator$(EXEEXT) \
 @COND_TOOLKIT_MSW@__RCDEFDIR_p_1 = --include-dir \
 @COND_TOOLKIT_MSW@	$(LIBDIRNAME)/wx/include/$(TOOLCHAIN_FULLNAME)
 @COND_PLATFORM_WIN32_1@__wxemulator___win32rc = wxemulator_sample_rc.o
-@COND_PLATFORM_OS2_1@__wxemulator_os2_lib_res = \
-@COND_PLATFORM_OS2_1@	$(top_srcdir)/include/wx/os2/wx.res
 COND_MONOLITHIC_0___WXLIB_CORE_p = \
 	-lwx_$(PORTNAME)$(WXUNIVNAME)$(WXUNICODEFLAG)$(WXDEBUGFLAG)$(WX_LIB_FLAVOUR)_core-$(WX_RELEASE)$(HOST_SUFFIX)
 @COND_MONOLITHIC_0@__WXLIB_CORE_p = $(COND_MONOLITHIC_0___WXLIB_CORE_p)
@@ -154,7 +151,7 @@ data:
 	done
 
 wxemulator_sample_rc.o: $(srcdir)/../../../samples/sample.rc
-	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_2) $(__DEBUG_DEFINE_p_2)  $(__EXCEPTIONS_DEFINE_p_2) $(__RTTI_DEFINE_p_2) $(__THREAD_DEFINE_p_2)   --include-dir $(srcdir) $(__DLLFLAG_p_2) --include-dir $(srcdir)/../../../samples $(__RCDEFDIR_p_1) --include-dir $(top_srcdir)/include
+	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_2) $(__DEBUG_DEFINE_p_2)  $(__EXCEPTIONS_DEFINE_p_2) $(__RTTI_DEFINE_p_2) $(__THREAD_DEFINE_p_2)  --include-dir $(srcdir) $(__DLLFLAG_p_2) --include-dir $(srcdir)/../../../samples $(__RCDEFDIR_p_1) --include-dir $(top_srcdir)/include
 
 wxemulator_emulator.o: $(srcdir)/emulator.cpp
 	$(CXXC) -c -o $@ $(WXEMULATOR_CXXFLAGS) $(srcdir)/emulator.cpp

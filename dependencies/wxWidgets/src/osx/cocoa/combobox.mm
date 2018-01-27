@@ -24,7 +24,7 @@
 
 // work in progress
 
-@interface wxNSTableDataSource : NSObject wxOSX_10_6_AND_LATER(<NSComboBoxDataSource>)
+@interface wxNSTableDataSource : NSObject <NSComboBoxDataSource>
 {
     wxNSComboBoxControl* impl;
 }
@@ -87,6 +87,19 @@
             event.SetString( static_cast<wxComboBox*>(wxpeer)->GetValue() );
             wxpeer->HandleWindowEvent( event );
         }
+    }
+}
+
+- (void)controlTextDidEndEditing:(NSNotification *) aNotification
+{
+    wxUnusedVar(aNotification);
+    wxWidgetCocoaImpl* impl = (wxWidgetCocoaImpl* ) wxWidgetImpl::FindFromWXWidget( self );
+    if ( impl )
+    {
+        wxNSTextFieldControl* timpl = dynamic_cast<wxNSTextFieldControl*>(impl);
+        if ( timpl )
+            timpl->UpdateInternalSelectionFromEditor(fieldEditor);
+        impl->DoNotifyFocusLost();
     }
 }
 

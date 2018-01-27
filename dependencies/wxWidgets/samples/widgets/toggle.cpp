@@ -89,11 +89,11 @@ public:
     ToggleWidgetsPage(WidgetsBookCtrl *book, wxImageList *imaglist);
     virtual ~ToggleWidgetsPage(){};
 
-    virtual wxControl *GetWidget() const { return m_toggle; }
-    virtual void RecreateWidget() { CreateToggle(); }
+    virtual wxWindow *GetWidget() const wxOVERRIDE { return m_toggle; }
+    virtual void RecreateWidget() wxOVERRIDE { CreateToggle(); }
 
     // lazy creation of the content
-    virtual void CreateContent();
+    virtual void CreateContent() wxOVERRIDE;
 
 protected:
     // event handlers
@@ -370,7 +370,7 @@ void ToggleWidgetsPage::CreateToggle()
         label = m_textLabel->GetValue();
     }
 
-    int flags = ms_defaultFlags;
+    int flags = GetAttrs().m_defaultFlags;
 #ifdef wxHAS_BITMAPTOGGLEBUTTON
     switch ( m_radioHAlign->GetSelection() )
     {

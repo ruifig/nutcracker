@@ -190,7 +190,7 @@ private:
     void Swap();
     void IndexFromEnd();
 
-    DECLARE_NO_COPY_CLASS(ArraysTestCase)
+    wxDECLARE_NO_COPY_CLASS(ArraysTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -331,12 +331,10 @@ void ArraysTestCase::wxStringArrayTest()
     a5.assign(a1.begin(), a1.end());
     CPPUNIT_ASSERT( a5 == a1 );
 
-#ifdef wxHAS_VECTOR_TEMPLATE_ASSIGN
     const wxString months[] = { "Jan", "Feb", "Mar" };
     a5.assign(months, months + WXSIZEOF(months));
     CPPUNIT_ASSERT_EQUAL( WXSIZEOF(months), a5.size() );
     CPPUNIT_ASSERT( COMPARE_3_VALUES(a5, "Jan", "Feb", "Mar") );
-#endif // wxHAS_VECTOR_TEMPLATE_ASSIGN
 
     a5.clear();
     CPPUNIT_ASSERT_EQUAL( 0, a5.size() );
@@ -364,6 +362,20 @@ void ArraysTestCase::SortedArray()
     a.push_back("b");
     a.push_back("a");
     CPPUNIT_ASSERT_EQUAL( 0, a.Index("a") );
+
+
+    wxSortedArrayString ar(wxStringSortDescending);
+    ar.Add("a");
+    ar.Add("b");
+    CPPUNIT_ASSERT_EQUAL( "b", ar[0] );
+    CPPUNIT_ASSERT_EQUAL( "a", ar[1] );
+
+    wxSortedArrayString ad(wxDictionaryStringSortAscending);
+    ad.Add("AB");
+    ad.Add("a");
+    ad.Add("Aa");
+    CPPUNIT_ASSERT_EQUAL( "a", ad[0] );
+    CPPUNIT_ASSERT_EQUAL( "Aa", ad[1] );
 }
 
 void ArraysTestCase::wxStringArraySplitTest()
@@ -628,8 +640,7 @@ namespace
 {
 
 template <typename A, typename T>
-void DoTestSwap(T v1, T v2, T v3,
-                A * WXUNUSED(dummyUglyVC6Workaround))
+void DoTestSwap(T v1, T v2, T v3)
 {
     A a1, a2;
     a1.swap(a2);
@@ -657,10 +668,10 @@ void DoTestSwap(T v1, T v2, T v3,
 
 void ArraysTestCase::Swap()
 {
-    DoTestSwap("Foo", "Bar", "Baz", (wxArrayString *)NULL);
+    DoTestSwap<wxArrayString>("Foo", "Bar", "Baz");
 
-    DoTestSwap(1, 10, 100, (wxArrayInt *)NULL);
-    DoTestSwap(6, 28, 496, (wxArrayLong *)NULL);
+    DoTestSwap<wxArrayInt>(1, 10, 100);
+    DoTestSwap<wxArrayLong>(6, 28, 496);
 }
 
 void ArraysTestCase::TestSTL()

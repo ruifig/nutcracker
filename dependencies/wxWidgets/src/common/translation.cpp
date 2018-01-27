@@ -46,6 +46,7 @@
 #include "wx/filename.h"
 #include "wx/tokenzr.h"
 #include "wx/fontmap.h"
+#include "wx/scopedptr.h"
 #include "wx/stdpaths.h"
 #include "wx/private/threadinfo.h"
 
@@ -147,7 +148,7 @@ wxString GetPreferredUILanguage(const wxArrayString& available)
                                                  NULL,
                                                  &bufferSize) )
         {
-            wxScopedArray<WCHAR> langs(new WCHAR[bufferSize]);
+            wxScopedArray<WCHAR> langs(bufferSize);
             if ( (*s_pfnGetUserPreferredUILanguages)(MUI_LANGUAGE_NAME,
                                                      &numLangs,
                                                      langs.get(),
@@ -1201,7 +1202,8 @@ bool wxMsgCatalogFile::FillHash(wxStringToStringHashMap& hash,
 
     // conversion to use to convert catalog strings to the GUI encoding
     wxMBConv *inputConv = NULL;
-    wxMBConv *inputConvPtr = NULL; // same as inputConv but safely deleteable
+
+    wxScopedPtr<wxMBConv> inputConvPtr; // just to delete inputConv if needed
 
     if ( !m_charset.empty() )
     {
@@ -1211,8 +1213,11 @@ bool wxMsgCatalogFile::FillHash(wxStringToStringHashMap& hash,
         if ( encCat != wxLocale::GetSystemEncoding() )
 #endif
         {
-            inputConvPtr =
             inputConv = new wxCSConv(m_charset);
+
+            // As we allocated it ourselves, we need to delete it, so ensure
+            // this happens.
+            inputConvPtr.reset(inputConv);
         }
     }
     else // no need or not possible to convert the encoding
@@ -1230,9 +1235,9 @@ bool wxMsgCatalogFile::FillHash(wxStringToStringHashMap& hash,
     // conversion to apply to msgid strings before looking them up: we only
     // need it if the msgids are neither in 7 bit ASCII nor in the same
     // encoding as the catalog
-    wxCSConv *sourceConv = msgIdCharset.empty() || (msgIdCharset == m_charset)
-                            ? NULL
-                            : new wxCSConv(msgIdCharset);
+    wxScopedPtr<wxCSConv> sourceConv;
+    if ( !msgIdCharset.empty() && (msgIdCharset != m_charset) )
+        sourceConv.reset(new wxCSConv(msgIdCharset));
 #endif // !wxUSE_UNICODE
 
     for (size_t32 i = 0; i < m_numStrings; i++)
@@ -1287,11 +1292,6 @@ bool wxMsgCatalogFile::FillHash(wxStringToStringHashMap& hash,
             ++index;
         }
     }
-
-#if !wxUSE_UNICODE
-    delete sourceConv;
-#endif
-    delete inputConvPtr;
 
     return true;
 }
@@ -1573,8 +1573,10 @@ bool wxTranslations::LoadCatalog(const wxString& domain, const wxString& lang, c
     {
         // add it to the head of the list so that in GetString it will
         // be searched before the catalogs added earlier
+
         cat->m_pNext = m_pMsgCat;
         m_pMsgCat = cat;
+        m_catalogMap[domain] = cat;
 
         return true;
     }
@@ -1735,18 +1737,12 @@ wxString wxTranslations::GetHeaderValue(const wxString& header,
 }
 
 
-// find catalog by name in a linked list, return NULL if !found
+// find catalog by name
 wxMsgCatalog *wxTranslations::FindCatalog(const wxString& domain) const
 {
-    // linear search in the linked list
-    wxMsgCatalog *pMsgCat;
-    for ( pMsgCat = m_pMsgCat; pMsgCat != NULL; pMsgCat = pMsgCat->m_pNext )
-    {
-        if ( pMsgCat->GetDomain() == domain )
-            return pMsgCat;
-    }
+    const wxMsgCatalogMap::const_iterator found = m_catalogMap.find(domain);
 
-    return NULL;
+    return found == m_catalogMap.end() ? NULL : found->second;
 }
 
 // ----------------------------------------------------------------------------
@@ -2041,16 +2037,16 @@ wxArrayString wxResourceTranslationsLoader::GetAvailableTranslations(const wxStr
 
 class wxTranslationsModule: public wxModule
 {
-    DECLARE_DYNAMIC_CLASS(wxTranslationsModule)
-    public:
+    wxDECLARE_DYNAMIC_CLASS(wxTranslationsModule);
+public:
         wxTranslationsModule() {}
 
-        bool OnInit()
+        bool OnInit() wxOVERRIDE
         {
             return true;
         }
 
-        void OnExit()
+        void OnExit() wxOVERRIDE
         {
             if ( gs_translationsOwned )
                 delete gs_translations;
@@ -2059,6 +2055,6 @@ class wxTranslationsModule: public wxModule
         }
 };
 
-IMPLEMENT_DYNAMIC_CLASS(wxTranslationsModule, wxModule)
+wxIMPLEMENT_DYNAMIC_CLASS(wxTranslationsModule, wxModule);
 
 #endif // wxUSE_INTL

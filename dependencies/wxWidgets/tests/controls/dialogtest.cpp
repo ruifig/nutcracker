@@ -29,7 +29,11 @@ public:
 
 private:
     CPPUNIT_TEST_SUITE( ModalDialogsTestCase );
+// wxInfoBar has bug under x11. It will cause the dialog crash
+// Disable it for now.
+#if !defined (__WXX11__)
         CPPUNIT_TEST( MessageDialog );
+#endif
         CPPUNIT_TEST( FileDialog );
         CPPUNIT_TEST( CustomDialog );
     CPPUNIT_TEST_SUITE_END();
@@ -38,7 +42,7 @@ private:
     void FileDialog();
     void CustomDialog();
 
-    DECLARE_NO_COPY_CLASS(ModalDialogsTestCase)
+    wxDECLARE_NO_COPY_CLASS(ModalDialogsTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -75,6 +79,13 @@ void ModalDialogsTestCase::FileDialog()
     CPPUNIT_ASSERT_EQUAL((int)wxID_OK, rc);
 
     CPPUNIT_ASSERT_EQUAL("test.txt", dlg.GetFilename());
+
+#ifdef __WXGTK3__
+    // The native file dialog in GTK+ 3 launches an async operation which tries
+    // to dereference the already deleted dialog object if we don't let it to
+    // complete before leaving this function.
+    wxYield();
+#endif
 }
 
 

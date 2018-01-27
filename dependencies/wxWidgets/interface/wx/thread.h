@@ -303,12 +303,15 @@ public:
 
     Example:
     @code
-        wxDECLARE_EVENT(myEVT_THREAD_UPDATE, wxThreadEvent);
-
         class MyFrame : public wxFrame, public wxThreadHelper
         {
         public:
-            MyFrame(...) { ... }
+            MyFrame(...)
+            {
+                // It is also possible to use event tables, but dynamic binding is simpler.
+                Bind(wxEVT_THREAD, &MyFrame::OnThreadUpdate, this);
+            }
+
             ~MyFrame()
             {
                 // it's better to do any thread cleanup in the OnClose()
@@ -336,9 +339,7 @@ public:
             wxDECLARE_EVENT_TABLE();
         };
 
-        wxDEFINE_EVENT(myEVT_THREAD_UPDATE, wxThreadEvent)
         wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
-            EVT_THREAD(wxID_ANY, myEVT_THREAD_UPDATE, MyFrame::OnThreadUpdate)
             EVT_CLOSE(MyFrame::OnClose)
         wxEND_EVENT_TABLE()
 
@@ -362,8 +363,8 @@ public:
 
         wxThread::ExitCode MyFrame::Entry()
         {
-            // IMPORTANT:
-            // this function gets executed in the secondary thread context!
+            // VERY IMPORTANT: this function gets executed in the secondary thread context!
+            // Do not call any GUI function inside this function; rather use wxQueueEvent():
 
             int offset = 0;
 
@@ -385,11 +386,8 @@ public:
                     offset += 1024;
                 }
 
-
-                // VERY IMPORTANT: do not call any GUI function inside this
-                //                 function; rather use wxQueueEvent():
-                wxQueueEvent(this, new wxThreadEvent(wxEVT_COMMAND_MYTHREAD_UPDATE));
-                    // we used pointer 'this' assuming it's safe; see OnClose()
+                // signal to main thread that download is complete
+                wxQueueEvent(GetEventHandler(), new wxThreadEvent());
             }
 
             // TestDestroy() returned true (which means the main thread asked us
@@ -779,6 +777,8 @@ enum wxThreadError
         MyThread *m_pThread;
         wxCriticalSection m_pThreadCS;    // protects the m_pThread pointer
 
+        friend class MyThread;            // allow it to access our m_pThread
+
         wxDECLARE_EVENT_TABLE();
     };
 
@@ -789,8 +789,8 @@ enum wxThreadError
         EVT_COMMAND(wxID_ANY, wxEVT_COMMAND_MYTHREAD_COMPLETED, MyFrame::OnThreadCompletion)
     wxEND_EVENT_TABLE()
 
-    wxDEFINE_EVENT(wxEVT_COMMAND_MYTHREAD_COMPLETED, wxThreadEvent)
-    wxDEFINE_EVENT(wxEVT_COMMAND_MYTHREAD_UPDATE, wxThreadEvent)
+    wxDEFINE_EVENT(wxEVT_COMMAND_MYTHREAD_COMPLETED, wxThreadEvent);
+    wxDEFINE_EVENT(wxEVT_COMMAND_MYTHREAD_UPDATE, wxThreadEvent);
 
     void MyFrame::DoStartThread()
     {
@@ -1034,19 +1034,6 @@ public:
             something with the thread (e.g. pass its ID to an external library)
             before it starts.
 
-        @warning
-            It is a good idea to explicitly specify a value as systems'
-            default values vary from just a couple of KB on some systems (BSD and
-            OS/2 systems) to one or several MB (Windows, Solaris, Linux).
-            So, if you have a thread that requires more than just a few KB of memory, you
-            will have mysterious problems on some platforms but not on the common ones.
-            On the other hand, just indicating a large stack size by default will give you
-            performance issues on those systems with small default stack since those
-            typically use fully committed memory for the stack.
-            On the contrary, if you use a lot of threads (say several hundred),
-            virtual address space can get tight unless you explicitly specify a
-            smaller amount of thread stack space for each thread.
-
         @return One of:
           - @b wxTHREAD_NO_ERROR - No error.
           - @b wxTHREAD_NO_RESOURCE - There were insufficient resources to create the thread.
@@ -1076,7 +1063,7 @@ public:
         See @ref thread_deletion for a broader explanation of this routine.
     */
     wxThreadError Delete(ExitCode *rc = NULL,
-                         wxThreadWait waitMode = wxTHREAD_WAIT_BLOCK);
+                         wxThreadWait waitMode = wxTHREAD_WAIT_DEFAULT);
 
     /**
         Returns the number of system CPUs or -1 if the value is unknown.
@@ -1104,6 +1091,15 @@ public:
         (i.e.\ the thread identifiers may be reused).
     */
     wxThreadIdType GetId() const;
+
+    /**
+        Gets the native thread handle.
+
+        This method only exists in wxMSW, use GetId() in portable code.
+
+        @since 3.1.0
+    */
+    WXHANDLE MSWGetHandle() const;
 
     /**
         Returns the thread kind as it was given in the ctor.
@@ -1247,6 +1243,11 @@ public:
           - @c wxPRIORITY_MIN: 0
           - @c wxPRIORITY_DEFAULT: 50
           - @c wxPRIORITY_MAX: 100
+
+        Notice that in the MSW implementation the thread priority can currently
+        be only set after creating the thread with CreateThread(). But under
+        all platforms this method can be called either before launching the
+        thread using Run() or after doing it.
     */
     void SetPriority(unsigned int priority);
 
@@ -1296,7 +1297,7 @@ public:
 
         See @ref thread_deletion for a broader explanation of this routine.
     */
-    ExitCode Wait(wxThreadWait flags = wxTHREAD_WAIT_BLOCK);
+    ExitCode Wait(wxThreadWait flags = wxTHREAD_WAIT_DEFAULT);
 
     /**
         Give the rest of the thread's time-slice to the system allowing the other

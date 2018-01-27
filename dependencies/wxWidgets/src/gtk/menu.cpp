@@ -36,12 +36,6 @@ extern int wxOpenModalDialogsCount;
 // we use normal item but with a special id for the menu title
 static const int wxGTK_TITLE_ID = -3;
 
-// forward declare it as it's used by wxMenuBar too when using Hildon
-extern "C"
-{
-    static void menuitem_activate(GtkWidget*, wxMenuItem* item);
-}
-
 #if wxUSE_ACCEL
 static void wxGetGtkAccel(const wxMenuItem*, guint*, GdkModifierType*);
 #endif
@@ -74,16 +68,7 @@ static void DoCommonMenuCallbackCode(wxMenu *menu, wxMenuEvent& event)
     if ( !IsMenuEventAllowed(menu) )
         return;
 
-    event.SetEventObject( menu );
-
-    wxEvtHandler* handler = menu->GetEventHandler();
-    if (handler && handler->SafelyProcessEvent(event))
-        return;
-
-    wxWindow *win = menu->GetWindow();
-    wxCHECK_RET( win, "event for a menu without associated window?" );
-
-    win->HandleWindowEvent( event );
+    wxMenu::ProcessMenuEvent(menu, event, menu->GetWindow());
 }
 
 // Return the top level menu containing this menu (possibly this menu itself).
@@ -126,12 +111,6 @@ wxMenuBar::~wxMenuBar()
 
 void wxMenuBar::Init(size_t n, wxMenu *menus[], const wxString titles[], long style)
 {
-#if wxUSE_LIBHILDON || wxUSE_LIBHILDON2
-    // Hildon window uses a single menu instead of a menu bar, so wxMenuBar is
-    // the same as menu in this case
-    m_widget =
-    m_menubar = gtk_menu_new();
-#else // !wxUSE_LIBHILDON && !wxUSE_LIBHILDON2
     if (!PreCreation( NULL, wxDefaultPosition, wxDefaultSize ) ||
         !CreateBase( NULL, -1, wxDefaultPosition, wxDefaultSize, style, wxDefaultValidator, wxT("menubar") ))
     {
@@ -153,7 +132,6 @@ void wxMenuBar::Init(size_t n, wxMenu *menus[], const wxString titles[], long st
     }
 
     PostCreation();
-#endif // wxUSE_LIBHILDON || wxUSE_LIBHILDON2/!wxUSE_LIBHILDON && !wxUSE_LIBHILDON2
 
     g_object_ref_sink(m_widget);
 
@@ -187,10 +165,8 @@ namespace
 void
 EnsureNoGrab(GtkWidget* widget)
 {
-#if !wxUSE_LIBHILDON && !wxUSE_LIBHILDON2
     gtk_widget_hide(widget);
     gtk_grab_remove(widget);
-#endif // !wxUSE_LIBHILDON && !wxUSE_LIBHILDON2
 }
 
 void
@@ -322,30 +298,6 @@ void wxMenuBar::GtkAppend(wxMenu* menu, const wxString& title, int pos)
 {
     menu->SetLayoutDirection(GetLayoutDirection());
 
-#if wxUSE_LIBHILDON || wxUSE_LIBHILDON2
-    // if the menu has only one item, append it directly to the top level menu
-    // instead of inserting a useless submenu
-    if ( menu->GetMenuItemCount() == 1 )
-    {
-        wxMenuItem * const item = menu->FindItemByPosition(0);
-
-        // remove both mnemonics and accelerator: neither is useful under Maemo
-        const wxString str(wxStripMenuCodes(item->GetItemLabel()));
-
-        if ( item->IsSubMenu() )
-        {
-            GtkAppend(item->GetSubMenu(), str, pos);
-            return;
-        }
-
-        menu->m_owner = gtk_menu_item_new_with_mnemonic( wxGTK_CONV( str ) );
-
-        g_signal_connect(menu->m_owner, "activate",
-                         G_CALLBACK(menuitem_activate), item);
-        item->SetMenuItem(menu->m_owner);
-    }
-    else
-#endif // wxUSE_LIBHILDON || wxUSE_LIBHILDON2 /!wxUSE_LIBHILDON && !wxUSE_LIBHILDON2
     {
         // This doesn't have much effect right now.
         menu->SetTitle( title );
@@ -732,12 +684,16 @@ void wxMenuItem::Check( bool check )
     if (check == m_isChecked)
         return;
 
-    wxMenuItemBase::Check( check );
-
     switch ( GetKind() )
     {
-        case wxITEM_CHECK:
         case wxITEM_RADIO:
+            // It doesn't make sense to uncheck a radio item.
+            if ( !check )
+                return;
+
+            wxFALLTHROUGH;
+        case wxITEM_CHECK:
+            wxMenuItemBase::Check( check );
             gtk_check_menu_item_set_active( (GtkCheckMenuItem*)m_menuItem, (gint)check );
             break;
 
@@ -854,7 +810,7 @@ wxMenu::~wxMenu()
     g_object_unref(m_accel);
 }
 
-void wxMenu::SetLayoutDirection(const wxLayoutDirection dir)
+void wxMenu::SetLayoutDirection(wxLayoutDirection dir)
 {
     if ( m_owner )
         wxWindow::GTKSetLayout(m_owner, dir);

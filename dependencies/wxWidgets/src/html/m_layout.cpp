@@ -25,11 +25,7 @@
 
 FORCE_LINK_ME(m_layout)
 
-#ifdef __WXWINCE__
-    #include "wx/msw/wince/missing.h"       // for bsearch()
-#else
-    #include <stdlib.h>                     // bsearch()
-#endif
+#include <stdlib.h>                     // bsearch()
 
 //-----------------------------------------------------------------------------
 // wxHtmlPageBreakCell
@@ -71,12 +67,12 @@ public:
 
     bool AdjustPagebreak(int* pagebreak,
                          const wxArrayInt& known_pagebreaks,
-                         int pageHeight) const;
+                         int pageHeight) const wxOVERRIDE;
 
     void Draw(wxDC& WXUNUSED(dc),
               int WXUNUSED(x), int WXUNUSED(y),
               int WXUNUSED(view_y1), int WXUNUSED(view_y2),
-              wxHtmlRenderingInfo& WXUNUSED(info)) {}
+              wxHtmlRenderingInfo& WXUNUSED(info)) wxOVERRIDE {}
 
 private:
     wxDECLARE_NO_COPY_CLASS(wxHtmlPageBreakCell);
@@ -406,7 +402,7 @@ TAG_HANDLER_BEGIN(SUBSUP, "SUB,SUP")
 
         m_WParser->SetScriptMode(issub ? wxHTML_SCRIPT_SUB : wxHTML_SCRIPT_SUP);
         m_WParser->SetScriptBaseline(
-                oldbase + c ? c->GetScriptBaseline() : 0);
+                oldbase + (c ? c->GetScriptBaseline() : 0));
 
         // select smaller font
         m_WParser->SetFontSize(m_WParser->GetFontSize()-2);

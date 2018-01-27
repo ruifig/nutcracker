@@ -107,7 +107,7 @@ private:
                  m_child2,
                  m_grandchild;
 
-    DECLARE_NO_COPY_CLASS(TreeCtrlTestCase)
+    wxDECLARE_NO_COPY_CLASS(TreeCtrlTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -513,7 +513,6 @@ void TreeCtrlTestCase::AssignImageList()
 
 void TreeCtrlTestCase::Focus()
 {
-#if !defined(__WXGTK__) && !defined(__WXOSX__)
     m_tree->SetFocusedItem(m_child1);
 
     CPPUNIT_ASSERT_EQUAL(m_child1, m_tree->GetFocusedItem());
@@ -521,7 +520,6 @@ void TreeCtrlTestCase::Focus()
     m_tree->ClearFocusedItem();
 
     CPPUNIT_ASSERT(!m_tree->GetFocusedItem());
-#endif
 }
 
 void TreeCtrlTestCase::Bold()
@@ -589,7 +587,12 @@ void TreeCtrlTestCase::KeyNavigation()
 
     CPPUNIT_ASSERT(m_tree->IsExpanded(m_root));
 
+#ifdef wxHAS_GENERIC_TREECTRL
+    sim.Char('-');
+#else
     sim.Char(WXK_LEFT);
+#endif
+
     wxYield();
 
     CPPUNIT_ASSERT(!m_tree->IsExpanded(m_root));

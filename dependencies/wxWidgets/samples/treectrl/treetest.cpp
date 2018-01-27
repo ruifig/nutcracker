@@ -188,7 +188,7 @@ wxBEGIN_EVENT_TABLE(MyTreeCtrl, wxTreeCtrl)
     EVT_RIGHT_DCLICK(MyTreeCtrl::OnRMouseDClick)
 wxEND_EVENT_TABLE()
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
@@ -431,7 +431,7 @@ void MyFrame::OnIdle(wxIdleEvent& event)
         wxString status;
         if (idRoot.IsOk())
         {
-            wxTreeItemId idLast = m_treeCtrl->GetLastChild(idRoot);
+            wxTreeItemId idLast = m_treeCtrl->GetLastTreeITem();
             status = wxString::Format(
                 wxT("Root/last item is %svisible/%svisible"),
                 m_treeCtrl->IsVisible(idRoot) ? wxT("") : wxT("not "),
@@ -758,7 +758,12 @@ void MyFrame::OnCollapseAndReset(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnEnsureVisible(wxCommandEvent& WXUNUSED(event))
 {
-    m_treeCtrl->DoEnsureVisible();
+    const wxTreeItemId
+        idLast = m_treeCtrl->GetLastTreeITem();
+    if ( idLast.IsOk() )
+        m_treeCtrl->EnsureVisible(idLast);
+    else
+        wxLogMessage("No last item");
 }
 
 void MyFrame::OnSetFocus(wxCommandEvent& WXUNUSED(event))
@@ -902,16 +907,7 @@ void MyFrame::OnScrollTo(wxCommandEvent& WXUNUSED(event))
 
 void MyFrame::OnSelectLast(wxCommandEvent& WXUNUSED(event))
 {
-    // select the very last item of the tree
-    wxTreeItemId item = m_treeCtrl->GetRootItem();
-    for ( ;; )
-    {
-        wxTreeItemId itemChild = m_treeCtrl->GetLastChild(item);
-        if ( !itemChild.IsOk() )
-            break;
-
-        item = itemChild;
-    }
+    wxTreeItemId item = m_treeCtrl->GetLastTreeITem();
 
     CHECK_ITEM( item );
 
@@ -934,9 +930,9 @@ void MyFrame::OnSetBgColour(wxCommandEvent& WXUNUSED(event))
 
 // MyTreeCtrl implementation
 #if USE_GENERIC_TREECTRL
-IMPLEMENT_DYNAMIC_CLASS(MyTreeCtrl, wxGenericTreeCtrl)
+wxIMPLEMENT_DYNAMIC_CLASS(MyTreeCtrl, wxGenericTreeCtrl);
 #else
-IMPLEMENT_DYNAMIC_CLASS(MyTreeCtrl, wxTreeCtrl)
+wxIMPLEMENT_DYNAMIC_CLASS(MyTreeCtrl, wxTreeCtrl);
 #endif
 
 MyTreeCtrl::MyTreeCtrl(wxWindow *parent, const wxWindowID id,
@@ -1167,12 +1163,6 @@ void MyTreeCtrl::AddItemsRecursively(const wxTreeItemId& idParent,
                              wxTreeItemIcon_Expanded);
             }
 
-            // remember the last child for OnEnsureVisible()
-            if ( !hasChildren && n == numChildren - 1 )
-            {
-                m_lastItem = id;
-            }
-
             AddItemsRecursively(id, numChildren, depth - 1, n + 1);
         }
     }
@@ -1209,6 +1199,21 @@ void MyTreeCtrl::AddTestItemsToTree(size_t numChildren,
         SetItemTextColour(id, *wxRED);
         SetItemBackgroundColour(id, *wxLIGHT_GREY);
     }
+}
+
+wxTreeItemId MyTreeCtrl::GetLastTreeITem() const
+{
+    wxTreeItemId item = GetRootItem();
+    for ( ;; )
+    {
+        wxTreeItemId itemChild = GetLastChild(item);
+        if ( !itemChild.IsOk() )
+            break;
+
+        item = itemChild;
+    }
+
+    return item;
 }
 
 void MyTreeCtrl::GetItemsRecursively(const wxTreeItemId& idParent,
@@ -1307,7 +1312,6 @@ void MyTreeCtrl::LogEvent(const wxChar *name, const wxTreeEvent& event)
 void MyTreeCtrl::name(wxTreeEvent& event)                        \
 {                                                                \
     LogEvent(wxT(#name), event);                                  \
-    SetLastItem(wxTreeItemId());                                 \
     event.Skip();                                                \
 }
 
@@ -1428,6 +1432,23 @@ void LogKeyEvent(const wxChar *name, const wxKeyEvent& event)
             case WXK_NUMPAD_SEPARATOR: key = wxT("NUMPAD_SEPARATOR"); break;
             case WXK_NUMPAD_SUBTRACT: key = wxT("NUMPAD_SUBTRACT"); break;
             case WXK_NUMPAD_DECIMAL: key = wxT("NUMPAD_DECIMAL"); break;
+            case WXK_BROWSER_BACK: key = wxT("BROWSER_BACK"); break;
+            case WXK_BROWSER_FORWARD: key = wxT("BROWSER_FORWARD"); break;
+            case WXK_BROWSER_REFRESH: key = wxT("BROWSER_REFRESH"); break;
+            case WXK_BROWSER_STOP: key = wxT("BROWSER_STOP"); break;
+            case WXK_BROWSER_SEARCH: key = wxT("BROWSER_SEARCH"); break;
+            case WXK_BROWSER_FAVORITES: key = wxT("BROWSER_FAVORITES"); break;
+            case WXK_BROWSER_HOME: key = wxT("BROWSER_HOME"); break;
+            case WXK_VOLUME_MUTE: key = wxT("VOLUME_MUTE"); break;
+            case WXK_VOLUME_DOWN: key = wxT("VOLUME_DOWN"); break;
+            case WXK_VOLUME_UP: key = wxT("VOLUME_UP"); break;
+            case WXK_MEDIA_NEXT_TRACK: key = wxT("MEDIA_NEXT_TRACK"); break;
+            case WXK_MEDIA_PREV_TRACK: key = wxT("MEDIA_PREV_TRACK"); break;
+            case WXK_MEDIA_STOP: key = wxT("MEDIA_STOP"); break;
+            case WXK_MEDIA_PLAY_PAUSE: key = wxT("MEDIA_PLAY_PAUSE"); break;
+            case WXK_LAUNCH_MAIL: key = wxT("LAUNCH_MAIL"); break;
+            case WXK_LAUNCH_APP1: key = wxT("LAUNCH_APP1"); break;
+            case WXK_LAUNCH_APP2: key = wxT("LAUNCH_APP2"); break;
 
             default:
             {

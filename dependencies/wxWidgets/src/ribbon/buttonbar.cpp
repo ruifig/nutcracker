@@ -31,10 +31,10 @@
 wxDEFINE_EVENT(wxEVT_RIBBONBUTTONBAR_CLICKED, wxRibbonButtonBarEvent);
 wxDEFINE_EVENT(wxEVT_RIBBONBUTTONBAR_DROPDOWN_CLICKED, wxRibbonButtonBarEvent);
 
-IMPLEMENT_DYNAMIC_CLASS(wxRibbonButtonBarEvent, wxCommandEvent)
-IMPLEMENT_CLASS(wxRibbonButtonBar, wxRibbonControl)
+wxIMPLEMENT_DYNAMIC_CLASS(wxRibbonButtonBarEvent, wxCommandEvent);
+wxIMPLEMENT_CLASS(wxRibbonButtonBar, wxRibbonControl);
 
-BEGIN_EVENT_TABLE(wxRibbonButtonBar, wxRibbonControl)
+wxBEGIN_EVENT_TABLE(wxRibbonButtonBar, wxRibbonControl)
     EVT_ERASE_BACKGROUND(wxRibbonButtonBar::OnEraseBackground)
     EVT_ENTER_WINDOW(wxRibbonButtonBar::OnMouseEnter)
     EVT_LEAVE_WINDOW(wxRibbonButtonBar::OnMouseLeave)
@@ -42,8 +42,9 @@ BEGIN_EVENT_TABLE(wxRibbonButtonBar, wxRibbonControl)
     EVT_PAINT(wxRibbonButtonBar::OnPaint)
     EVT_SIZE(wxRibbonButtonBar::OnSize)
     EVT_LEFT_DOWN(wxRibbonButtonBar::OnMouseDown)
+    EVT_LEFT_DCLICK(wxRibbonButtonBar::OnMouseDown)
     EVT_LEFT_UP(wxRibbonButtonBar::OnMouseUp)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 class wxRibbonButtonBarButtonSizeInfo
 {
@@ -95,12 +96,14 @@ public:
                     *size = wxRIBBON_BUTTONBAR_BUTTON_MEDIUM;
                     break;
                 }
+                wxFALLTHROUGH;
             case wxRIBBON_BUTTONBAR_BUTTON_MEDIUM:
                 if(sizes[wxRIBBON_BUTTONBAR_BUTTON_SMALL].is_supported)
                 {
                     *size = wxRIBBON_BUTTONBAR_BUTTON_SMALL;
                     break;
                 }
+                wxFALLTHROUGH;
             case wxRIBBON_BUTTONBAR_BUTTON_SMALL:
             default:
                 return false;
@@ -515,6 +518,11 @@ bool wxRibbonButtonBar::DeleteButton(int button_id)
         {
             m_layouts_valid = false;
             m_buttons.RemoveAt(i);
+            if (m_hovered_button && m_hovered_button->base == button)
+                m_hovered_button = NULL;
+            if (m_active_button  && m_active_button->base  == button)
+                m_active_button = NULL;
+            delete button;
             Realize();
             Refresh();
             return true;

@@ -183,6 +183,7 @@
         <sources>$(WEBVIEW_SRC)</sources>
         <library>coredll</library>
         <library>basedll</library>
+        <ldlibs>$(EXTRALIBS_WEBVIEW)</ldlibs>
         <msvc-headers>$(WEBVIEW_HDR)</msvc-headers>
     </dll>
 
@@ -305,7 +306,7 @@
     <wxshortcut id="wxaui" cond="MONOLITHIC=='0' and USE_AUI=='1'"/>
 
     <set var="MSVC6PRJ_MERGED_TARGETS_MULTILIB" append="1">aui=auilib+auidll</set>
-    
+
     <!-- ================================================================ -->
     <!--                            RIBBON                                -->
     <!-- ================================================================ -->

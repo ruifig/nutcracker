@@ -391,7 +391,7 @@ public:
 // wxBitmap
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_DYNAMIC_CLASS(wxBitmap, wxBitmapBase)
+wxIMPLEMENT_DYNAMIC_CLASS(wxBitmap, wxBitmapBase);
 
 bool wxBitmap::Create(const wxIDirectFBSurfacePtr& surface)
 {
@@ -420,7 +420,7 @@ bool wxBitmap::CreateWithFormat(int width, int height, int dfbFormat)
 }
 
 #if wxUSE_IMAGE
-wxBitmap::wxBitmap(const wxImage& imageOrig, int depth)
+wxBitmap::wxBitmap(const wxImage& imageOrig, int depth, double WXUNUSED(scale))
 {
     wxCHECK_RET( imageOrig.IsOk(), wxT("invalid image") );
 

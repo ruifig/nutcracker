@@ -35,15 +35,19 @@ public:
 private:
     CPPUNIT_TEST_SUITE( MiscTestCase );
         CPPUNIT_TEST( Assert );
+#ifdef HAVE_VARIADIC_MACROS
+        CPPUNIT_TEST( CallForEach );
+#endif // HAVE_VARIADIC_MACROS
         CPPUNIT_TEST( Delete );
         CPPUNIT_TEST( StaticCast );
     CPPUNIT_TEST_SUITE_END();
 
     void Assert();
+    void CallForEach();
     void Delete();
     void StaticCast();
 
-    DECLARE_NO_COPY_CLASS(MiscTestCase)
+    wxDECLARE_NO_COPY_CLASS(MiscTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -75,6 +79,20 @@ void MiscTestCase::Assert()
     wxSetAssertHandler(oldHandler);
 }
 
+#ifdef HAVE_VARIADIC_MACROS
+void MiscTestCase::CallForEach()
+{
+    #define MY_MACRO(pos, str) s += str;
+
+    wxString s;
+    wxCALL_FOR_EACH(MY_MACRO, "foo", "bar", "baz");
+
+    CPPUNIT_ASSERT_EQUAL( "foobarbaz", s );
+
+    #undef MY_MACRO
+}
+#endif // HAVE_VARIADIC_MACROS
+
 void MiscTestCase::Delete()
 {
     // Allocate some arbitrary memory to get a valid pointer:
@@ -90,7 +108,7 @@ void MiscTestCase::Delete()
     CPPUNIT_ASSERT( array != NULL );
 
     // Check that wxDELETEA sets the pointer to NULL:
-    wxDELETE( array );
+    wxDELETEA( array );
     CPPUNIT_ASSERT( array == NULL );
 
     // this results in compilation error, as it should

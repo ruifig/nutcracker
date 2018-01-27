@@ -22,6 +22,7 @@
 #endif
 
 #include "wx/fontdlg.h"
+#include "wx/numformatter.h"
 
 // -----------------------------------------------------------------------
 
@@ -41,7 +42,7 @@
 // Dummy comparison required by value type implementation.
 bool operator == (const wxFontData&, const wxFontData&)
 {
-    return FALSE;
+    return false;
 }
 
 // Custom version of wxFontProperty that also holds colour in the value.
@@ -49,8 +50,7 @@ bool operator == (const wxFontData&, const wxFontData&)
 
 IMPLEMENT_VARIANT_OBJECT_SHALLOWCMP(wxFontData)
 
-WX_PG_IMPLEMENT_PROPERTY_CLASS(wxFontDataProperty,wxFontProperty,
-                               wxFontData,const wxFontData&,TextCtrlAndButton)
+wxPG_IMPLEMENT_PROPERTY_CLASS(wxFontDataProperty,wxFontProperty,TextCtrlAndButton)
 
 wxFontDataProperty::wxFontDataProperty( const wxString& label, const wxString& name,
    const wxFontData& value ) : wxFontProperty(label,name,value.GetInitialFont())
@@ -58,16 +58,18 @@ wxFontDataProperty::wxFontDataProperty( const wxString& label, const wxString& n
     wxFontData fontData(value);
 
     // Fix value.
-    fontData.SetChosenFont(value.GetInitialFont());
+    wxFont font;
+    font << m_value;  // Get font data from base object.
+    fontData.SetChosenFont(font);
     if ( !fontData.GetColour().IsOk() )
         fontData.SetColour(*wxBLACK);
 
     // Set initial value - should be done in a simpler way like this
     // (instead of calling SetValue) in derived (wxObject) properties.
-    m_value_wxFontData << value;
+    m_value_wxFontData << fontData;
 
     // Add extra children.
-    AddPrivateChild( new wxColourProperty(_("Colour"), wxPG_LABEL,
+    AddPrivateChild( new wxColourProperty(wxT("Colour"), wxPG_LABEL,
                                           fontData.GetColour() ) );
 }
 
@@ -75,9 +77,9 @@ wxFontDataProperty::~wxFontDataProperty () { }
 
 void wxFontDataProperty::OnSetValue()
 {
-    if ( m_value.GetType() != "wxFontData" )
+    if ( !m_value.IsType(wxT("wxFontData")) )
     {
-        if ( m_value.GetType() == "wxFont" )
+        if ( m_value.IsType(wxT("wxFont")) )
         {
             wxFont font;
             font << m_value;
@@ -99,7 +101,7 @@ void wxFontDataProperty::OnSetValue()
         }
         else
         {
-            wxFAIL_MSG(wxT("Value to wxFontDataProperty must be eithe wxFontData or wxFont"));
+            wxFAIL_MSG(wxT("Value to wxFontDataProperty must be either wxFontData or wxFont"));
         }
     }
     else
@@ -113,7 +115,7 @@ void wxFontDataProperty::OnSetValue()
 
         wxFont font = fontData.GetChosenFont();
         if ( !font.IsOk() )
-            font = wxFont(10,wxSWISS,wxNORMAL,wxNORMAL);
+            font = wxFontInfo(10).Family(wxFONTFAMILY_SWISS);
 
         m_value = WXVARIANT(font);
     }
@@ -179,7 +181,7 @@ wxVariant wxFontDataProperty::ChildChanged( wxVariant& thisValue,
             // Transfer from subset to superset.
             wxFont font = fontData.GetChosenFont();
             variant = WXVARIANT(font);
-            wxFontProperty::ChildChanged( variant, childIndex, childValue );
+            variant = wxFontProperty::ChildChanged( variant, childIndex, childValue );
             font << variant;
             fontData.SetChosenFont(font);
     }
@@ -193,8 +195,7 @@ wxVariant wxFontDataProperty::ChildChanged( wxVariant& thisValue,
 // wxSizeProperty
 // -----------------------------------------------------------------------
 
-WX_PG_IMPLEMENT_PROPERTY_CLASS(wxSizeProperty,wxPGProperty,
-                               wxSize,const wxSize&,TextCtrl)
+wxPG_IMPLEMENT_PROPERTY_CLASS(wxSizeProperty,wxPGProperty,TextCtrl)
 
 wxSizeProperty::wxSizeProperty( const wxString& label, const wxString& name,
     const wxSize& value) : wxPGProperty(label,name)
@@ -234,8 +235,7 @@ wxVariant wxSizeProperty::ChildChanged( wxVariant& thisValue,
 // wxPointProperty
 // -----------------------------------------------------------------------
 
-WX_PG_IMPLEMENT_PROPERTY_CLASS(wxPointProperty,wxPGProperty,
-                               wxPoint,const wxPoint&,TextCtrl)
+wxPG_IMPLEMENT_PROPERTY_CLASS(wxPointProperty,wxPGProperty,TextCtrl)
 
 wxPointProperty::wxPointProperty( const wxString& label, const wxString& name,
     const wxPoint& value) : wxPGProperty(label,name)
@@ -277,7 +277,7 @@ wxVariant wxPointProperty::ChildChanged( wxVariant& thisValue,
 // -----------------------------------------------------------------------
 
 WX_PG_IMPLEMENT_ARRAYSTRING_PROPERTY_WITH_VALIDATOR(wxDirsProperty, ',',
-                                                    "Browse")
+                                                    wxT("Browse"))
 
 #if wxUSE_VALIDATORS
 
@@ -292,16 +292,16 @@ wxValidator* wxDirsProperty::DoGetValidator() const
 bool wxDirsProperty::OnCustomStringEdit( wxWindow* parent, wxString& value )
 {
     wxDirDialog dlg(parent,
-                    _("Select a directory to be added to the list:"),
+                    wxT("Select a directory to be added to the list:"),
                     value,
                     0);
 
     if ( dlg.ShowModal() == wxID_OK )
     {
         value = dlg.GetPath();
-        return TRUE;
+        return true;
     }
-    return FALSE;
+    return false;
 }
 
 // -----------------------------------------------------------------------
@@ -343,32 +343,27 @@ public:
     void SetPrecision ( int precision )
     {
         m_precision = precision;
-        m_dtoaTemplate.Empty();
     }
 
 protected:
     // Mandatory array of type
     wxArrayDouble   m_array;
 
-    // Use this to avoid extra wxString creation+Printf
-    // on double-to-wxString conversion.
-    wxString        m_dtoaTemplate;
-
     int             m_precision;
 
     // Mandatory overridden methods
-    virtual wxString ArrayGet( size_t index );
-    virtual size_t ArrayGetCount();
-    virtual bool ArrayInsert( const wxString& str, int index );
-    virtual bool ArraySet( size_t index, const wxString& str );
-    virtual void ArrayRemoveAt( int index );
-    virtual void ArraySwap( size_t first, size_t second );
+    virtual wxString ArrayGet( size_t index ) wxOVERRIDE;
+    virtual size_t ArrayGetCount() wxOVERRIDE;
+    virtual bool ArrayInsert( const wxString& str, int index ) wxOVERRIDE;
+    virtual bool ArraySet( size_t index, const wxString& str ) wxOVERRIDE;
+    virtual void ArrayRemoveAt( int index ) wxOVERRIDE;
+    virtual void ArraySwap( size_t first, size_t second ) wxOVERRIDE;
 
 private:
     wxDECLARE_DYNAMIC_CLASS_NO_COPY(wxArrayDoubleEditorDialog);
 };
 
-IMPLEMENT_DYNAMIC_CLASS(wxArrayDoubleEditorDialog, wxPGArrayEditorDialog)
+wxIMPLEMENT_DYNAMIC_CLASS(wxArrayDoubleEditorDialog, wxPGArrayEditorDialog);
 
 //
 // Array dialog array access and manipulation
@@ -376,9 +371,8 @@ IMPLEMENT_DYNAMIC_CLASS(wxArrayDoubleEditorDialog, wxPGArrayEditorDialog)
 
 wxString wxArrayDoubleEditorDialog::ArrayGet( size_t index )
 {
-    wxString str;
-    wxPropertyGrid::DoubleToString(str,m_array[index],m_precision,true,&m_dtoaTemplate);
-    return str;
+    return wxNumberFormatter::ToString(
+        m_array[index], m_precision, wxNumberFormatter::Style_NoTrailingZeroes);
 }
 
 size_t wxArrayDoubleEditorDialog::ArrayGetCount()
@@ -390,22 +384,22 @@ bool wxArrayDoubleEditorDialog::ArrayInsert( const wxString& str, int index )
 {
     double d;
     if ( !str.ToDouble(&d) )
-        return FALSE;
+        return false;
 
     if (index<0)
         m_array.Add(d);
     else
         m_array.Insert(d,index);
-    return TRUE;
+    return true;
 }
 
 bool wxArrayDoubleEditorDialog::ArraySet( size_t index, const wxString& str )
 {
     double d;
     if ( !str.ToDouble(&d) )
-        return FALSE;
+        return false;
     m_array[index] = d;
-    return TRUE;
+    return true;
 }
 
 void wxArrayDoubleEditorDialog::ArrayRemoveAt( int index )
@@ -415,10 +409,7 @@ void wxArrayDoubleEditorDialog::ArrayRemoveAt( int index )
 
 void wxArrayDoubleEditorDialog::ArraySwap( size_t first, size_t second )
 {
-    double a = m_array[first];
-    double b = m_array[second];
-    m_array[first] = b;
-    m_array[second] = a;
+    wxSwap(m_array[first], m_array[second]);
 }
 
 //
@@ -474,7 +465,7 @@ bool wxArrayDoubleEditorDialog::Create(wxWindow *parent,
 bool operator == (const wxArrayDouble& a, const wxArrayDouble& b)
 {
     if ( a.GetCount() != b.GetCount() )
-        return FALSE;
+        return false;
 
     size_t i;
 
@@ -484,19 +475,17 @@ bool operator == (const wxArrayDouble& a, const wxArrayDouble& b)
         if ( fabs(a[i] - b[i]) > 0.0000000001 )
         {
             //wxLogDebug(wxT("%f != %f"),a[i],b[i]);
-            return FALSE;
+            return false;
         }
     }
-    return TRUE;
+    return true;
 }
 
 WX_PG_IMPLEMENT_VARIANT_DATA_DUMMY_EQ(wxArrayDouble)
 
-WX_PG_IMPLEMENT_PROPERTY_CLASS(wxArrayDoubleProperty,
-                               wxPGProperty,
-                               wxArrayDouble,
-                               const wxArrayDouble&,
-                               TextCtrlAndButton)
+wxPG_IMPLEMENT_PROPERTY_CLASS(wxArrayDoubleProperty,
+                              wxPGProperty,
+                              TextCtrlAndButton)
 
 
 wxArrayDoubleProperty::wxArrayDoubleProperty (const wxString& label,
@@ -508,7 +497,7 @@ wxArrayDoubleProperty::wxArrayDoubleProperty (const wxString& label,
 
     //
     // Need to figure out delimiter needed for this locale
-    // (ie. can't use comma when comma acts as decimal point in float).
+    // (i.e. can't use comma when comma acts as decimal point in float).
     wxChar use_delimiter = wxT(',');
 
     if (wxString::Format(wxT("%.2f"),12.34).Find(use_delimiter) >= 0)
@@ -551,8 +540,6 @@ wxString wxArrayDoubleProperty::ValueToString( wxVariant& value,
 
 void wxArrayDoubleProperty::GenerateValueAsString( wxString& target, int prec, bool removeZeroes ) const
 {
-    wxString s;
-    wxString template_str;
     wxChar between[3] = wxT(", ");
     size_t i;
 
@@ -561,13 +548,13 @@ void wxArrayDoubleProperty::GenerateValueAsString( wxString& target, int prec, b
     target.Empty();
 
     const wxArrayDouble& value = wxArrayDoubleRefFromVariant(m_value);
+    wxNumberFormatter::Style style = wxNumberFormatter::Style_None;
+    if (removeZeroes)
+        style = wxNumberFormatter::Style_NoTrailingZeroes;
 
     for ( i=0; i<value.GetCount(); i++ )
     {
-
-        wxPropertyGrid::DoubleToString(s,value[i],prec,removeZeroes,&template_str);
-
-        target += s;
+        target += wxNumberFormatter::ToString(value[i], prec, style);
 
         if ( i<(value.GetCount()-1) )
             target += between;
@@ -605,8 +592,6 @@ bool wxArrayDoubleProperty::OnEvent( wxPropertyGrid* propgrid,
 
 bool wxArrayDoubleProperty::StringToValue( wxVariant& variant, const wxString& text, int ) const
 {
-    double tval;
-    wxString tstr;
     // Add values to a temporary array so that in case
     // of error we can opt not to use them.
     wxArrayDouble new_array;
@@ -619,27 +604,25 @@ bool wxArrayDoubleProperty::StringToValue( wxVariant& variant, const wxString& t
 
         if ( !token.empty() )
         {
-
+            double tval;
             // If token was invalid, exit the loop now
             if ( !token.ToDouble(&tval) )
             {
-                tstr.Printf ( _("\"%s\" is not a floating-point number."), token.c_str() );
                 ok = false;
                 break;
             }
-            // TODO: Put validator code here
 
             new_array.Add(tval);
-
         }
 
     WX_PG_TOKENIZER1_END()
 
-    // When invalid token found, show error message and don't change anything
+    // When invalid token found signal the error
+    // by returning pending value of non-wxArrayDouble type.
     if ( !ok )
     {
-        //ShowError( tstr );
-        return false;
+        variant = (long)0;
+        return true;
     }
 
     if ( !(wxArrayDoubleRefFromVariant(m_value) == new_array) )
@@ -662,3 +645,36 @@ bool wxArrayDoubleProperty::DoSetAttribute( const wxString& name, wxVariant& val
     return false;
 }
 
+wxValidator* wxArrayDoubleProperty::DoGetValidator() const
+{
+#if wxUSE_VALIDATORS
+    WX_PG_DOGETVALIDATOR_ENTRY()
+
+    wxTextValidator* validator = new wxTextValidator(wxFILTER_INCLUDE_CHAR_LIST);
+
+    // Accept characters for numeric elements
+    wxNumericPropertyValidator numValidator(wxNumericPropertyValidator::Float);
+    wxArrayString incChars(numValidator.GetIncludes());
+    // Accept also a delimiter and space character
+    incChars.Add(m_delimiter);
+    incChars.Add(wxT(" "));
+
+    validator->SetIncludes(incChars);
+
+    WX_PG_DOGETVALIDATOR_EXIT(validator)
+#else
+    return NULL;
+#endif
+}
+
+bool wxArrayDoubleProperty::ValidateValue(wxVariant& value,
+                                 wxPGValidationInfo& validationInfo) const
+{
+    if (!value.IsType(wxT("wxArrayDouble")))
+    {
+        validationInfo.SetFailureMessage(wxT("At least one element is not a valid floating-point number."));
+        return false;
+    }
+
+    return true;
+}

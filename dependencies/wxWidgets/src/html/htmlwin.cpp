@@ -39,8 +39,8 @@
 //#define DEBUG_HTML_SELECTION
 
 // HTML events:
-IMPLEMENT_DYNAMIC_CLASS(wxHtmlLinkEvent, wxCommandEvent)
-IMPLEMENT_DYNAMIC_CLASS(wxHtmlCellEvent, wxCommandEvent)
+wxIMPLEMENT_DYNAMIC_CLASS(wxHtmlLinkEvent, wxCommandEvent);
+wxIMPLEMENT_DYNAMIC_CLASS(wxHtmlCellEvent, wxCommandEvent);
 
 wxDEFINE_EVENT( wxEVT_HTML_CELL_CLICKED, wxHtmlCellEvent );
 wxDEFINE_EVENT( wxEVT_HTML_CELL_HOVER, wxHtmlCellEvent );
@@ -66,7 +66,7 @@ public:
         m_orient = orient;
     }
 
-    virtual void Notify();
+    virtual void Notify() wxOVERRIDE;
 
 private:
     wxScrolledWindow *m_win;
@@ -286,6 +286,7 @@ wxHtmlFilter *wxHtmlWindow::m_DefaultFilter = NULL;
 wxHtmlProcessorList *wxHtmlWindow::m_GlobalProcessors = NULL;
 wxCursor *wxHtmlWindow::ms_cursorLink = NULL;
 wxCursor *wxHtmlWindow::ms_cursorText = NULL;
+wxCursor *wxHtmlWindow::ms_cursorDefault = NULL;
 
 void wxHtmlWindow::CleanUpStatics()
 {
@@ -296,6 +297,7 @@ void wxHtmlWindow::CleanUpStatics()
     wxDELETE(m_GlobalProcessors);
     wxDELETE(ms_cursorLink);
     wxDELETE(ms_cursorText);
+    wxDELETE(ms_cursorDefault);
 }
 
 void wxHtmlWindow::Init()
@@ -381,6 +383,14 @@ void wxHtmlWindow::SetRelatedFrame(wxFrame* frame, const wxString& format)
 {
     m_RelatedFrame = frame;
     m_TitleFormat = format;
+
+    // Check if the format provided can actually be used: it's more
+    // user-friendly to do it here and now rather than triggering the same
+    // assert much later when it's really used.
+
+    // If you get an assert here, it means that the title doesn't contain
+    // exactly one "%s" format specifier, which is an error in the caller.
+    wxString::Format(m_TitleFormat, wxString());
 }
 
 
@@ -475,7 +485,12 @@ bool wxHtmlWindow::DoSetPage(const wxString& source)
     SetBackgroundColour(wxColour(0xFF, 0xFF, 0xFF));
     SetBackgroundImage(wxNullBitmap);
 
-    m_Parser->SetDC(&dc);
+    double pixelScale = 1.0;
+#ifndef wxHAVE_DPI_INDEPENDENT_PIXELS
+    pixelScale = GetContentScaleFactor();
+#endif
+
+    m_Parser->SetDC(&dc, pixelScale, 1.0);
 
     // notice that it's important to set m_Cell to NULL here before calling
     // Parse() below, even if it will be overwritten by its return value as
@@ -1138,6 +1153,10 @@ void wxHtmlWindow::OnPaint(wxPaintEvent& WXUNUSED(event))
     const wxRect rect = GetUpdateRegion().GetBox();
     const wxSize sz = GetClientSize();
 
+    // Don't bother drawing the empty window.
+    if ( sz.x == 0 || sz.y == 0 )
+        return;
+
     // set up the DC we're drawing on: if the window is already double buffered
     // we do it directly on wxPaintDC, otherwise we allocate a backing store
     // buffer and compose the drawing there and then blit it to screen all at
@@ -1673,7 +1692,7 @@ void wxHtmlWindow::SelectAll()
 
 
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlProcessor,wxObject)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlProcessor, wxObject);
 
 wxBEGIN_PROPERTIES_TABLE(wxHtmlWindow)
 /*
@@ -1690,9 +1709,9 @@ wxEND_HANDLERS_TABLE()
 
 wxCONSTRUCTOR_5( wxHtmlWindow , wxWindow* , Parent , wxWindowID , Id , wxPoint , Position , wxSize , Size , long , WindowStyle )
 
-wxIMPLEMENT_DYNAMIC_CLASS_XTI(wxHtmlWindow, wxScrolledWindow,"wx/html/htmlwin.h")
+wxIMPLEMENT_DYNAMIC_CLASS_XTI(wxHtmlWindow, wxScrolledWindow, "wx/html/htmlwin.h");
 
-BEGIN_EVENT_TABLE(wxHtmlWindow, wxScrolledWindow)
+wxBEGIN_EVENT_TABLE(wxHtmlWindow, wxScrolledWindow)
     EVT_SIZE(wxHtmlWindow::OnSize)
     EVT_LEFT_DOWN(wxHtmlWindow::OnMouseDown)
     EVT_LEFT_UP(wxHtmlWindow::OnMouseUp)
@@ -1709,7 +1728,7 @@ BEGIN_EVENT_TABLE(wxHtmlWindow, wxScrolledWindow)
     EVT_MENU(wxID_COPY, wxHtmlWindow::OnCopy)
     EVT_TEXT_COPY(wxID_ANY, wxHtmlWindow::OnClipboardEvent)
 #endif // wxUSE_CLIPBOARD
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 //-----------------------------------------------------------------------------
 // wxHtmlWindowInterface implementation in wxHtmlWindow
@@ -1794,7 +1813,9 @@ wxCursor wxHtmlWindow::GetDefaultHTMLCursor(HTMLCursor type)
 
         case HTMLCursor_Default:
         default:
-            return *wxSTANDARD_CURSOR;
+            if ( !ms_cursorDefault )
+                ms_cursorDefault = new wxCursor(wxCURSOR_ARROW);
+            return *ms_cursorDefault;
     }
 }
 
@@ -1803,6 +1824,27 @@ wxCursor wxHtmlWindow::GetHTMLCursor(HTMLCursor type) const
     return GetDefaultHTMLCursor(type);
 }
 
+/*static*/
+void wxHtmlWindow::SetDefaultHTMLCursor(HTMLCursor type, const wxCursor& cursor)
+{
+    switch (type)
+    {
+        case HTMLCursor_Link:
+            delete ms_cursorLink;
+            ms_cursorLink = new wxCursor(cursor);
+            return;
+
+        case HTMLCursor_Text:
+            delete ms_cursorText;
+            ms_cursorText = new wxCursor(cursor);
+            return;
+
+        case HTMLCursor_Default:
+        default:
+            delete ms_cursorText;
+            ms_cursorDefault = new wxCursor(cursor);
+    }
+}
 
 //-----------------------------------------------------------------------------
 // wxHtmlWinModule
@@ -1814,14 +1856,14 @@ wxCursor wxHtmlWindow::GetHTMLCursor(HTMLCursor type) const
 
 class wxHtmlWinModule: public wxModule
 {
-DECLARE_DYNAMIC_CLASS(wxHtmlWinModule)
+    wxDECLARE_DYNAMIC_CLASS(wxHtmlWinModule);
 public:
     wxHtmlWinModule() : wxModule() {}
-    bool OnInit() { return true; }
-    void OnExit() { wxHtmlWindow::CleanUpStatics(); }
+    bool OnInit() wxOVERRIDE { return true; }
+    void OnExit() wxOVERRIDE { wxHtmlWindow::CleanUpStatics(); }
 };
 
-IMPLEMENT_DYNAMIC_CLASS(wxHtmlWinModule, wxModule)
+wxIMPLEMENT_DYNAMIC_CLASS(wxHtmlWinModule, wxModule);
 
 
 // This hack forces the linker to always link in m_* files

@@ -20,7 +20,7 @@
 #endif
 
 // define wxHAVE_U_ESCAPE if the compiler supports \uxxxx character constants
-#if (defined(__VISUALC__) && (__VISUALC__ >= 1300)) || \
+#if defined(__VISUALC__) || \
     (defined(__GNUC__) && (__GNUC__ >= 3))
     #define wxHAVE_U_ESCAPE
 
@@ -78,14 +78,19 @@ public:
 #if wxDEBUG_LEVEL
     // some old cppunit versions don't define CPPUNIT_ASSERT_THROW so roll our
     // own
-    #define WX_ASSERT_FAILS_WITH_ASSERT(cond) \
-        { \
+    #define WX_ASSERT_FAILS_WITH_ASSERT_MESSAGE(msg, code) \
+        wxSTATEMENT_MACRO_BEGIN \
             bool throwsAssert = false; \
-            try { cond ; } \
+            try { code ; } \
             catch ( const TestAssertFailure& ) { throwsAssert = true; } \
             if ( !throwsAssert ) \
-                CPPUNIT_FAIL("expected assertion not generated"); \
-        }
+                CPPUNIT_FAIL(msg); \
+        wxSTATEMENT_MACRO_END
+
+    #define WX_ASSERT_FAILS_WITH_ASSERT(code) \
+        WX_ASSERT_FAILS_WITH_ASSERT_MESSAGE( \
+            "expected assertion not generated", code)
+
 #else
     // there are no assertions in this build so we can't do anything (we used
     // to check that the condition failed but this didn't work well as in

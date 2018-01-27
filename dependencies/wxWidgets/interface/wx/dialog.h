@@ -126,7 +126,7 @@ enum wxDialogLayoutAdaptationMode
            calling SetExtraStyle() before Create is called (two-step
            construction).
     @style{wxDIALOG_EX_METAL}
-           On Mac OS X, frames with this style will be shown with a metallic
+           On OS X, frames with this style will be shown with a metallic
            look. This is an extra style.
     @endStyleTable
 
@@ -303,17 +303,6 @@ public:
         @see @ref overview_dialog_autoscrolling (for more on layout adaptation)
     */
     virtual bool DoLayoutAdaptation();
-
-    /**
-        This function is called when the titlebar OK button is pressed
-        (PocketPC only). A command event for the identifier returned by
-        GetAffirmativeId() is sent by default. You can override this function.
-        If the function returns @false, wxWidgets will call Close() for the
-        dialog.
-
-        @onlyfor{wxmsw}
-    */
-    virtual bool DoOK();
 
     /**
         A static function enabling or disabling layout adaptation for all

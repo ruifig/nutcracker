@@ -32,7 +32,6 @@
 #include "wx/fontutil.h"
 #include "wx/dynlib.h"
 #include "wx/paper.h"
-#include "wx/scopeguard.h"
 #include "wx/modalhook.h"
 
 #include <gtk/gtk.h>
@@ -234,11 +233,11 @@ public:
     wxGtkPrintModule()
     {
     }
-    bool OnInit();
-    void OnExit() {}
+    bool OnInit() wxOVERRIDE;
+    void OnExit() wxOVERRIDE {}
 
 private:
-    DECLARE_DYNAMIC_CLASS(wxGtkPrintModule)
+    wxDECLARE_DYNAMIC_CLASS(wxGtkPrintModule);
 };
 
 bool wxGtkPrintModule::OnInit()
@@ -252,7 +251,7 @@ bool wxGtkPrintModule::OnInit()
     return true;
 }
 
-IMPLEMENT_DYNAMIC_CLASS(wxGtkPrintModule, wxModule)
+wxIMPLEMENT_DYNAMIC_CLASS(wxGtkPrintModule, wxModule);
 
 //----------------------------------------------------------------------------
 // wxGtkPrintFactory
@@ -386,7 +385,7 @@ extern "C"
 // wxGtkPrintNativeData
 //----------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(wxGtkPrintNativeData, wxPrintNativeDataBase)
+wxIMPLEMENT_CLASS(wxGtkPrintNativeData, wxPrintNativeDataBase);
 
 wxGtkPrintNativeData::wxGtkPrintNativeData()
 {
@@ -599,7 +598,7 @@ void wxGtkPrintNativeData::SetPageSetupToSettings(GtkPrintSettings* settings, Gt
 // wxGtkPrintDialog
 //----------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(wxGtkPrintDialog, wxPrintDialogBase)
+wxIMPLEMENT_CLASS(wxGtkPrintDialog, wxPrintDialogBase);
 
 wxGtkPrintDialog::wxGtkPrintDialog( wxWindow *parent, wxPrintDialogData *data )
                     : wxPrintDialogBase(parent, wxID_ANY, _("Print"),
@@ -612,6 +611,11 @@ wxGtkPrintDialog::wxGtkPrintDialog( wxWindow *parent, wxPrintDialogData *data )
 
     m_parent = parent;
     SetShowDialog(true);
+
+    const wxPrintData& printData = m_printDialogData.GetPrintData();
+    wxGtkPrintNativeData* native =
+        static_cast<wxGtkPrintNativeData*>(printData.GetNativeData());
+    native->SetPrintJob(gtk_print_operation_new());
 }
 
 wxGtkPrintDialog::wxGtkPrintDialog( wxWindow *parent, wxPrintData *data )
@@ -625,11 +629,22 @@ wxGtkPrintDialog::wxGtkPrintDialog( wxWindow *parent, wxPrintData *data )
 
     m_parent = parent;
     SetShowDialog(true);
+
+    const wxPrintData& printData = m_printDialogData.GetPrintData();
+    wxGtkPrintNativeData* native =
+        static_cast<wxGtkPrintNativeData*>(printData.GetNativeData());
+    native->SetPrintJob(gtk_print_operation_new());
 }
 
 
 wxGtkPrintDialog::~wxGtkPrintDialog()
 {
+    const wxPrintData& printData = m_printDialogData.GetPrintData();
+    wxGtkPrintNativeData* native =
+        static_cast<wxGtkPrintNativeData*>(printData.GetNativeData());
+    GtkPrintOperation* printOp = native->GetPrintJob();
+    g_object_unref(printOp);
+    native->SetPrintJob(NULL);
 }
 
 // This is called even if we actually don't want the dialog to appear.
@@ -744,7 +759,7 @@ int wxGtkPrintDialog::ShowModal()
 // wxGtkPageSetupDialog
 //----------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(wxGtkPageSetupDialog, wxPageSetupDialogBase)
+wxIMPLEMENT_CLASS(wxGtkPageSetupDialog, wxPageSetupDialogBase);
 
 wxGtkPageSetupDialog::wxGtkPageSetupDialog( wxWindow *parent,
                             wxPageSetupDialogData* data )
@@ -866,7 +881,7 @@ int wxGtkPageSetupDialog::ShowModal()
 // wxGtkPrinter
 //----------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(wxGtkPrinter, wxPrinterBase)
+wxIMPLEMENT_CLASS(wxGtkPrinter, wxPrinterBase);
 
 wxGtkPrinter::wxGtkPrinter( wxPrintDialogData *data ) :
     wxPrinterBase( data )
@@ -921,10 +936,9 @@ bool wxGtkPrinter::Print(wxWindow *parent, wxPrintout *printout, bool prompt )
     wxPrintData printdata = GetPrintDialogData().GetPrintData();
     wxGtkPrintNativeData *native = (wxGtkPrintNativeData*) printdata.GetNativeData();
 
-    wxGtkObject<GtkPrintOperation> printOp(gtk_print_operation_new());
-    native->SetPrintJob(printOp);
-    wxON_BLOCK_EXIT_OBJ1(*native, wxGtkPrintNativeData::SetPrintJob,
-                         static_cast<GtkPrintOperation*>(NULL));
+    // wxGtkPrintDialog needs to be created first as it creates the PrintOp
+    wxGtkPrintDialog dialog(parent, &m_printDialogData);
+    GtkPrintOperation* printOp = native->GetPrintJob();
 
     wxPrinterToGtkData dataToSend;
     dataToSend.printer = this;
@@ -937,7 +951,6 @@ bool wxGtkPrinter::Print(wxWindow *parent, wxPrintout *printout, bool prompt )
 
     // This is used to setup the DC and
     // show the dialog if desired
-    wxGtkPrintDialog dialog( parent, &m_printDialogData );
     dialog.SetPrintDC(m_dc);
     dialog.SetShowDialog(prompt);
 
@@ -1173,7 +1186,7 @@ bool wxGtkPrinter::Setup( wxWindow * WXUNUSED(parent) )
 
 #endif
 
-IMPLEMENT_ABSTRACT_CLASS(wxGtkPrinterDCImpl, wxDCImpl)
+wxIMPLEMENT_ABSTRACT_CLASS(wxGtkPrinterDCImpl, wxDCImpl);
 
 wxGtkPrinterDCImpl::wxGtkPrinterDCImpl(wxPrinterDC *owner, const wxPrintData& data)
                   : wxDCImpl( owner )
@@ -2096,6 +2109,8 @@ void wxGtkPrinterDCImpl::DoSetClippingRegion(wxCoord x, wxCoord y, wxCoord width
 void wxGtkPrinterDCImpl::DestroyClippingRegion()
 {
     cairo_reset_clip(m_cairo);
+
+    wxDCImpl::DestroyClippingRegion();
 }
 
 bool wxGtkPrinterDCImpl::StartDoc(const wxString& WXUNUSED(message))
@@ -2269,7 +2284,7 @@ int wxGtkPrinterDCImpl::GetResolution() const
 // Print preview
 // ----------------------------------------------------------------------------
 
-IMPLEMENT_CLASS(wxGtkPrintPreview, wxPrintPreviewBase)
+wxIMPLEMENT_CLASS(wxGtkPrintPreview, wxPrintPreviewBase);
 
 void wxGtkPrintPreview::Init(wxPrintout * WXUNUSED(printout),
                              wxPrintout * WXUNUSED(printoutForPrinting),

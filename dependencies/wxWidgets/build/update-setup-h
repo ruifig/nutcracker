@@ -55,11 +55,6 @@ update_single_setup_h()
     setup_inc=$1
     shift
 
-    if [ $setup_inc -ot $1 ]; then
-        echo "Skipping $1 which is already up to date."
-        return 0
-    fi
-
     echo -n "Updating $1 ..."
 
     tmp=$i.$$.tmp
@@ -95,12 +90,11 @@ if [ ! -f wxwin.m4 ]; then
     exit 1
 fi
 
+update_common_setup_h include/wx/android/setup.h
 update_common_setup_h include/wx/motif/setup0.h
 update_common_setup_h include/wx/msw/setup0.h
-update_common_setup_h include/wx/msw/wince/setup.h
 update_common_setup_h include/wx/gtk/setup0.h
 update_common_setup_h include/wx/osx/setup0.h
-update_common_setup_h include/wx/os2/setup0.h
 update_common_setup_h include/wx/univ/setup0.h
 update_common_setup_h setup.h.in
 

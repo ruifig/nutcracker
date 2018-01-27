@@ -124,7 +124,6 @@ bool wxStaticBitmap::Create(wxWindow *parent,
     // painting manually is reported not to work under Windows CE (see #10093),
     // so don't do it there even if this probably means that alpha is not
     // supported there -- but at least bitmaps without alpha appear correctly
-#ifndef __WXWINCE__
     // Windows versions before XP (and even XP if the application has no
     // manifest and so the old comctl32.dll is used) don't draw correctly the
     // images with alpha channel so we need to draw them ourselves and it's
@@ -134,7 +133,6 @@ bool wxStaticBitmap::Create(wxWindow *parent,
     {
         Connect(wxEVT_PAINT, wxPaintEventHandler(wxStaticBitmap::DoPaintManually));
     }
-#endif // !__WXWINCE__
 
     return true;
 }
@@ -188,9 +186,28 @@ wxBitmap wxStaticBitmap::GetBitmap() const
     }
 }
 
+void wxStaticBitmap::Init()
+{
+    m_isIcon = true;
+    m_image = NULL;
+    m_currentHandle = 0;
+    m_ownsCurrentHandle = false;
+}
+
+void wxStaticBitmap::DeleteCurrentHandleIfNeeded()
+{
+    if ( m_ownsCurrentHandle )
+    {
+        ::DeleteObject(m_currentHandle);
+        m_ownsCurrentHandle = false;
+    }
+}
+
 void wxStaticBitmap::Free()
 {
     MSWReplaceImageHandle(0);
+
+    DeleteCurrentHandleIfNeeded();
 
     wxDELETE(m_image);
 }
@@ -221,8 +238,6 @@ void wxStaticBitmap::WXHandleSize(wxSizeEvent& event)
     event.Skip();
 }
 
-#ifndef __WXWINCE__
-
 void wxStaticBitmap::DoPaintManually(wxPaintEvent& WXUNUSED(event))
 {
     wxPaintDC dc(this);
@@ -244,8 +259,6 @@ void wxStaticBitmap::DoPaintManually(wxPaintEvent& WXUNUSED(event))
                   (size.GetHeight() - bmp.GetHeight()) / 2,
                   true /* use mask */);
 }
-
-#endif // !__WXWINCE__
 
 void wxStaticBitmap::SetImage( const wxGDIImage* image )
 {
@@ -280,10 +293,13 @@ void wxStaticBitmap::SetImageNoCopy( wxGDIImage* image)
     GetPosition(&x, &y);
     GetSize(&w, &h);
 
-#ifdef __WIN32__
-    HANDLE handle = (HANDLE)m_image->GetHandle();
+    // Normally we just use the handle of provided image but in some cases we
+    // create our own temporary bitmap, so the actual handle may end up being
+    // different from the original one.
+    const HANDLE handleOrig = (HANDLE)m_image->GetHandle();
+    HANDLE handle = handleOrig;
 
-    AutoHBITMAP hbmpRelease;
+#if wxUSE_WXDIB
     if ( !m_isIcon )
     {
         // wxBitmap normally stores alpha in pre-multiplied format but
@@ -297,23 +313,19 @@ void wxStaticBitmap::SetImageNoCopy( wxGDIImage* image)
             // not-premultiplied alpha values.
             handle = wxDIB(bmp.ConvertToImage(),
                            wxDIB::PixelFormat_NotPreMultiplied).Detach();
-
-            // Ensure that this temporary HBITMAP will be destroyed.
-            hbmpRelease.Init((HBITMAP)handle);
         }
     }
+#endif // wxUSE_WXDIB
     LONG style = ::GetWindowLong( (HWND)GetHWND(), GWL_STYLE ) ;
     ::SetWindowLong( (HWND)GetHWND(), GWL_STYLE, ( style & ~( SS_BITMAP|SS_ICON ) ) |
                      ( m_isIcon ? SS_ICON : SS_BITMAP ) );
 
     MSWReplaceImageHandle((WXLPARAM)handle);
 
-    // Save bitmap handle only if it's not a temporary one, otherwise it's
-    // going to be destroyed right now anyhow.
-    if ( !hbmpRelease )
-        m_currentHandle = (WXHANDLE)handle;
+    DeleteCurrentHandleIfNeeded();
 
-#endif // Win32
+    m_currentHandle = (WXHANDLE)handle;
+    m_ownsCurrentHandle = handle != handleOrig;
 
     if ( ImageIsOk() )
     {

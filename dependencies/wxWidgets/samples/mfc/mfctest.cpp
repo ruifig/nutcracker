@@ -24,14 +24,9 @@
 
 #define START_WITH_MFC_WINDOW 0
 
+// NOTES:
 //
-// IMPORTANT NOTES:
-//
-// (1) You may need to set wxUSE_MFC to 1 in include/wx/msw/setup.h but
-//     normally this shouldn't be needed any longer, i.e. it works without
-//     it for me (VZ)
-//
-// (2) You should link with MFC DLL, not static libraries: or, to use static
+//  *  You should link with MFC DLL, not static libraries: or, to use static
 //     run-time libraries, use this command for both building wxWidgets and
 //     the sample:
 //
@@ -40,7 +35,7 @@
 //     Unless the run-time library settings match for wxWidgets and MFC, you
 //     will get link errors for symbols such as __mbctype, __argc, and __argv
 //
-// (3) If you see bogus memory leaks within the MSVC IDE on exit, in this
+//  *  If you see bogus memory leaks within the MSVC IDE on exit, in this
 //     sample or in your own project, you must be using __WXDEBUG__ +
 //     WXUSINGDLL + _AFXDLL
 //     Unfortunately this confuses the MSVC/MFC leak detector. To do away with
@@ -75,6 +70,8 @@
 #endif
 
 #include "wx/evtloop.h"
+#include "wx/nativewin.h"
+#include "wx/spinctrl.h"
 
 #include "resource.h"
 
@@ -126,14 +123,46 @@ public:
     wxDECLARE_EVENT_TABLE();
 };
 
+class MyPanel : public wxPanel
+{
+public:
+    MyPanel(wxWindow *parent, const wxPoint& pos)
+        : wxPanel(parent, wxID_ANY, pos)
+    {
+        wxSizer* const sizer = new wxFlexGridSizer(2, wxSize(5, 5));
+        sizer->Add(new wxStaticText(this, wxID_ANY, "Enter your &name:"),
+                   wxSizerFlags().Center().Right());
+        m_textName = new wxTextCtrl(this, wxID_ANY);
+        m_textName->SetHint("First Last");
+        sizer->Add(m_textName, wxSizerFlags().Expand().CenterVertical());
+
+        sizer->Add(new wxStaticText(this, wxID_ANY, "And your &age:"),
+                   wxSizerFlags().Center().Right());
+        m_spinAge = new wxSpinCtrl(this, wxID_ANY);
+        sizer->Add(m_spinAge, wxSizerFlags().Expand().CenterVertical());
+
+        wxStaticBoxSizer* const
+            box = new wxStaticBoxSizer(wxVERTICAL, this, "wxWidgets box");
+        box->Add(sizer, wxSizerFlags(1).Expand());
+        SetSizer(box);
+
+        // We won't be resized automatically, so set our size ourselves.
+        SetSize(GetBestSize());
+    }
+
+private:
+    wxTextCtrl* m_textName;
+    wxSpinCtrl* m_spinAge;
+};
+
 // ID for the menu quit command
 #define HELLO_QUIT 1
 #define HELLO_NEW  2
 
-DECLARE_APP(MyApp)
+wxDECLARE_APP(MyApp);
 
-// notice use of IMPLEMENT_APP_NO_MAIN() instead of the usual IMPLEMENT_APP!
-IMPLEMENT_APP_NO_MAIN(MyApp)
+// Notice use of wxIMPLEMENT_APP_NO_MAIN() instead of the usual wxIMPLEMENT_APP!
+wxIMPLEMENT_APP_NO_MAIN(MyApp);
 
 #ifdef _UNICODE
 // In Unicode build MFC normally requires to manually change the entry point to
@@ -152,6 +181,18 @@ CMainWindow::CMainWindow()
     LoadAccelTable( wxT("MainAccelTable") );
     Create( NULL, wxT("Hello Foundation Application"),
         WS_OVERLAPPEDWINDOW, rectDefault, NULL, wxT("MainMenu") );
+
+    // Create a container representing the MFC window in wxWidgets window
+    // hierarchy.
+    m_containerWX = new wxNativeContainerWindow(m_hWnd);
+
+    // Now we can create children of this container as usual.
+    new MyPanel(m_containerWX, wxPoint(5, 5));
+
+    // An ugly but necessary workaround to prevent the container TLW from
+    // resizing the panel to fit its entire client area as it would do if it
+    // were its only child.
+    new wxWindow(m_containerWX, wxID_ANY, wxPoint(4, 4), wxSize(1, 1));
 }
 
 void CMainWindow::OnPaint()

@@ -99,7 +99,7 @@ private:
     void BeforeAndAfter();
     void ScopedBuffers();
 
-    DECLARE_NO_COPY_CLASS(StringTestCase)
+    wxDECLARE_NO_COPY_CLASS(StringTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -168,10 +168,23 @@ void StringTestCase::Format()
     }
 
 
+    // Positional parameters tests:
     CPPUNIT_ASSERT_EQUAL
     (
         "two one",
         wxString::Format(wxT("%2$s %1$s"), wxT("one"), wxT("two"))
+    );
+
+    CPPUNIT_ASSERT_EQUAL
+    (
+        "hello hello",
+        wxString::Format("%1$s %1$s", "hello")
+    );
+
+    CPPUNIT_ASSERT_EQUAL
+    (
+        "4 world hello world 3",
+        wxString::Format("%4$d %2$s %1$s %2$s %3$d", "hello", "world", 3, 4)
     );
 }
 
@@ -589,14 +602,16 @@ enum
     Number_Long     = 16    // only for long tests
 };
 
+#ifdef wxLongLong_t
+typedef wxLongLong_t TestValue_t;
+#else
+typedef long TestValue_t;
+#endif
+
 static const struct ToLongData
 {
     const wxChar *str;
-#ifdef wxLongLong_t
-    wxLongLong_t value;
-#else
-    long value;
-#endif // wxLongLong_t
+    TestValue_t value;
     int flags;
     int base;
 
@@ -618,7 +633,7 @@ static const struct ToLongData
 
     { wxT("-1"), -1, Number_Signed | Number_Long },
     // this is surprising but consistent with strtoul() behaviour
-    { wxT("-1"), ULONG_MAX, Number_Unsigned | Number_Long },
+    { wxT("-1"), (TestValue_t)ULONG_MAX, Number_Unsigned | Number_Long },
 
     // this must overflow, even with 64 bit long
     { wxT("922337203685477580711"), 0, Number_Invalid },
@@ -626,8 +641,9 @@ static const struct ToLongData
 #ifdef wxLongLong_t
     { wxT("2147483648"), wxLL(2147483648), Number_LongLong },
     { wxT("-2147483648"), wxLL(-2147483648), Number_LongLong | Number_Signed },
-    { wxT("9223372036854775808"), wxULL(9223372036854775808), Number_LongLong |
-                                                             Number_Unsigned },
+    { wxT("9223372036854775808"),
+      TestValue_t(wxULL(9223372036854775808)),
+      Number_LongLong | Number_Unsigned },
 #endif // wxLongLong_t
 
     // Base tests.
@@ -952,6 +968,12 @@ void StringTestCase::DoCStrDataTernaryOperator(bool cond)
 
     wxString s("foo");
 
+    // Using literal strings in ternary operator below results in these
+    // warnings, but they're unavoidable if we want such code to continue to
+    // compile at all, as it used to in pre-3.0 versions, so just suppress them.
+    wxGCC_WARNING_SUPPRESS(write-strings)
+    wxCLANG_WARNING_SUPPRESS(c++11-compat-deprecated-writable-strings)
+
     const wchar_t *wcStr = L"foo";
     CPPUNIT_ASSERT( CheckStr(s, (cond ? s.c_str() : wcStr)) );
     CPPUNIT_ASSERT( CheckStr(s, (cond ? s.c_str() : L"foo")) );
@@ -963,6 +985,9 @@ void StringTestCase::DoCStrDataTernaryOperator(bool cond)
     CPPUNIT_ASSERT( CheckStr(s, (cond ? s.c_str() : "foo")) );
     CPPUNIT_ASSERT( CheckStr(s, (cond ? mbStr : s.c_str())) );
     CPPUNIT_ASSERT( CheckStr(s, (cond ? "foo" : s.c_str())) );
+
+    wxGCC_WARNING_RESTORE(write-strings)
+    wxCLANG_WARNING_RESTORE(c++11-compat-deprecated-writable-strings)
 
     wxString empty("");
     CPPUNIT_ASSERT( CheckStr(empty, (cond ? empty.c_str() : wxEmptyString)) );

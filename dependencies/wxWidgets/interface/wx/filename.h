@@ -773,7 +773,8 @@ public:
     static wxULongLong GetSize(const wxString& filename);
 
     /**
-        Returns the directory used for temporary files.
+        Returns the directory used for temporary files, for current user. Same as
+        wxStandardPaths::GetTempDir().
     */
     static wxString GetTempDir();
 
@@ -813,8 +814,7 @@ public:
      /**
         This function builds a volume path string, for example "C:\\".
 
-        Implemented for the platforms which use drive letters, i.e. DOS, MSW
-        and OS/2 only.
+        Implemented for the platforms which use drive letters, i.e. MSW only.
 
         @since 2.9.0
 
@@ -978,33 +978,6 @@ public:
         Returns @true if this filename is not absolute.
     */
     bool IsRelative(wxPathFormat format = wxPATH_NATIVE) const;
-
-    /**
-        On Mac OS, gets the common type and creator for the given extension.
-
-        @onlyfor{wxosx}
-    */
-    static bool MacFindDefaultTypeAndCreator(const wxString& ext,
-                                            wxUint32* type,
-                                            wxUint32* creator);
-
-    /**
-        On Mac OS, registers application defined extensions and their default type
-        and creator.
-
-        @onlyfor{wxosx}
-    */
-    static void MacRegisterDefaultTypeAndCreator(const wxString& ext,
-                                                wxUint32 type,
-                                                wxUint32 creator);
-
-    /**
-        On Mac OS, looks up the appropriate type and creator from the registration
-        and then sets it.
-
-        @onlyfor{wxosx}
-    */
-    bool MacSetDefaultTypeAndCreator();
 
     /**
         Make the file name absolute.

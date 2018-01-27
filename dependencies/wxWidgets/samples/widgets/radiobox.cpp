@@ -85,11 +85,11 @@ public:
     RadioWidgetsPage(WidgetsBookCtrl *book, wxImageList *imaglist);
     virtual ~RadioWidgetsPage(){};
 
-    virtual wxControl *GetWidget() const { return m_radio; }
-    virtual void RecreateWidget() { CreateRadio(); }
+    virtual wxWindow *GetWidget() const wxOVERRIDE { return m_radio; }
+    virtual void RecreateWidget() wxOVERRIDE { CreateRadio(); }
 
     // lazy creation of the content
-    virtual void CreateContent();
+    virtual void CreateContent() wxOVERRIDE;
 
 protected:
     // event handlers
@@ -370,7 +370,7 @@ void RadioWidgetsPage::CreateRadio()
     int flags = m_chkSpecifyRows->GetValue() ? wxRA_SPECIFY_ROWS
                                              : wxRA_SPECIFY_COLS;
 
-    flags |= ms_defaultFlags;
+    flags |= GetAttrs().m_defaultFlags;
 
 #ifdef wxRA_LEFTTORIGHT
     switch ( m_radioDir->GetSelection() )

@@ -244,7 +244,7 @@ MyFrame::MyFrame(const wxString& title)
 //      wxDECLARE_DYNAMIC_CLASS_NO_COPY(MyXTIFrame);
 //  };
 //
-//  IMPLEMENT_DYNAMIC_CLASS_XTI(MyXTIFrame, MyXTIFrame, "x.h")
+//  wxIMPLEMENT_DYNAMIC_CLASS_XTI(MyXTIFrame, MyXTIFrame, "x.h");
 //
 //  WX_BEGIN_PROPERTIES_TABLE(MyXTIFrame)
 //      WX_PROPERTY( Button, wxButton*, SetButton, GetButton, )
@@ -258,7 +258,7 @@ MyFrame::MyFrame(const wxString& title)
 //                    wxString, Title, wxPoint, Position, wxSize, Size )
 //
 //  wxBEGIN_EVENT_TABLE(MyXTIFrame, wxFrame)
-// wxEND_EVENT_TABLE()
+//  wxEND_EVENT_TABLE()
 
 // the following class "persists" (i.e. saves) a wxFrame into a wxObjectWriter
 

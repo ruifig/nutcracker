@@ -336,11 +336,18 @@ public:
 
         event.Skip();
     }
+
+    virtual int OnRun()
+    {
+        if ( TestAppBase::OnRun() != 0 )
+            m_exitcode = EXIT_FAILURE;
+
+        return m_exitcode;
+    }
 #else // !wxUSE_GUI
     virtual int OnRun()
     {
-        m_exitcode = RunTests();
-        return m_exitcode;
+        return RunTests();
     }
 #endif // wxUSE_GUI/!wxUSE_GUI
 
@@ -373,11 +380,13 @@ private:
     FilterEventFunc m_filterEventFunc;
     ProcessEventFunc m_processEventFunc;
 
+#if wxUSE_GUI
     // the program exit code
     int m_exitcode;
+#endif // wxUSE_GUI
 };
 
-IMPLEMENT_APP_NO_MAIN(TestApp)
+wxIMPLEMENT_APP_NO_MAIN(TestApp);
 
 
 // ----------------------------------------------------------------------------
@@ -434,6 +443,16 @@ extern void SetProcessEventFunc(ProcessEventFunc func)
 
 extern bool IsNetworkAvailable()
 {
+    // Somehow even though network is available on Travis CI build machines,
+    // attempts to open remote URIs sporadically fail, so don't run these tests
+    // under Travis to avoid false positives.
+    static int s_isTravis = -1;
+    if ( s_isTravis == -1 )
+        s_isTravis = wxGetEnv("TRAVIS", NULL);
+
+    if ( s_isTravis )
+        return false;
+
     // NOTE: we could use wxDialUpManager here if it was in wxNet; since it's in
     //       wxCore we use a simple rough test:
     
@@ -467,7 +486,7 @@ extern bool IsAutomaticTest()
             username = wxGetUserId();
 
         username.MakeLower();
-        s_isAutomatic = username.Matches("buildslave*") ||
+        s_isAutomatic = username == "buildbot" ||
                             username.Matches("sandbox*");
     }
 
@@ -510,7 +529,9 @@ TestApp::TestApp()
 
     m_locale = NULL;
 
+#if wxUSE_GUI
     m_exitcode = EXIT_SUCCESS;
+#endif // wxUSE_GUI
 }
 
 // Init
@@ -520,6 +541,7 @@ bool TestApp::OnInit()
     if ( !TestAppBase::OnInit() )
         return false;
 
+    // Output some important information about the test environment.
 #if wxUSE_GUI
     cout << "Test program for wxWidgets GUI features\n"
 #else
@@ -527,19 +549,18 @@ bool TestApp::OnInit()
 #endif
          << "build: " << WX_BUILD_OPTIONS_SIGNATURE << "\n"
          << "running under " << wxGetOsDescription()
-         << " as " << wxGetUserId() << std::endl;
+         << " as " << wxGetUserId();
 
     if ( m_detail )
     {
-        // Output some important information about the test environment.
-        cout << "Running under " << wxGetOsDescription() << ", "
-                "locale is " << setlocale(LC_ALL, NULL) << std::endl;
+        cout << ", locale is " << setlocale(LC_ALL, NULL);
     }
 
+    cout << std::endl;
+
 #if wxUSE_GUI
-    // create a hidden parent window to be used as parent for the GUI controls
-    wxTestableFrame* frame = new wxTestableFrame();
-    frame->Show();
+    // create a parent window to be used as parent for the GUI controls
+    new wxTestableFrame();
 
     Connect(wxEVT_IDLE, wxIdleEventHandler(TestApp::OnIdle));
 #endif // wxUSE_GUI
@@ -715,7 +736,7 @@ int TestApp::OnExit()
     delete GetTopWindow();
 #endif // wxUSE_GUI
 
-    return m_exitcode;
+    return TestAppBase::OnExit();
 }
 
 // List the tests

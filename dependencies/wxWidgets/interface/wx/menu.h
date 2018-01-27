@@ -514,7 +514,7 @@ public:
         Constructs a wxMenu object.
 
         @param style
-            If set to wxMENU_TEAROFF, the menu will be detachable (wxGTK only).
+            If set to wxMENU_TEAROFF, the menu will be detachable (wxGTK and wxQT only).
     */
     wxMenu(long style);
 
@@ -524,7 +524,7 @@ public:
         @param title
             Title at the top of the menu (not always supported).
         @param style
-            If set to wxMENU_TEAROFF, the menu will be detachable (wxGTK only).
+            If set to wxMENU_TEAROFF, the menu will be detachable (wxGTK and wxQT only).
     */
     wxMenu(const wxString& title, long style = 0);
 
@@ -1036,11 +1036,13 @@ public:
     virtual void SetTitle(const wxString& title);
 
     /**
-        Sends events to @a source (or owning window if @NULL) to update the
-        menu UI.
+        Update the state of all menu items, recursively, by generating @c
+        wxEVT_UPDATE_UI events for them.
 
-        This is called just before the menu is popped up with wxWindow::PopupMenu,
-        but the application may call it at other times if required.
+        This is an internal wxWidgets function and shouldn't normally be called
+        from outside of the library. If it is called, @a source argument should
+        not be used, it is deprecated and exists only for backwards
+        compatibility.
     */
     void UpdateUI(wxEvtHandler* source = NULL);
 

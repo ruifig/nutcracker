@@ -37,7 +37,7 @@
 FORCE_LINK(wxhtml_chm_support)
 #endif
 
-IMPLEMENT_DYNAMIC_CLASS(wxHtmlHelpController, wxHelpControllerBase)
+wxIMPLEMENT_DYNAMIC_CLASS(wxHtmlHelpController, wxHelpControllerBase);
 
 wxHtmlHelpController::wxHtmlHelpController(int style, wxWindow* parentWindow):
     wxHelpControllerBase(parentWindow)
@@ -176,12 +176,12 @@ wxHtmlHelpFrame* wxHtmlHelpController::CreateHelpFrame(wxHtmlHelpData *data)
 {
     wxHtmlHelpFrame* frame = new wxHtmlHelpFrame(data);
     frame->SetController(this);
+    frame->SetTitleFormat(m_titleFormat);
     frame->Create(m_parentWindow, -1, wxEmptyString, m_FrameStyle
 #if wxUSE_CONFIG
         , m_Config, m_ConfigRoot
 #endif // wxUSE_CONFIG
         );
-    frame->SetTitleFormat(m_titleFormat);
     frame->SetShouldPreventAppExit(m_shouldPreventAppExit);
     m_helpFrame = frame;
     return frame;

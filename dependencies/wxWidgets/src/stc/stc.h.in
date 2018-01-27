@@ -7,7 +7,7 @@
 //              This class delegates all method calls and events to the
 //              Scintilla objects and so forth.  This allows the use of
 //              Scintilla without polluting the namespace with all the
-//              classes and itentifiers from Scintilla.
+//              classes and identifiers from Scintilla.
 //
 // Author:      Robin Dunn
 //
@@ -504,8 +504,8 @@ protected:
     void NotifyParent(SCNotification* scn);
 
 private:
-    DECLARE_EVENT_TABLE()
-    DECLARE_DYNAMIC_CLASS(wxStyledTextCtrl)
+    wxDECLARE_EVENT_TABLE();
+    wxDECLARE_DYNAMIC_CLASS(wxStyledTextCtrl);
 
 protected:
 
@@ -608,7 +608,7 @@ public:
 
 #ifndef SWIG
 private:
-    DECLARE_DYNAMIC_CLASS(wxStyledTextEvent)
+    wxDECLARE_DYNAMIC_CLASS(wxStyledTextEvent);
 
     int  m_position;
     int  m_key;

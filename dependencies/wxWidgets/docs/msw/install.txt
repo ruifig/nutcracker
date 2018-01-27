@@ -1,9 +1,8 @@
                    Installing wxWidgets for Windows
                    --------------------------------
 
-This is wxWidgets for Microsoft Windows 9x/ME, Windows NT
-and later (2000, XP, Vista, 7, 8, etc) including both 32 bit and 64
-bit versions.
+This is wxWidgets for Microsoft Windows (XP, Vista, 7, 8, 10, etc)
+including both 32 bit and 64 bit versions.
 
 
 Table of Contents:
@@ -46,7 +45,18 @@ this environment variable is used in the examples below.
 
 NB: If you checked your sources from version control repository and
     didn't obtain them from a release file, you also need to copy
-    include/wx/msw/setup0.h to include/wx/msw/setup.h.
+    include/wx/msw/setup0.h to include/wx/msw/setup.h and to remember
+    to update the latter whenever the former changes, otherwise you
+    will get compilation errors if any new symbols are added to
+    setup0.h file in the repository.
+
+    If you have no intention of modifying setup.h, you may avoid this
+    problem by creating a symbolic link to setup0.h instead of making
+    a copy of it using mklink, from an admin command prompt:
+
+        cd include/wx/msw/
+        mklink setup.h setup0.h
+
 
 
 Building wxWidgets
@@ -96,22 +106,60 @@ Microsoft Visual C++ Compilation
 
 * From the IDE using the provided project files:
 
-Ready to use project files are provided for VC++ versions 6, 7, 8, 9
-and 10 (also known as MSVS 6, 2003, 2005, 2008 and 2010 respectively).
-For VC++ 11 (2012, respectively), you need to import the existing VC10
-project files into VC11 IDE first.
+Ready to use project files are provided for VC++ versions 7, 8, 9,
+10, 11, 12 and 14 (also known as MSVS 2003, 2005, 2008, 2010, 2012, 2013
+and 2015 respectively).
 
-Simply open wx_vcN.sln (for N=7, 8, 9 or 10) or wx.dsw (for VC6) file,
+Simply open wx_vcN.sln (for N=7, 8, 9, 10, 11 or 12) file,
 select the appropriate configuration (Debug or Release, static or DLL)
 and build the solution. Notice that when building a DLL configuration,
 you may need to perform the build several times because the projects
 are not always built in the correct order, and this may result in link
 errors. Simply do the build again, up to 3 times, to fix this.
 
-Notice that x64 configurations are only included in VC10 project
+Notice that x64 configurations are only included in VC10 and later project
 currently. If you want to build Win64 libraries with the previous
 compiler versions, the simplest solution is to use the makefiles as
 described above.
+
+
+Special notes for Visual Studio 2010+:
+
+For Visual Studio 2010+ solutions it is possible to customize the build by
+creating a wx_local.props file in the build\msw directory which is used, if it
+exists, by the projects. The settings in that file override the default values
+for the properties such as wxCfg (corresponding to the CFG makefile variable
+described below) or wxVendor (corresponding to VENDOR). The typical way to
+make the file is to copy wx_setup.props to wx_local.props and then edit local.
+
+For example, if you are building wxWidgets libraries using multiple versions
+of Visual Studio you could change wxCompilerPrefix to include the toolset:
+
+-    <wxCompilerPrefix>vc</wxCompilerPrefix>
++    <wxCompilerPrefix>vc$(PlatformToolsetVersion)</wxCompilerPrefix>
+
+Following that example if you are using Visual Studio 2013 and open
+wx_vc12.sln it will build using the "vc120" prefix for the build directories
+so to allow its build files to coexist with the files produced by the other
+MSVC versions.
+
+Keep in mind that by using a separate local props file you ensure that your
+changes won't be lost when updating to a future wxWidgets version. But if
+wx_setup.props is updated in some later commit your wx_local.props is not
+updated with it. For example the version information in wx_setup.props could
+change and the information in your wx_local.props would be outdated. It is
+your responsibility to monitor for such situations.
+
+Improve debugging for Visual Studio 2012+:
+
+Debug visualizers for Visual Studio 2012+ are provided which makes inspecting
+various wxWidgets classes easier to view while debugging. To use them:
+
+1. Open the folder misc/msvc
+2. Open the folder %USERPROFILE%\My Documents\Visual Studio 2012\Visualizers\
+   (or the corresponding location for newer versions, e.g. ...2013\Visualizers)
+3. Copy wxWidgets.natvis and autoexp.inc
+4. For Visual Studio 2013+ additionally copy wxWidgets.2013.natvis
 
 
 Cygwin/MinGW Compilation
@@ -342,16 +390,14 @@ SHARED=1
 
 UNICODE=0
   To completely disable Unicode support (default is UNICODE=1). It should not
-  be necessary to do this unless, perhaps, you still wish to target Win9x
-  systems and can't use MSLU (which requires MSLU=1) for some reason.
+  be necessary to do this.
 
   This option affect name of the library ('u' is appended in the default
   Unicode build) and the directory where the library and setup.h are stored
   (ditto).
 
 WXUNIV=1
-  Build wxUniversal instead of native wxMSW (see
-  http://www.wxwidgets.org/wxuniv.htm for more information).
+  Build wxUniversal instead of native wxMSW
 
 MONOLITHIC=1
   Starting with version 2.5.1, wxWidgets has the ability to be built as
@@ -376,16 +422,6 @@ RUNTIME_LIBS=static
   that the program does not depend on DLLs provided with the compiler (e.g.
   Visual C++'s msvcrt.dll or Borland's cc3250mt.dll).
   Caution: Do not use static runtime libraries when building DLL (SHARED=1)!
-
-MSLU=1
-  Enables MSLU (Microsoft Layer for Unicode). This setting makes sense only if
-  used together with UNICODE=1. If you want to be able to use Unicode version
-  on Windows9x, you will need MSLU (Microsoft Layer for Unicode) runtime DLL
-  and import lib.  The former can be downloaded from Microsoft, the latter is
-  part of the latest Platform SDK from Microsoft (see msdn.microsoft.com for
-  details). An alternative implementation of import library can be downloaded
-  from http://libunicows.sourceforge.net - unlike the official one, this one
-  works with other compilers and does not require 300+ MB Platform SDK update.
 
 DEBUG_FLAG=0
 DEBUG_FLAG=1
@@ -442,7 +478,7 @@ COMPILER_PREFIX=<string>
   If you build with multiple versions of the same compiler, you can put
   their outputs into directories like "vc6_lib", "vc8_lib" etc. instead of
   "vc_lib" by setting this variable to e.g. "vc6". This is merely a
-  convenience variable, you can achieve the same effect (but different 
+  convenience variable, you can achieve the same effect (but different
   directory names) with the CFG option.
 
 CFLAGS
@@ -478,7 +514,7 @@ different ways, e.g. MSVC users should use $(WXWIN) instead of just $WXWIN):
   - _UNICODE unless you want to use deprecated ANSI build of wxWidgets.
   - NDEBUG if you want to build in release mode, i.e. disable asserts.
   - WXUSINGDLL if you are using DLL build of wxWidgets.
-* If using MSVC 6 or 7 only (i.e. not for later versions), also define
+* If using MSVC 7 only (i.e. not for later versions), also define
   wxUSE_RC_MANIFEST=1 and WX_CPU_X86.
 * Add $WXWIN/lib/prefix_lib-or-dll to the libraries path. The prefix depends
   on the compiler, by default it is "vc" for MSVC, "gcc" for g++ and so on.

@@ -36,21 +36,22 @@ EXTRALIBS_GUI = @EXTRALIBS_GUI@
 CXXWARNINGS = @CXXWARNINGS@
 HOST_SUFFIX = @HOST_SUFFIX@
 SAMPLES_RPATH_FLAG = @SAMPLES_RPATH_FLAG@
+SAMPLES_CXXFLAGS = @SAMPLES_CXXFLAGS@
 wx_top_builddir = @wx_top_builddir@
 
 ### Variables: ###
 
 DESTDIR = 
-WX_RELEASE = 3.0
-WX_VERSION = $(WX_RELEASE).2
+WX_RELEASE = 3.1
+WX_VERSION = $(WX_RELEASE).0
 LIBDIRNAME = $(wx_top_builddir)/lib
 HELPVIEW_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	$(__DEBUG_DEFINE_p) $(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) \
 	$(__THREAD_DEFINE_p) -I$(srcdir) $(__DLLFLAG_p) \
-	-I$(srcdir)/../../../samples $(CXXWARNINGS) $(CPPFLAGS) $(CXXFLAGS)
+	-I$(srcdir)/../../../samples $(CXXWARNINGS) $(SAMPLES_CXXFLAGS) $(CPPFLAGS) \
+	$(CXXFLAGS)
 HELPVIEW_OBJECTS =  \
 	$(__helpview___win32rc) \
-	$(__helpview_os2_lib_res) \
 	helpview_helpview.o
 
 ### Conditionally set variables: ###
@@ -89,8 +90,6 @@ COND_PLATFORM_OS2_1___helpview___os2_emxbindcmd = $(NM) helpview$(EXEEXT) | if \
 @COND_TOOLKIT_MSW@__RCDEFDIR_p_1 = --include-dir \
 @COND_TOOLKIT_MSW@	$(LIBDIRNAME)/wx/include/$(TOOLCHAIN_FULLNAME)
 @COND_PLATFORM_WIN32_1@__helpview___win32rc = helpview_sample_rc.o
-@COND_PLATFORM_OS2_1@__helpview_os2_lib_res = \
-@COND_PLATFORM_OS2_1@	$(top_srcdir)/include/wx/os2/wx.res
 @COND_PLATFORM_MACOSX_1@__helpview_app_Contents_PkgInfo___depname \
 @COND_PLATFORM_MACOSX_1@	= helpview.app/Contents/PkgInfo
 @COND_PLATFORM_MACOSX_1@__helpview_bundle___depname = helpview_bundle
@@ -196,7 +195,7 @@ data:
 	done
 
 helpview_sample_rc.o: $(srcdir)/../../../samples/sample.rc
-	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_2) $(__DEBUG_DEFINE_p_2)  $(__EXCEPTIONS_DEFINE_p_2) $(__RTTI_DEFINE_p_2) $(__THREAD_DEFINE_p_2)   --include-dir $(srcdir) $(__DLLFLAG_p_2) --include-dir $(srcdir)/../../../samples $(__RCDEFDIR_p_1) --include-dir $(top_srcdir)/include
+	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_2) $(__DEBUG_DEFINE_p_2)  $(__EXCEPTIONS_DEFINE_p_2) $(__RTTI_DEFINE_p_2) $(__THREAD_DEFINE_p_2)  --include-dir $(srcdir) $(__DLLFLAG_p_2) --include-dir $(srcdir)/../../../samples $(__RCDEFDIR_p_1) --include-dir $(top_srcdir)/include
 
 helpview_helpview.o: $(srcdir)/helpview.cpp
 	$(CXXC) -c -o $@ $(HELPVIEW_CXXFLAGS) $(srcdir)/helpview.cpp

@@ -38,7 +38,7 @@
 // resources
 // ----------------------------------------------------------------------------
 
-// the application icon (under Windows and OS/2 it is in resources)
+// the application icon (under Windows it is in resources)
 #ifndef wxHAS_IMAGES_IN_RESOURCES
     #include "../sample.xpm"
 #endif
@@ -58,7 +58,7 @@ class VarScrollApp : public wxApp
 {
 public:
     // create our main window
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 };
 
 // Define a new frame type: this is going to be our main frame
@@ -170,7 +170,7 @@ public:
         event.Skip();
     }
 
-    virtual wxCoord OnGetRowHeight(size_t n) const
+    virtual wxCoord OnGetRowHeight(size_t n) const wxOVERRIDE
     {
         wxASSERT( n < GetRowCount() );
 
@@ -267,7 +267,7 @@ public:
         event.Skip();
     }
 
-    virtual wxCoord OnGetColumnWidth(size_t n) const
+    virtual wxCoord OnGetColumnWidth(size_t n) const wxOVERRIDE
     {
         wxASSERT( n < GetColumnCount() );
 
@@ -388,14 +388,14 @@ public:
         event.Skip();
     }
 
-    virtual wxCoord OnGetRowHeight(size_t n) const
+    virtual wxCoord OnGetRowHeight(size_t n) const wxOVERRIDE
     {
         wxASSERT( n < GetRowCount() );
 
         return m_heights[n];
     }
 
-    virtual wxCoord OnGetColumnWidth(size_t n) const
+    virtual wxCoord OnGetColumnWidth(size_t n) const wxOVERRIDE
     {
         wxASSERT( n < GetColumnCount() );
 
@@ -461,7 +461,7 @@ wxEND_EVENT_TABLE()
 // static object for many reasons) and also declares the accessor function
 // wxGetApp() which will return the reference of the right type (i.e. VarScrollApp and
 // not wxApp)
-IMPLEMENT_APP(VarScrollApp)
+wxIMPLEMENT_APP(VarScrollApp);
 
 // ============================================================================
 // implementation

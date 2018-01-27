@@ -58,7 +58,8 @@ unbind, the handlers dynamically, i.e. during run-time depending on some
 conditions. It also allows the direct binding of events to:
 @li A handler method in another object.
 @li An ordinary function like a static method or a global function.
-@li An arbitrary functor like boost::function<>.
+@li An arbitrary functor such as boost::function<> or, in C++11,
+std::function<> or a lambda expression.
 
 The static event tables can only handle events in the object where they are
 defined so using Bind<>() is more flexible than using the event tables. On the
@@ -254,7 +255,8 @@ Now let us describe the semantic differences:
         which allows to bind an event to:
         @li A method in another object.
         @li An ordinary function like a static method or a global function.
-        @li An arbitrary functor like boost::function<>.
+        @li An arbitrary functor such as boost::function<> or, in C++11,
+        std::function<> or a lambda expression.
 
         This is impossible to do with the event tables because it is not
         possible to specify these handlers to dispatch the event to, so it
@@ -368,10 +370,30 @@ MyFrame::MyFrame()
 }
 @endcode
 
-A common example of a functor is boost::function<>:
+In C++11 a lambda expression can be used directly, without having to define a
+separate functor class:
 
 @code
+MyFrame::MyFrame()
+{
+    Bind(wxEVT_COMMAND_MENU_SELECTED,
+         [](wxCommandEvent&) {
+            // Do something useful
+         },
+         wxID_EXIT);
+}
+@endcode
+
+Another common example of a generic functor is boost::function<> or, since
+C++11, std::function<>:
+
+@code
+#if __cplusplus >= 201103L || wxCHECK_VISUALC_VERSION(10)
+using namespace std;
+using namespace std::placeholders;
+#else // Pre C++11 compiler
 using namespace boost;
+#endif
 
 void MyHandler::OnExit( wxCommandEvent & )
 {
@@ -389,7 +411,7 @@ MyFrame::MyFrame()
 @endcode
 
 
-With the aid of boost::bind<>() you can even use methods or functions which
+With the aid of @c bind<>() you can even use methods or functions which
 don't quite have the correct signature:
 
 @code
@@ -438,14 +460,14 @@ doesn't count as having handled the event and the search continues):
     </li>
 
     <li value="1">
-    If this event handler is disabled via a call to
-    wxEvtHandler::SetEvtHandlerEnabled() the next three steps are skipped and
-    the event handler resumes at step (5).
+    If the object is a wxWindow and has an associated validator, wxValidator
+    gets a chance to process the event.
     </li>
 
     <li value="2">
-    If the object is a wxWindow and has an associated validator, wxValidator
-    gets a chance to process the event.
+    If this event handler is disabled via a call to
+    wxEvtHandler::SetEvtHandlerEnabled() the two next steps are skipped and
+    the event handler resumes at step (5).
     </li>
 
     <li value="3">
@@ -453,14 +475,19 @@ doesn't count as having handled the event and the search continues):
     Bind<>() was called, is consulted. Notice that this is done before
     checking the static event table entries, so if both a dynamic and a static
     event handler match the same event, the static one is never going to be
-    used unless wxEvent::Skip() is called in the dynamic one.
+    used unless wxEvent::Skip() is called in the dynamic one. Also note that
+    the dynamically bound handlers are searched in order of their registration
+    during program run-time, i.e. later bound handlers take priority over the
+    previously bound ones.
     </li>
 
     <li value="4">
     The event table containing all the handlers defined using the event table
-    macros in this class and its base classes is examined. Notice that this
-    means that any event handler defined in a base class will be executed at
-    this step.
+    macros in this class and its base classes is examined. The search in an
+    event table respects the order of the event macros appearance in the source
+    code, i.e. earlier occurring entries take precedence over later occurring
+    ones. Notice that this means that any event handler defined in a base class
+    will be executed at this step.
     </li>
 
     <li value="5">

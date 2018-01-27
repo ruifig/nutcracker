@@ -85,7 +85,7 @@ MyCompareFunction(wxIntPtr item1, wxIntPtr item2, wxIntPtr WXUNUSED(sortData))
 // MyApp
 // ----------------------------------------------------------------------------
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 // `Main program' equivalent, creating windows and returning main app frame
 bool MyApp::OnInit()
@@ -154,11 +154,15 @@ wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(LIST_MAC_USE_GENERIC, MyFrame::OnToggleMacUseGeneric)
 #endif // __WXOSX__
     EVT_MENU(LIST_FIND, MyFrame::OnFind)
+    EVT_MENU(LIST_TOGGLE_CHECKBOX, MyFrame::OnToggleItemCheckbox)
+    EVT_MENU(LIST_GET_CHECKBOX, MyFrame::OnGetItemCheckbox)
+    EVT_MENU(LIST_TOGGLE_CHECKBOXES, MyFrame::OnToggleCheckboxes)
 
     EVT_UPDATE_UI(LIST_SHOW_COL_INFO, MyFrame::OnUpdateUIEnableInReport)
     EVT_UPDATE_UI(LIST_TOGGLE_HEADER, MyFrame::OnUpdateUIEnableInReport)
 
     EVT_UPDATE_UI(LIST_TOGGLE_MULTI_SEL, MyFrame::OnUpdateToggleMultiSel)
+    EVT_UPDATE_UI(LIST_TOGGLE_CHECKBOXES, MyFrame::OnUpdateToggleCheckboxes)
     EVT_UPDATE_UI(LIST_TOGGLE_HEADER, MyFrame::OnUpdateToggleHeader)
     EVT_UPDATE_UI(LIST_ROW_LINES, MyFrame::OnUpdateRowLines)
 wxEND_EVENT_TABLE()
@@ -261,6 +265,12 @@ MyFrame::MyFrame(const wxChar *title)
     menuList->AppendCheckItem(LIST_TOGGLE_HEADER, "Toggle &header\tCtrl-H");
     menuList->Check(LIST_TOGGLE_HEADER, true);
     menuList->AppendCheckItem(LIST_TOGGLE_BELL, "Toggle &bell on no match");
+    menuList->AppendSeparator();
+    menuList->AppendCheckItem(LIST_TOGGLE_CHECKBOXES,
+                              wxT("&Enable Checkboxes"));
+    menuList->Check(LIST_TOGGLE_CHECKBOXES, true);
+    menuList->Append(LIST_TOGGLE_CHECKBOX, wxT("Toggle the item checkbox state"));
+    menuList->Append(LIST_GET_CHECKBOX, wxT("Get the item checkbox state"));
 
     wxMenu *menuCol = new wxMenu;
     menuCol->Append(LIST_SET_FG_COL, wxT("&Foreground colour..."));
@@ -519,11 +529,11 @@ void MyFrame::InitWithReportItems()
     itemCol.SetImage(-1);
     m_listCtrl->InsertColumn(0, itemCol);
 
-    itemCol.SetText(wxT("Column 2"));
+    itemCol.SetText(wxT("Column 2 (auto size excluding header)"));
     itemCol.SetAlign(wxLIST_FORMAT_CENTRE);
     m_listCtrl->InsertColumn(1, itemCol);
 
-    itemCol.SetText(wxT("Column 3"));
+    itemCol.SetText(wxT("Column 3 (auto size including header)"));
     itemCol.SetAlign(wxLIST_FORMAT_RIGHT);
     m_listCtrl->InsertColumn(2, itemCol);
 
@@ -558,10 +568,6 @@ void MyFrame::InitWithReportItems()
 
     m_listCtrl->SetTextColour(*wxBLUE);
 
-    m_listCtrl->SetColumnWidth( 0, wxLIST_AUTOSIZE );
-    m_listCtrl->SetColumnWidth( 1, wxLIST_AUTOSIZE );
-    m_listCtrl->SetColumnWidth( 2, wxLIST_AUTOSIZE );
-
     // Set images in columns
     m_listCtrl->SetItemColumnImage(1, 1, 0);
 
@@ -573,6 +579,10 @@ void MyFrame::InitWithReportItems()
 
     // test SetItemFont too
     m_listCtrl->SetItemFont(0, *wxITALIC_FONT);
+
+    m_listCtrl->SetColumnWidth( 0, wxLIST_AUTOSIZE );
+    m_listCtrl->SetColumnWidth( 1, wxLIST_AUTOSIZE );
+    m_listCtrl->SetColumnWidth( 2, wxLIST_AUTOSIZE_USEHEADER );
 }
 
 void MyFrame::InitWithIconItems(bool withText, bool sameIcon)
@@ -671,11 +681,11 @@ void MyFrame::InitWithVirtualItems()
     }
     else
     {
-        m_listCtrl->AppendColumn(wxT("First Column"));
-        m_listCtrl->AppendColumn(wxT("Second Column"));
-        m_listCtrl->SetColumnWidth(0, 150);
-        m_listCtrl->SetColumnWidth(1, 150);
+        m_listCtrl->AppendColumn(wxT("First Column (size auto)"));
+        m_listCtrl->AppendColumn(wxT("Second Column (150px)"));
         m_listCtrl->SetItemCount(1000000);
+        m_listCtrl->SetColumnWidth(0, wxLIST_AUTOSIZE_USEHEADER);
+        m_listCtrl->SetColumnWidth(1, 150);
     }
 }
 
@@ -835,6 +845,27 @@ void MyFrame::OnUpdateToggleMultiSel(wxUpdateUIEvent& event)
      event.Check(!m_listCtrl->HasFlag(wxLC_SINGLE_SEL));
 }
 
+void MyFrame::OnToggleCheckboxes(wxCommandEvent& WXUNUSED(event))
+{
+    if ( !m_listCtrl->EnableCheckboxes(!m_listCtrl->HasCheckboxes()) )
+    {
+        wxLogMessage("Failed to toggle checkboxes (not supported?)");
+    }
+    else
+    {
+        wxLogMessage("Checkboxes are now %s",
+                     m_listCtrl->HasCheckboxes() ? "enabled" : "disabled");
+    }
+}
+
+void MyFrame::OnUpdateToggleCheckboxes(wxUpdateUIEvent& event)
+{
+    bool cbEnabled = m_listCtrl->HasCheckboxes();
+    event.Check(cbEnabled);
+    GetMenuBar()->Enable(LIST_TOGGLE_CHECKBOX, cbEnabled);
+    GetMenuBar()->Enable(LIST_GET_CHECKBOX, cbEnabled);
+}
+
 void MyFrame::OnUpdateToggleHeader(wxUpdateUIEvent& event)
 {
     event.Check(!m_listCtrl->HasFlag(wxLC_NO_HEADER));
@@ -893,6 +924,33 @@ void MyFrame::OnEdit(wxCommandEvent& WXUNUSED(event))
     }
 }
 
+void MyFrame::OnToggleItemCheckbox(wxCommandEvent& WXUNUSED(event))
+{
+    long item = m_listCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+    while (item != -1)
+    {
+        bool checked = m_listCtrl->IsItemChecked(item);
+        m_listCtrl->CheckItem(item, !checked);
+
+        item = m_listCtrl->GetNextItem(item, wxLIST_NEXT_ALL,
+            wxLIST_STATE_SELECTED);
+    }
+}
+
+void MyFrame::OnGetItemCheckbox(wxCommandEvent& WXUNUSED(event))
+{
+    long item = m_listCtrl->GetNextItem(-1, wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
+    while (item != -1)
+    {
+        bool checked = m_listCtrl->IsItemChecked(item);
+
+        wxLogMessage(wxT("Item %ld is %s"), item, checked ? wxT("checked") : wxT("unchecked"));
+
+        item = m_listCtrl->GetNextItem(item, wxLIST_NEXT_ALL,
+            wxLIST_STATE_SELECTED);
+    }
+}
+
 void MyFrame::OnDelete(wxCommandEvent& WXUNUSED(event))
 {
     if ( m_listCtrl->GetItemCount() )
@@ -935,6 +993,10 @@ wxBEGIN_EVENT_TABLE(MyListCtrl, wxListCtrl)
     EVT_LIST_KEY_DOWN(LIST_CTRL, MyListCtrl::OnListKeyDown)
     EVT_LIST_ITEM_ACTIVATED(LIST_CTRL, MyListCtrl::OnActivated)
     EVT_LIST_ITEM_FOCUSED(LIST_CTRL, MyListCtrl::OnFocused)
+    EVT_LIST_ITEM_CHECKED(LIST_CTRL, MyListCtrl::OnChecked)
+    EVT_LIST_ITEM_UNCHECKED(LIST_CTRL, MyListCtrl::OnUnChecked)
+
+    EVT_LIST_ITEM_RIGHT_CLICK(LIST_CTRL, MyListCtrl::OnItemRightClick)
 
     EVT_LIST_COL_CLICK(LIST_CTRL, MyListCtrl::OnColClick)
     EVT_LIST_COL_RIGHT_CLICK(LIST_CTRL, MyListCtrl::OnColRightClick)
@@ -1114,6 +1176,27 @@ void MyListCtrl::OnActivated(wxListEvent& event)
 void MyListCtrl::OnFocused(wxListEvent& event)
 {
     LogEvent(event, wxT("OnFocused"));
+
+    event.Skip();
+}
+
+void MyListCtrl::OnItemRightClick(wxListEvent& event)
+{
+    LogEvent(event, wxT("OnItemRightClick"));
+
+    event.Skip();
+}
+
+void MyListCtrl::OnChecked(wxListEvent& event)
+{
+    LogEvent(event, wxT("OnChecked"));
+
+    event.Skip();
+}
+
+void MyListCtrl::OnUnChecked(wxListEvent& event)
+{
+    LogEvent(event, wxT("OnUnChecked"));
 
     event.Skip();
 }

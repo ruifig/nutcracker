@@ -92,11 +92,7 @@ void            FindMax(int *max_thing, int thing);
     #include "wx/clipbrd.h"
 #endif
 
-#ifdef __WXWINCE__
-    STDAPI_(__int64) CeGetRandomSeed();
-#endif
-
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 MainWindow *TheMainWindow = NULL;
 
@@ -108,11 +104,11 @@ void MainWindow::CreateFonts()
     m_italicFont = wxTheFontList->FindOrCreateFont(pointSize, wxSWISS, wxITALIC, wxNORMAL);
 }
 
-BEGIN_EVENT_TABLE(MainWindow, wxFrame)
+wxBEGIN_EVENT_TABLE(MainWindow, wxFrame)
     EVT_CLOSE(MainWindow::OnCloseWindow)
     EVT_CHAR(MainWindow::OnChar)
     EVT_MENU(wxID_ANY, MainWindow::OnPopup)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 MainWindow::MainWindow(wxFrame *frame, wxWindowID id, const wxString& title,
      const wxPoint& pos, const wxSize& size, long style):
@@ -519,14 +515,10 @@ bool MyApp::OnInit()
     poem_buffer = new wxChar[BUFFER_SIZE];
 
     // Seed the random number generator
-#ifdef __WXWINCE__
-    srand((unsigned) CeGetRandomSeed());
-#else
     time_t current_time;
 
     (void)time(&current_time);
     srand((unsigned int)current_time);
-#endif
 
 //    randomize();
     pages[0] = 0;
@@ -581,11 +573,11 @@ void MainWindow::OnChar(wxKeyEvent& event)
     canvas->OnChar(event);
 }
 
-BEGIN_EVENT_TABLE(MyCanvas, wxWindow)
+wxBEGIN_EVENT_TABLE(MyCanvas, wxWindow)
     EVT_MOUSE_EVENTS(MyCanvas::OnMouseEvent)
     EVT_CHAR(MyCanvas::OnChar)
     EVT_PAINT(MyCanvas::OnPaint)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 // Define a constructor for my canvas
 MyCanvas::MyCanvas(wxFrame *frame):

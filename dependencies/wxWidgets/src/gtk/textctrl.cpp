@@ -600,7 +600,7 @@ static void state_flags_changed(GtkWidget*, GtkStateFlags, wxTextCtrl* win)
 //  wxTextCtrl
 //-----------------------------------------------------------------------------
 
-BEGIN_EVENT_TABLE(wxTextCtrl, wxTextCtrlBase)
+wxBEGIN_EVENT_TABLE(wxTextCtrl, wxTextCtrlBase)
     EVT_CHAR(wxTextCtrl::OnChar)
 
     EVT_MENU(wxID_CUT, wxTextCtrl::OnCut)
@@ -624,7 +624,7 @@ BEGIN_EVENT_TABLE(wxTextCtrl, wxTextCtrlBase)
     EVT_RIGHT_DOWN  (wxTextCtrl::OnUrlMouseEvent)
     EVT_RIGHT_UP    (wxTextCtrl::OnUrlMouseEvent)
     EVT_RIGHT_DCLICK(wxTextCtrl::OnUrlMouseEvent)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 void wxTextCtrl::Init()
 {
@@ -695,6 +695,7 @@ bool wxTextCtrl::Create( wxWindow *parent,
         gulong sig_id = g_signal_connect(m_buffer, "mark_set", G_CALLBACK(mark_set), &m_anonymousMarkList);
         // Create view
         m_text = gtk_text_view_new_with_buffer(m_buffer);
+        GTKConnectFreezeWidget(m_text);
         // gtk_text_view_set_buffer adds its own reference
         g_object_unref(m_buffer);
         g_signal_handler_disconnect(m_buffer, sig_id);
@@ -851,7 +852,10 @@ GtkEditable *wxTextCtrl::GetEditable() const
 
 GtkEntry *wxTextCtrl::GetEntry() const
 {
-    return GTK_ENTRY(m_text);
+    if (GTK_IS_ENTRY(m_text))
+        return (GtkEntry*)m_text;
+
+    return NULL;
 }
 
 int wxTextCtrl::GTKIMFilterKeypress(GdkEventKey* event) const
@@ -986,6 +990,11 @@ wxString wxTextCtrl::GetValue() const
 {
     wxCHECK_MSG( m_text != NULL, wxEmptyString, wxT("invalid text ctrl") );
 
+    return wxTextEntry::GetValue();
+}
+
+wxString wxTextCtrl::DoGetValue() const
+{
     if ( IsMultiLine() )
     {
         GtkTextIter start;
@@ -998,7 +1007,7 @@ wxString wxTextCtrl::GetValue() const
     }
     else // single line
     {
-        return wxTextEntry::GetValue();
+        return wxTextEntry::DoGetValue();
     }
 }
 
@@ -1099,6 +1108,11 @@ void wxTextCtrl::WriteText( const wxString &text )
 
     // we're changing the text programmatically
     DontMarkDirtyOnNextChange();
+
+    // avoid generating wxEVT_CHAR when called from wxEVT_CHAR handler
+    GdkEventKey* const imKeyEvent_save = m_imKeyEvent;
+    m_imKeyEvent = NULL;
+    wxON_BLOCK_EXIT_SET(m_imKeyEvent, imKeyEvent_save);
 
     if ( !IsMultiLine() )
     {
@@ -1650,8 +1664,7 @@ GdkWindow *wxTextCtrl::GTKGetWindow(wxArrayGdkWindows& WXUNUSED(windows)) const
     else
     {
 #ifdef __WXGTK3__
-        GdkWindow* wxGTKFindWindow(GtkWidget* widget);
-        return wxGTKFindWindow(m_text);
+        return GTKFindWindow(m_text);
 #else
         return gtk_entry_get_text_window(GTK_ENTRY(m_text));
 #endif
@@ -1815,22 +1828,27 @@ void wxTextCtrl::DoApplyWidgetStyle(GtkRcStyle *style)
     const bool bg_ok = m_backgroundColour.IsOk();
     if (fg_ok || bg_ok)
     {
-        GdkRGBA fg_orig, bg_orig;
+        GdkRGBA *fg_orig, *bg_orig;
         GtkStyleContext* context = gtk_widget_get_style_context(m_text);
         if (IsMultiLine())
         {
             gtk_style_context_save(context);
             gtk_style_context_add_class(context, GTK_STYLE_CLASS_VIEW);
         }
-        gtk_style_context_get_color(context, selectedFocused, &fg_orig);
-        gtk_style_context_get_background_color(context, selectedFocused, &bg_orig);
+        gtk_style_context_set_state(context, selectedFocused);
+        gtk_style_context_get(context, selectedFocused,
+            "color", &fg_orig, "background-color", &bg_orig,
+            NULL);
         if (IsMultiLine())
             gtk_style_context_restore(context);
 
         if (fg_ok)
-            gtk_widget_override_color(m_text, selectedFocused, &fg_orig);
+            gtk_widget_override_color(m_text, selectedFocused, fg_orig);
         if (bg_ok)
-            gtk_widget_override_background_color(m_text, selectedFocused, &bg_orig);
+            gtk_widget_override_background_color(m_text, selectedFocused, bg_orig);
+
+        gdk_rgba_free(fg_orig);
+        gdk_rgba_free(bg_orig);
     }
 #endif // __WXGTK3__
 
@@ -1963,6 +1981,8 @@ void wxTextCtrl::DoFreeze()
     wxCHECK_RET(m_text != NULL, wxT("invalid text ctrl"));
 
     GTKFreezeWidget(m_text);
+    if (m_widget != m_text)
+        GTKFreezeWidget(m_widget);
 
     if ( HasFlag(wxTE_MULTILINE) )
     {
@@ -2009,6 +2029,8 @@ void wxTextCtrl::DoThaw()
     }
 
     GTKThawWidget(m_text);
+    if (m_widget != m_text)
+        GTKThawWidget(m_widget);
 }
 
 // ----------------------------------------------------------------------------

@@ -33,7 +33,7 @@
 // wxHtmlWinParser
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlWinParser, wxHtmlParser)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlWinParser, wxHtmlParser);
 
 wxList wxHtmlWinParser::m_Modules;
 
@@ -265,15 +265,6 @@ void wxHtmlWinParser::DoneParser()
     wxHtmlParser::DoneParser();
 }
 
-#if WXWIN_COMPATIBILITY_2_6
-wxHtmlWindow *wxHtmlWinParser::GetWindow()
-{
-    if (!m_windowInterface)
-        return NULL;
-    return wxDynamicCast(m_windowInterface->GetHTMLWindow(), wxHtmlWindow);
-}
-#endif
-
 wxObject* wxHtmlWinParser::GetProduct()
 {
     wxHtmlContainerCell *top;
@@ -302,10 +293,10 @@ wxFSFile *wxHtmlWinParser::OpenURL(wxHtmlURLType type,
 
         // consider url as absolute path first
         wxURI current(myurl);
-        myfullurl = current.BuildUnescapedURI();
+        myfullurl = current.BuildURI();
 
         // if not absolute then ...
-        if( current.IsReference() )
+        if( current.IsRelative() )
         {
             wxString basepath = GetFS()->GetPath();
             wxURI base(basepath);
@@ -315,7 +306,7 @@ wxFSFile *wxHtmlWinParser::OpenURL(wxHtmlURLType type,
             {
                 wxURI path(myfullurl);
                 path.Resolve( base );
-                myfullurl = path.BuildUnescapedURI();
+                myfullurl = path.BuildURI();
             }
             else
             {
@@ -324,15 +315,23 @@ wxFSFile *wxHtmlWinParser::OpenURL(wxHtmlURLType type,
                 {
                     basepath += myurl;
                     wxURI connected( basepath );
-                    myfullurl = connected.BuildUnescapedURI();
+                    myfullurl = connected.BuildURI();
                 }
             }
         }
 
         wxString redirect;
-        status = m_windowInterface->OnHTMLOpeningURL(type, myfullurl, &redirect);
+        status = m_windowInterface->OnHTMLOpeningURL
+                                    (
+                                        type,
+                                        wxURI::Unescape(myfullurl),
+                                        &redirect
+                                    );
         if ( status != wxHTML_REDIRECT )
+        {
+            myurl = myfullurl;
             break;
+        }
 
         myurl = redirect;
     }
@@ -620,9 +619,9 @@ wxFont* wxHtmlWinParser::CreateCurrentFont()
         *faceptr = face;
         *fontptr = new wxFont(
                        (int) (m_FontsSizes[fs] * m_FontScale),
-                       ff ? wxMODERN : wxSWISS,
-                       fi ? wxITALIC : wxNORMAL,
-                       fb ? wxBOLD : wxNORMAL,
+                       ff ? wxFONTFAMILY_MODERN : wxFONTFAMILY_SWISS,
+                       fi ? wxFONTSTYLE_ITALIC : wxFONTSTYLE_NORMAL,
+                       fb ? wxFONTWEIGHT_BOLD : wxFONTWEIGHT_NORMAL,
                        fu ? true : false, face
 #if wxUSE_UNICODE
                        );
@@ -751,7 +750,7 @@ void wxHtmlWinParser::SetInputEncoding(wxFontEncoding enc)
 // wxHtmlWinTagHandler
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxHtmlWinTagHandler, wxHtmlTagHandler)
+wxIMPLEMENT_ABSTRACT_CLASS(wxHtmlWinTagHandler, wxHtmlTagHandler);
 
 void wxHtmlWinTagHandler::ApplyStyle(const wxHtmlStyleParams &styleParams)
 {
@@ -870,7 +869,7 @@ void wxHtmlWinTagHandler::ApplyStyle(const wxHtmlStyleParams &styleParams)
 //     Do not add any winpars.cpp shutdown or initialization code to it,
 //     create a new module instead!
 
-IMPLEMENT_DYNAMIC_CLASS(wxHtmlTagsModule, wxModule)
+wxIMPLEMENT_DYNAMIC_CLASS(wxHtmlTagsModule, wxModule);
 
 bool wxHtmlTagsModule::OnInit()
 {

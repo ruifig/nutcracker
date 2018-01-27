@@ -36,6 +36,7 @@ private:
     CPPUNIT_TEST_SUITE( VarArgTestCase );
         CPPUNIT_TEST( StringPrintf );
         CPPUNIT_TEST( CharPrintf );
+        CPPUNIT_TEST( SizetPrintf );
 #if wxUSE_STD_STRING
         CPPUNIT_TEST( StdString );
 #endif
@@ -49,6 +50,7 @@ private:
 
     void StringPrintf();
     void CharPrintf();
+    void SizetPrintf();
 #if wxUSE_STD_STRING
     void StdString();
 #endif
@@ -59,7 +61,7 @@ private:
     void RepeatedPrintf();
     void ArgsValidation();
 
-    DECLARE_NO_COPY_CLASS(VarArgTestCase)
+    wxDECLARE_NO_COPY_CLASS(VarArgTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -99,9 +101,16 @@ void VarArgTestCase::StringPrintf()
     CPPUNIT_ASSERT( s2 == "value=FooBar;" );
 
     // this tests correct passing of wxCStrData constructed from string
-    // literal:
+    // literal (and we disable the warnings related to the use of a literal
+    // here because we want to test that this compiles, even with warnings):
+    wxGCC_WARNING_SUPPRESS(write-strings)
+    wxCLANG_WARNING_SUPPRESS(c++11-compat-deprecated-writable-strings)
+
     bool cond = true;
     s2.Printf(wxT("foo %s"), !cond ? s.c_str() : wxT("bar"));
+
+    wxGCC_WARNING_RESTORE(write-strings)
+    wxCLANG_WARNING_RESTORE(c++11-compat-deprecated-writable-strings)
 }
 
 void VarArgTestCase::CharPrintf()
@@ -124,12 +133,10 @@ void VarArgTestCase::CharPrintf()
 
     // test char used as integer:
     #ifdef _MSC_VER
-        #pragma warning(disable:4305) // truncation of constant value in VC6
         #pragma warning(disable:4309) // truncation of constant value
     #endif
     c = 240;
     #ifdef _MSC_VER
-        #pragma warning(default:4305) // truncation of constant value in VC6
         #pragma warning(default:4309)
     #endif
     s.Printf("value is %i (int)", c);
@@ -138,6 +145,24 @@ void VarArgTestCase::CharPrintf()
     unsigned char u = 240;
     s.Printf("value is %i (int)", u);
     CPPUNIT_ASSERT_EQUAL( "value is 240 (int)", s );
+}
+
+void VarArgTestCase::SizetPrintf()
+{
+    size_t  i =  1;
+    ssize_t j = -2;
+
+    CPPUNIT_ASSERT_EQUAL
+        (
+            "size_t=1 ssize_t=-2",
+            wxString::Format("size_t=%zu ssize_t=%zd", i, j)
+        );
+
+    CPPUNIT_ASSERT_EQUAL
+        (
+            "size_t=0xA0",
+            wxString::Format("size_t=0x%zX", static_cast<size_t>(160))
+        );
 }
 
 #if wxUSE_STD_STRING
@@ -241,13 +266,7 @@ void VarArgTestCase::ArgsValidation()
     // but these are not:
     WX_ASSERT_FAILS_WITH_ASSERT( wxString::Format("%i", "foo") );
     WX_ASSERT_FAILS_WITH_ASSERT( wxString::Format("%s", (void*)this) );
-
-    // for some reason assert is not generated with VC6, don't know what's
-    // going there so disable it for now to make the test suite pass when using
-    // this compiler until someone has time to debug this (FIXME-VC6)
-#ifndef __VISUALC6__
     WX_ASSERT_FAILS_WITH_ASSERT( wxString::Format("%d", ptr) );
-#endif
 
     // we don't check wxNO_PRINTF_PERCENT_N here as these expressions should
     // result in an assert in our code before the CRT functions are even called

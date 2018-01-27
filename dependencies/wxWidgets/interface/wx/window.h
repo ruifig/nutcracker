@@ -137,7 +137,7 @@ enum wxWindowVariant
            is the old name for this style. Windows only.
     @style{wxBORDER_THEME}
            Displays a native border suitable for a control, on the current
-           platform. On Windows XP or Vista, this will be a themed border; on
+           platform. On Windows, this will be a themed border; on
            most other platforms a sunken border will be used. For more
            information for themed borders on Windows, please see Themed
            borders on Windows.
@@ -190,11 +190,6 @@ enum wxWindowVariant
     @endStyleTable
 
     @beginExtraStyleTable
-    @style{wxWS_EX_VALIDATE_RECURSIVELY}
-           By default, wxWindow::Validate(), wxWindow::TransferDataTo() and
-           wxWindow::TransferDataFromWindow() only work on
-           direct children of the window (compatible behaviour).
-           Set this flag to make them recursively descend into all subwindows.
     @style{wxWS_EX_BLOCK_EVENTS}
            wxCommandEvents and the objects of the derived classes are
            forwarded to the parent window and so on recursively by default.
@@ -422,7 +417,7 @@ public:
 
     /**
         This function is called by wxWidgets keyboard navigation code when the user
-        gives the focus to this window from keyboard (e.g. using @c TAB key).
+        gives the focus to this window from keyboard (e.g.\ using @c TAB key).
 
         By default this method simply calls SetFocus() but
         can be overridden to do something in addition to this in the derived classes.
@@ -480,8 +475,10 @@ public:
     wxWindowList& GetChildren();
 
     /**
-        @overload
-    */
+        Returns a const reference to the list of the window's children.
+
+        @copydetails GetChildren()
+     */
     const wxWindowList& GetChildren() const;
 
     /**
@@ -586,7 +583,7 @@ public:
         @param vflag
             Whether the vertical scroll bar should always be visible.
 
-        @remarks This function is currently only implemented under Mac/Carbon.
+        @remarks This function is currently not implemented.
     */
     virtual void AlwaysShowScrollbars(bool hflag = true, bool vflag = true);
 
@@ -917,6 +914,149 @@ public:
     virtual void FitInside();
 
     /**
+        Convert DPI-independent pixel values to the value in pixels appropriate
+        for the current toolkit.
+
+        A DPI-independent pixel is just a pixel at the standard 96 DPI
+        resolution. To keep the same physical size at higher resolution, the
+        physical pixel value must be scaled by GetContentScaleFactor() but this
+        scaling may be already done by the underlying toolkit (GTK+, Cocoa,
+        ...) automatically. This method performs the conversion only if it is
+        not already done by the lower level toolkit and so by using it with
+        pixel values you can guarantee that the physical size of the
+        corresponding elements will remain the same in all resolutions under
+        all platforms. For example, instead of creating a bitmap of the hard
+        coded size of 32 pixels you should use
+        @code
+            wxBitmap bmp(FromDIP(32, 32));
+        @endcode
+        to avoid using tiny bitmaps on high DPI screens.
+
+        Notice that this function is only needed when using hard coded pixel
+        values. It is not necessary if the sizes are already based on the
+        DPI-independent units such as dialog units or if you are relying on the
+        controls automatic best size determination and using sizers to lay out
+        them.
+
+        Also note that if either component of @a sz has the special value of
+        -1, it is returned unchanged independently of the current DPI, to
+        preserve the special value of -1 in wxWidgets API (it is often used to
+        mean "unspecified").
+
+        @since 3.1.0
+     */
+    wxSize FromDIP(const wxSize& sz) const;
+
+    /// @overload
+    wxPoint FromDIP(const wxPoint& pt) const;
+
+    /**
+        Convert DPI-independent distance in pixels to the value in pixels
+        appropriate for the current toolkit.
+
+        This is the same as FromDIP(const wxSize& sz) overload, but assumes
+        that the resolution is the same in horizontal and vertical directions.
+
+        If @a d has the special value of -1, it is returned unchanged
+        independently of the current DPI.
+
+        @since 3.1.0
+     */
+    int FromDIP(int d) const;
+
+    /**
+        Non window-specific DPI-independent pixels conversion functions.
+
+        The display resolution depends on the window in general as different
+        windows can appear on different monitors using different resolutions,
+        however sometimes no window is available for converting the resolution
+        independent pixels to the physical values and in this case these static
+        overloads can be used with @NULL value for @a w argument.
+
+        Using these methods is discouraged as passing @NULL will prevent your
+        application from correctly supporting monitors with different
+        resolutions even in the future wxWidgets versions which will add
+        support for them, and passing non-@NULL window is just a less
+        convenient way of calling the non-static FromDIP() method.
+
+        @since 3.1.0
+     */
+    static wxSize FromDIP(const wxSize& sz, const wxWindow* w);
+
+    /// @overload
+    static wxPoint FromDIP(const wxPoint& pt, const wxWindow* w);
+
+    /// @overload
+    static wxSize FromDIP(const wxSize& sz, const wxWindow* w);
+
+
+    /**
+    Convert pixel values of the current toolkit to DPI-independent pixel values.
+
+    A DPI-independent pixel is just a pixel at the standard 96 DPI
+    resolution. To keep the same physical size at higher resolution, the
+    physical pixel value must be scaled by GetContentScaleFactor() but this
+    scaling may be already done by the underlying toolkit (GTK+, Cocoa,
+    ...) automatically. This method performs the conversion only if it is
+    not already done by the lower level toolkit, For example, you may
+    want to use this to store window sizes and positions so that they
+    can be re-used regardless of the display DPI:
+    @code
+    wxPoint pt(ToDIP(GetPosition()));
+    wxSize size(ToDIP(GetSize()));
+    @endcode
+
+    Also note that if either component of @a sz has the special value of
+    -1, it is returned unchanged independently of the current DPI, to
+    preserve the special value of -1 in wxWidgets API (it is often used to
+    mean "unspecified").
+
+    @since 3.1.0
+    */
+    wxSize ToDIP(const wxSize& sz) const;
+
+    /// @overload
+    wxPoint ToDIP(const wxPoint& pt) const;
+
+    /**
+    Convert pixel values of the current toolkit to DPI-independent pixel values.
+
+    This is the same as ToDIP(const wxSize& sz) overload, but assumes
+    that the resolution is the same in horizontal and vertical directions.
+
+    If @a d has the special value of -1, it is returned unchanged
+    independently of the current DPI.
+
+    @since 3.1.0
+    */
+    int ToDIP(int d) const;
+
+    /**
+    Non window-specific pixel to DPI-independent pixels conversion functions.
+
+    The display resolution depends on the window in general as different
+    windows can appear on different monitors using different resolutions,
+    however sometimes no window is available for converting the resolution
+    independent pixels to the physical values and in this case these static
+    overloads can be used with @NULL value for @a w argument.
+
+    Using these methods is discouraged as passing @NULL will prevent your
+    application from correctly supporting monitors with different
+    resolutions even in the future wxWidgets versions which will add
+    support for them, and passing non-@NULL window is just a less
+    convenient way of calling the non-static ToDIP() method.
+
+    @since 3.1.0
+    */
+    static wxSize ToDIP(const wxSize& sz, const wxWindow* w);
+
+    /// @overload
+    static wxPoint ToDIP(const wxPoint& pt, const wxWindow* w);
+
+    /// @overload
+    static wxSize ToDIP(const wxSize& sz, const wxWindow* w);
+
+    /**
         This functions returns the best acceptable minimal size for the window.
 
         For example, for a static control, it will be the minimal size such that the
@@ -1124,10 +1264,19 @@ public:
        Returns the magnification of the backing store of this window, eg 2.0
        for a window on a retina screen.
 
+       This factor should be used to determine the size of bitmaps and similar
+       "content-containing" windows appropriate for the current resolution.
+       E.g. the program may load a 32px bitmap if the content scale factor is
+       1.0 or 64px version of the same bitmap if it is 2.0 or bigger.
+
+       Notice that this method should @e not be used for window sizes, as they
+       are already scaled by this factor by the underlying toolkit under some
+       platforms. Use FromDIP() for anything window-related instead.
+
        @since 2.9.5
     */
-    virtual double GetContentScaleFactor() const;
-    
+    double GetContentScaleFactor() const;
+
     /**
         Returns the size of the left/right and top/bottom borders of this window in x
         and y components of the result respectively.
@@ -1568,6 +1717,11 @@ public:
     */
     void Move(const wxPoint& pt, int flags = wxSIZE_USE_EXISTING);
 
+    /**
+        Moves the window to the specified position.
+
+        This is exactly the same as calling Move() with the default arguments.
+     */
     void SetPosition(const wxPoint& pt);
 
     //@}
@@ -1948,7 +2102,7 @@ public:
         this only since GTK 2.12 with a compositing manager enabled, call
         IsTransparentBackgroundSupported() to check whether this is the case.
 
-        Also, on order for @c SetBackgroundStyle(wxBG_STYLE_TRANSPARENT) to
+        Also, in order for @c SetBackgroundStyle(wxBG_STYLE_TRANSPARENT) to
         work, it must be called before Create(). If you're using your own
         wxWindow-derived class you should write your code in the following way:
         @code
@@ -2591,9 +2745,7 @@ public:
             animation time for the current platform is used.
 
         @note Currently this function is only implemented in wxMSW and wxOSX
-              (for wxTopLevelWindows only in Carbon version and for any kind of
-              windows in Cocoa) and does the same thing as Show() in the other
-              ports.
+              and does the same thing as Show() in the other ports.
 
         @since 2.9.0
 
@@ -2779,8 +2931,8 @@ public:
         Transfers values from child controls to data areas specified by their
         validators. Returns @false if a transfer failed.
 
-        If the window has @c wxWS_EX_VALIDATE_RECURSIVELY extra style flag set,
-        the method will also call TransferDataFromWindow() of all child windows.
+        Notice that this also calls TransferDataFromWindow() for all children
+        recursively.
 
         @see TransferDataToWindow(), wxValidator, Validate()
     */
@@ -2790,8 +2942,8 @@ public:
         Transfers values to child controls from data areas specified by their
         validators.
 
-        If the window has @c wxWS_EX_VALIDATE_RECURSIVELY extra style flag set,
-        the method will also call TransferDataToWindow() of all child windows.
+        Notice that this also calls TransferDataToWindow() for all children
+        recursively.
 
         @return Returns @false if a transfer failed.
 
@@ -2801,8 +2953,8 @@ public:
 
     /**
         Validates the current values of the child controls using their validators.
-        If the window has @c wxWS_EX_VALIDATE_RECURSIVELY extra style flag set,
-        the method will also call Validate() of all child windows.
+
+        Notice that this also calls Validate() for all children recursively.
 
         @return Returns @false if any of the validations failed.
 
@@ -3012,7 +3164,7 @@ public:
         This function returns @true if this window, or one of its parent
         windows, is scheduled for destruction and can be useful to avoid
         manipulating it as it's usually useless to do something with a window
-        which is on the point of disappearing anyhow.
+        which is at the point of disappearing anyhow.
      */
     bool IsBeingDeleted() const;
 
@@ -3259,7 +3411,19 @@ public:
     */
     //@{
 
+    /**
+        Return where the given point lies, exactly.
+
+        This method is used to test whether the point lies inside the client
+        window area or on one of its scrollbars.
+
+        The point coordinates are specified in client window coordinates.
+     */
     wxHitTest HitTest(wxCoord x, wxCoord y) const;
+
+    /**
+        @overload
+     */
     wxHitTest HitTest(const wxPoint& pt) const;
 
     /**
@@ -3430,9 +3594,8 @@ public:
                  modifier/virtualKeyCode combination.
 
         @remarks Use EVT_HOTKEY(hotkeyId, fnc) in the event table to capture the
-                 event. This function is currently only implemented
-                 under Windows. It is used in the Windows CE port for
-                 detecting hardware button presses.
+                 event. This function is currently only implemented under MSW
+                 and OS X and always returns false in the other ports.
 
         @see UnregisterHotKey()
     */
@@ -3801,6 +3964,8 @@ wxWindow* wxGetActiveWindow();
 /**
     Returns the first top level parent of the given window, or in other words,
     the frame or dialog containing it, or @NULL.
+
+    Notice that if @a window is itself already a TLW, it is returned directly.
 
     @header{wx/window.h}
 */

@@ -291,9 +291,16 @@ public:
         the current colour setting.
 
         A depth of 32 including an alpha channel is supported under MSW, Mac and GTK+.
+
+        @param width
+            The width of the bitmap in pixels, must be strictly positive.
+        @param height
+            The height of the bitmap in pixels, must be strictly positive.
+        @param depth
+            The number of bits used to represent each bitmap pixel.
     */
     wxBitmap(int width, int height, int depth = wxBITMAP_SCREEN_DEPTH);
-    
+
     /**
         @overload
     */
@@ -347,6 +354,21 @@ public:
     wxBitmap(const wxImage& img, int depth = wxBITMAP_SCREEN_DEPTH);
 
     /**
+        Creates bitmap corresponding to the given cursor.
+
+        This can be useful to display a cursor as it cannot be drawn directly
+        on a window.
+
+        This constructor only exists in wxMSW and wxGTK (where it is
+        implemented for GTK+ 2.8 or later) only.
+
+        @param cursor A valid wxCursor.
+
+        @since 3.1.0
+    */
+    explicit wxBitmap(const wxCursor& cursor);
+
+    /**
         Destructor.
         See @ref overview_refcount_destruct for more info.
 
@@ -398,15 +420,56 @@ public:
     /**
         Creates a fresh bitmap.
         If the final argument is omitted, the display depth of the screen is used.
-        
+
+        @param width
+            The width of the bitmap in pixels, must be strictly positive.
+        @param height
+            The height of the bitmap in pixels, must be strictly positive.
+        @param depth
+            The number of bits used to represent each bitmap pixel.
+
         @return @true if the creation was successful.
     */
     virtual bool Create(int width, int height, int depth = wxBITMAP_SCREEN_DEPTH);
-    
+
     /**
         @overload
     */
     virtual bool Create(const wxSize& sz, int depth = wxBITMAP_SCREEN_DEPTH);
+
+    /**
+        Create a bitmap compatible with the given DC, inheriting its magnification factor
+
+        @param width
+            The width of the bitmap in pixels, must be strictly positive.
+        @param height
+            The height of the bitmap in pixels, must be strictly positive.
+        @param dc
+            DC from wich the scaling factor is inherited
+
+        @return @true if the creation was successful.
+
+        @since 3.1.0
+    */
+    bool Create(int width, int height, const wxDC& dc);
+
+    /**
+        Create a bitmap with a scale factor, width and height are multiplied with that factor
+
+        @param width
+            The width of the bitmap in pixels, must be strictly positive.
+        @param height
+            The height of the bitmap in pixels, must be strictly positive.
+        @param depth
+            The number of bits used to represent each bitmap pixel.
+        @param logicalScale
+            Scale factor used by the bitmap
+
+        @return @true if the creation was successful.
+
+        @since 3.1.0
+    */
+    bool CreateScaled(int logwidth, int logheight, int depth, double logicalScale);
 
     /*
         Creates a bitmap from the given data, which can be of arbitrary type.

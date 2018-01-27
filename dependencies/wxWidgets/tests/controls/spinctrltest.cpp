@@ -49,7 +49,7 @@ private:
 
     wxSpinCtrl* m_spin;
 
-    DECLARE_NO_COPY_CLASS(SpinCtrlTestCase)
+    wxDECLARE_NO_COPY_CLASS(SpinCtrlTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -125,6 +125,7 @@ void SpinCtrlTestCase::Arrows()
     wxUIActionSimulator sim;
 
     m_spin->SetFocus();
+    wxYield();
 
     sim.Char(WXK_UP);
 
@@ -154,6 +155,7 @@ void SpinCtrlTestCase::Wrap()
     wxUIActionSimulator sim;
 
     m_spin->SetFocus();
+    wxYield();
 
     sim.Char(WXK_DOWN);
 

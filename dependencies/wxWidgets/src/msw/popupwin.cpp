@@ -47,13 +47,6 @@ bool wxPopupWindow::Create(wxWindow *parent, int flags)
                                 flags | wxPOPUP_WINDOW);
 }
 
-void wxPopupWindow::DoGetPosition(int *x, int *y) const
-{
-    // This method only exists for ABI compatibility but does nothing special
-    // any more, it is removed in 3.1.0 and later.
-    wxPopupWindowBase::DoGetPosition(x, y);
-}
-
 WXDWORD wxPopupWindow::MSWGetStyle(long flags, WXDWORD *exstyle) const
 {
     // we only honour the border flags, the others don't make sense for us
@@ -77,13 +70,7 @@ WXHWND wxPopupWindow::MSWGetParent() const
     //     WS_CHILD but then showing a popup would deactivate the parent which
     //     is ugly and working around this, although possible, is even more
     //     ugly
-    // GetDesktopWindow() is not always supported on WinCE, and if
-    // it is, it often returns NULL.
-#ifdef __WXWINCE__
-    return 0;
-#else
     return (WXHWND)::GetDesktopWindow();
-#endif
 }
 
 void wxPopupWindow::SetFocus()

@@ -45,7 +45,7 @@
 // resources
 // ----------------------------------------------------------------------------
 
-// the application icon (under Windows and OS/2 it is in resources)
+// the application icon (under Windows it is in resources)
 #ifndef wxHAS_IMAGES_IN_RESOURCES
     #include "../sample.xpm"
 #endif
@@ -66,7 +66,7 @@ public:
                                   int WXUNUSED(flags) = 0,
                                   wxHeaderSortIconType WXUNUSED(sortArrow)
                                     = wxHDR_SORT_ICON_NONE,
-                                  wxHeaderButtonParams* params = NULL)
+                                  wxHeaderButtonParams* params = NULL) wxOVERRIDE
     {
         wxDCBrushChanger setBrush(dc, *wxBLUE_BRUSH);
         wxDCTextColourChanger setFgCol(dc, *wxWHITE);
@@ -86,7 +86,7 @@ public:
 // cases, but we show this here just for completeness)
 class MyTraits : public wxGUIAppTraits
 {
-    virtual wxRendererNative *CreateRenderer()
+    virtual wxRendererNative *CreateRenderer() wxOVERRIDE
     {
         // it will be deleted on program shutdown by wxWidgets itself
         return new MyRenderer;
@@ -97,10 +97,10 @@ class MyTraits : public wxGUIAppTraits
 class MyApp : public wxApp
 {
 public:
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 
     // if we want MyTraits to be used we must override CreateTraits()
-    virtual wxAppTraits *CreateTraits() { return new MyTraits; }
+    virtual wxAppTraits *CreateTraits() wxOVERRIDE { return new MyTraits; }
 };
 
 // Define a new frame type: this is going to be our main frame
@@ -125,6 +125,8 @@ private:
         { OnToggleDrawFlag(event, wxCONTROL_CURRENT); }
     void OnDrawUndetermined(wxCommandEvent &event)
         { OnToggleDrawFlag(event, wxCONTROL_UNDETERMINED); }
+    void OnDrawSpecial(wxCommandEvent &event)
+        { OnToggleDrawFlag(event, wxCONTROL_SPECIAL); }
 
     void OnAlignLeft(wxCommandEvent& WXUNUSED(event))
         { OnChangeAlign(wxALIGN_LEFT); }
@@ -198,7 +200,9 @@ private:
             flagsString += "wxCONTROL_CHECKED ";
         if ( m_flags & wxCONTROL_UNDETERMINED )
             flagsString += "wxCONTROL_UNDETERMINED ";
-        if ( flagsString.empty() )
+        if (m_flags & wxCONTROL_SPECIAL)
+            flagsString += "wxCONTROL_SPECIAL ";
+        if (flagsString.empty())
             flagsString = "(none)";
         dc.DrawText("Using flags: " + flagsString, x1, y);
         y += lineHeight*3;
@@ -242,6 +246,12 @@ private:
                                  wxRect(wxPoint(x2, y), sizeCheck), m_flags);
         y += lineHeight + sizeCheck.y;
 
+        dc.DrawText("DrawCollapseButton()", x1, y);
+        const wxSize sizeCollapse = renderer.GetCollapseButtonSize(this, dc);
+        renderer.DrawCollapseButton(this, dc,
+                                    wxRect(wxPoint(x2, y), sizeCollapse), m_flags);
+        y += lineHeight + sizeCollapse.y;
+
         dc.DrawText("DrawTreeItemButton()", x1, y);
         renderer.DrawTreeItemButton(this, dc,
                                     wxRect(x2, y, 20, 20), m_flags);
@@ -267,6 +277,27 @@ private:
 
         y += lineHeight + rBtn.height;
 #endif // wxHAS_DRAW_TITLE_BAR_BITMAP
+
+        const wxCoord heightGauge = 24;
+        const wxCoord widthGauge = 180;
+
+        dc.DrawText("DrawGauge()", x1, y);
+        wxRendererNative::GetDefault().DrawGauge(this, dc,
+            wxRect(x2, y, widthGauge, heightGauge), 25, 100, m_flags);
+
+        y += lineHeight + heightGauge;
+
+        const wxCoord heightListItem = 48;
+        const wxCoord widthListItem = 260;
+
+        dc.DrawText("DrawItemSelectionRect()", x1, y);
+        wxRendererNative::GetDefault().DrawItemSelectionRect(this, dc,
+            wxRect(x2, y, widthListItem, heightListItem), m_flags | wxCONTROL_SELECTED);
+
+        wxRendererNative::GetDefault().DrawItemText(this, dc, "DrawItemText()",
+            wxRect(x2, y, widthListItem, heightListItem).Inflate(-2, -2), m_align, m_flags | wxCONTROL_SELECTED);
+
+        y += lineHeight + heightListItem;
     }
 
     int m_flags;
@@ -295,6 +326,7 @@ enum
     Render_DrawChecked,
     Render_DrawHot,
     Render_DrawUndetermined,
+    Render_DrawSpecial,
 
     Render_AlignLeft,
     Render_AlignCentre,
@@ -331,6 +363,7 @@ wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(Render_DrawChecked, MyFrame::OnDrawChecked)
     EVT_MENU(Render_DrawHot, MyFrame::OnDrawHot)
     EVT_MENU(Render_DrawUndetermined, MyFrame::OnDrawUndetermined)
+    EVT_MENU(Render_DrawSpecial, MyFrame::OnDrawSpecial)
     EVT_MENU(Render_AlignLeft, MyFrame::OnAlignLeft)
     EVT_MENU(Render_AlignCentre, MyFrame::OnAlignCentre)
     EVT_MENU(Render_AlignRight, MyFrame::OnAlignRight)
@@ -352,7 +385,7 @@ wxEND_EVENT_TABLE()
 // static object for many reasons) and also implements the accessor function
 // wxGetApp() which will return the reference of the right type (i.e. MyApp and
 // not wxApp)
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 // ============================================================================
 // implementation
@@ -411,6 +444,8 @@ MyFrame::MyFrame()
                               "Draw in &hot state\tCtrl-H");
     menuFile->AppendCheckItem(Render_DrawUndetermined,
                               "Draw in unde&termined state\tCtrl-T");
+    menuFile->AppendCheckItem(Render_DrawSpecial,
+                              "Draw in &special state\tCtrl-S");
     menuFile->AppendSeparator();
 
     menuFile->AppendRadioItem(Render_AlignLeft, "&Left align\tCtrl-1");

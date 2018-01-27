@@ -96,7 +96,7 @@ private:
     void BMPFlippingAndRLECompression();
     void ScaleCompare();
 
-    DECLARE_NO_COPY_CLASS(ImageTestCase)
+    wxDECLARE_NO_COPY_CLASS(ImageTestCase);
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( ImageTestCase );
@@ -985,11 +985,6 @@ static void SetAlpha(wxImage *image)
 
 void ImageTestCase::CompareSavedImage()
 {
-    // FIXME-VC6: Pre-declare the loop variables for compatibility with
-    // pre-standard compilers such as MSVC6 that don't implement proper scope
-    // for the variables declared in the for loops.
-    int i;
-
     wxImage expected24("horse.png");
     CPPUNIT_ASSERT( expected24.IsOk() );
     CPPUNIT_ASSERT( !expected24.HasAlpha() );
@@ -998,7 +993,7 @@ void ImageTestCase::CompareSavedImage()
 
 #if wxUSE_PALETTE
     unsigned char greys[256];
-    for (i = 0; i < 256; ++i)
+    for (int i = 0; i < 256; ++i)
     {
         greys[i] = i;
     }
@@ -1163,8 +1158,7 @@ void ImageTestCase::SaveAnimatedGIF()
 
     wxImageArray images;
     images.Add(image);
-    int i;
-    for (i = 0; i < 4-1; ++i)
+    for (int i = 0; i < 4-1; ++i)
     {
         images.Add( images[i].Rotate90() );
 
@@ -1180,7 +1174,7 @@ void ImageTestCase::SaveAnimatedGIF()
     const int imageCount = handler.GetImageCount(memIn);
     CPPUNIT_ASSERT_EQUAL(4, imageCount);
 
-    for (i = 0; i < imageCount; ++i)
+    for (int i = 0; i < imageCount; ++i)
     {
         wxFileOffset pos = memIn.TellI();
         CPPUNIT_ASSERT( handler.LoadFile(&image, memIn, true, i) );
@@ -1346,11 +1340,55 @@ void ImageTestCase::BMPFlippingAndRLECompression()
 }
 
 
+static bool
+CompareApprox(const wxImage& i1, const wxImage& i2)
+{
+    if ( i1.GetWidth() != i2.GetWidth() )
+        return false;
+
+    if ( i1.GetHeight() != i2.GetHeight() )
+        return false;
+
+    const unsigned char* p1 = i1.GetData();
+    const unsigned char* p2 = i2.GetData();
+    const int numBytes = i1.GetWidth()*i1.GetHeight()*3;
+    for ( int n = 0; n < numBytes; n++, p1++, p2++ )
+    {
+        switch ( *p1 - *p2 )
+        {
+            case -1:
+            case  0:
+            case +1:
+                // Accept up to one pixel difference, this happens because of
+                // different rounding behaviours in different compiler versions
+                // even under the same architecture, see the example in
+                // http://thread.gmane.org/gmane.comp.lib.wxwidgets.devel/151149/focus=151154
+                break;
+
+            default:
+                return false;
+        }
+    }
+
+    return true;
+}
+
+// The 0 below can be replaced with 1 to generate, instead of comparing with,
+// the test files.
 #define ASSERT_IMAGE_EQUAL_TO_FILE(image, file) \
+    if ( 0 ) \
+    { \
+        CPPUNIT_ASSERT_MESSAGE( "Failed to save " file, image.SaveFile(file) ); \
+    } \
+    else \
     { \
         wxImage imageFromFile(file); \
         CPPUNIT_ASSERT_MESSAGE( "Failed to load " file, imageFromFile.IsOk() ); \
-        CPPUNIT_ASSERT_EQUAL( imageFromFile, image ); \
+        CPPUNIT_ASSERT_MESSAGE \
+        ( \
+            "Wrong scaled " + CppUnit::assertion_traits<wxImage>::toString(image), \
+            CompareApprox(imageFromFile, image) \
+        ); \
     }
 
 void ImageTestCase::ScaleCompare()

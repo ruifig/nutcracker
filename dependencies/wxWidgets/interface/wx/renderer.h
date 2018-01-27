@@ -12,6 +12,13 @@
 */
 enum
 {
+    /**
+        Default state, no special flags.
+
+        @since 3.1.0
+     */
+    wxCONTROL_NONE       = 0x00000000,
+
     /** Control is disabled. */
     wxCONTROL_DISABLED   = 0x00000001,
 
@@ -30,7 +37,7 @@ enum
     /** Only for the menu items. */
     wxCONTROL_ISSUBMENU  = wxCONTROL_SPECIAL,
 
-    /** Only for the tree items. */
+    /** Only for the tree items and collapse buttons. */
     wxCONTROL_EXPANDED   = wxCONTROL_SPECIAL,
 
     /** Only for the status bar panes. */
@@ -38,6 +45,9 @@ enum
 
     /** Checkboxes only: flat border. */
     wxCONTROL_FLAT       = wxCONTROL_SPECIAL,
+
+    /** Item selection rect only: cell inside selection. */
+    wxCONTROL_CELL       = wxCONTROL_SPECIAL,
 
     /** Mouse is currently over the control. */
     wxCONTROL_CURRENT    = 0x00000010,
@@ -343,6 +353,22 @@ public:
                                int flags = 0) = 0;
 
     /**
+        Draw a progress bar in the specified rectangle.
+
+        The @a value and @a max arguments determine the part of the progress
+        bar that is drawn as being filled in, @a max must be strictly positive
+        and @a value must be between 0 and @a max.
+
+        @since 3.1.0
+     */
+    virtual void DrawGauge(wxWindow* win,
+                           wxDC& dc,
+                           const wxRect& rect,
+                           int value,
+                           int max,
+                           int flags = 0) = 0;
+
+    /**
         Draw the header control button (used, for example, by wxListCtrl).
 
         Depending on platforms the @a flags parameter may support the @c wxCONTROL_SELECTED
@@ -381,10 +407,35 @@ public:
         @c wxCONTROL_FOCUSED may be used to indicate if the control has the focus
         (otherwise the selection rectangle is e.g. often grey and not blue).
         This may be ignored by the renderer or deduced by the code directly from
-        the @a win.
+        the @a win. Additionally @c wxCONTROL_CELL may be used to draw a cell inside
+        a bigger selection area.
+
+        @see DrawItemText()
     */
     virtual void DrawItemSelectionRect(wxWindow* win, wxDC& dc,
                                        const wxRect& rect, int flags = 0) = 0;
+
+
+    /**
+        Draw item text in the correct color based on selection status.
+
+        Background of the text should be painted with DrawItemSelectionRect().
+
+        The supported @a flags are @c wxCONTROL_SELECTED for items
+        which are selected.
+        @c wxCONTROL_FOCUSED may be used to indicate if the control has the focus.
+        @c wxCONTROL_DISABLED may be used to indicate if the control is disabled.
+
+        @since 3.1.0
+        @see DrawItemSelectionRect()
+    */
+    virtual void DrawItemText(wxWindow* win,
+                              wxDC& dc,
+                              const wxString& text,
+                              const wxRect& rect,
+                              int align = wxALIGN_LEFT | wxALIGN_TOP,
+                              int flags = 0,
+                              wxEllipsizeMode ellipsizeMode = wxELLIPSIZE_END) = 0;
 
     /**
         Draw a blank push button that looks very similar to wxButton.
@@ -394,6 +445,24 @@ public:
     */
     virtual void DrawPushButton(wxWindow* win, wxDC& dc, const wxRect& rect,
                                 int flags = 0) = 0;
+
+    /**
+        Draw a collapse button.
+
+        @a flags may have the @c wxCONTROL_EXPANDED or @c wxCONTROL_CURRENT
+        bit set, see @ref wxCONTROL_FLAGS.
+
+        @since 3.1.0
+    */
+    virtual void DrawCollapseButton(wxWindow *win, wxDC& dc,
+                                    const wxRect& rect, int flags = 0) = 0;
+
+    /**
+        Returns the size of a collapse button.
+
+        @since 3.1.0
+    */
+    virtual wxSize GetCollapseButtonSize(wxWindow *win, wxDC& dc) = 0;
 
     /**
         Draw the border for sash window: this border must be such that the sash
@@ -450,10 +519,6 @@ public:
 
         The presence of this function is indicated by @c
         wxHAS_DRAW_TITLE_BAR_BITMAP symbol being defined.
-
-        Also notice that PNG handler must be enabled using wxImage::AddHandler()
-        to use this function under OS X currently as the bitmaps are embedded
-        in the library itself in PNG format.
 
         @since 2.9.1
      */

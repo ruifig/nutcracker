@@ -35,40 +35,39 @@ EXTRALIBS_GUI = @EXTRALIBS_GUI@
 CXXWARNINGS = @CXXWARNINGS@
 HOST_SUFFIX = @HOST_SUFFIX@
 SAMPLES_RPATH_FLAG = @SAMPLES_RPATH_FLAG@
+SAMPLES_CXXFLAGS = @SAMPLES_CXXFLAGS@
 wx_top_builddir = @wx_top_builddir@
 
 ### Variables: ###
 
 DESTDIR = 
-WX_RELEASE = 3.0
-WX_VERSION = $(WX_RELEASE).2
+WX_RELEASE = 3.1
+WX_VERSION = $(WX_RELEASE).0
 LIBDIRNAME = $(wx_top_builddir)/lib
 IPCCLIENT_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	$(__DEBUG_DEFINE_p) $(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) \
 	$(__THREAD_DEFINE_p) -I$(srcdir) $(__DLLFLAG_p) -I$(srcdir)/../../samples \
-	$(CXXWARNINGS) $(CPPFLAGS) $(CXXFLAGS)
+	$(CXXWARNINGS) $(SAMPLES_CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS)
 IPCCLIENT_OBJECTS =  \
 	$(__ipcclient___win32rc) \
-	$(__ipc) \
 	ipcclient_client.o
 IPCSERVER_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	$(__DEBUG_DEFINE_p) $(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) \
 	$(__THREAD_DEFINE_p) -I$(srcdir) $(__DLLFLAG_p) -I$(srcdir)/../../samples \
-	$(CXXWARNINGS) $(CPPFLAGS) $(CXXFLAGS)
+	$(CXXWARNINGS) $(SAMPLES_CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS)
 IPCSERVER_OBJECTS =  \
 	$(__ipcserver___win32rc) \
-	$(__ipc) \
 	ipcserver_server.o
 BASEIPCCLIENT_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	$(__DEBUG_DEFINE_p) $(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) \
 	$(__THREAD_DEFINE_p) -I$(srcdir) $(__DLLFLAG_p) -DwxUSE_GUI=0 $(CXXWARNINGS) \
-	$(CPPFLAGS) $(CXXFLAGS)
+	$(SAMPLES_CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS)
 BASEIPCCLIENT_OBJECTS =  \
 	baseipcclient_baseclient.o
 BASEIPCSERVER_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) \
 	$(__DEBUG_DEFINE_p) $(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) \
 	$(__THREAD_DEFINE_p) -I$(srcdir) $(__DLLFLAG_p) -DwxUSE_GUI=0 $(CXXWARNINGS) \
-	$(CPPFLAGS) $(CXXFLAGS)
+	$(SAMPLES_CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS)
 BASEIPCSERVER_OBJECTS =  \
 	baseipcserver_baseserver.o
 
@@ -147,7 +146,6 @@ COND_PLATFORM_OS2_1___ipcserver___os2_emxbindcmd = $(NM) ipcserver$(EXEEXT) | \
 @COND_SHARED_1@__DLLFLAG_p_0 = --define WXUSINGDLL
 @COND_TOOLKIT_MSW@__RCDEFDIR_p = --include-dir \
 @COND_TOOLKIT_MSW@	$(LIBDIRNAME)/wx/include/$(TOOLCHAIN_FULLNAME)
-@COND_PLATFORM_OS2_1@__ipc = $(top_srcdir)/include/wx/os2/wx.res
 COND_MONOLITHIC_0___WXLIB_CORE_p = \
 	-lwx_$(PORTNAME)$(WXUNIVNAME)$(WXUNICODEFLAG)$(WXDEBUGFLAG)$(WX_LIB_FLAVOUR)_core-$(WX_RELEASE)$(HOST_SUFFIX)
 @COND_MONOLITHIC_0@__WXLIB_CORE_p = $(COND_MONOLITHIC_0___WXLIB_CORE_p)
@@ -276,13 +274,13 @@ baseipcserver$(EXEEXT): $(BASEIPCSERVER_OBJECTS)
 	$(__baseipcserver___mac_setfilecmd)
 
 ipcclient_sample_rc.o: $(srcdir)/../../samples/sample.rc
-	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_0) $(__DEBUG_DEFINE_p_0)  $(__EXCEPTIONS_DEFINE_p_0) $(__RTTI_DEFINE_p_0) $(__THREAD_DEFINE_p_0)   --include-dir $(srcdir) $(__DLLFLAG_p_0) --include-dir $(srcdir)/../../samples $(__RCDEFDIR_p) --include-dir $(top_srcdir)/include
+	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_0) $(__DEBUG_DEFINE_p_0)  $(__EXCEPTIONS_DEFINE_p_0) $(__RTTI_DEFINE_p_0) $(__THREAD_DEFINE_p_0)  --include-dir $(srcdir) $(__DLLFLAG_p_0) --include-dir $(srcdir)/../../samples $(__RCDEFDIR_p) --include-dir $(top_srcdir)/include
 
 ipcclient_client.o: $(srcdir)/client.cpp
 	$(CXXC) -c -o $@ $(IPCCLIENT_CXXFLAGS) $(srcdir)/client.cpp
 
 ipcserver_sample_rc.o: $(srcdir)/../../samples/sample.rc
-	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_0) $(__DEBUG_DEFINE_p_0)  $(__EXCEPTIONS_DEFINE_p_0) $(__RTTI_DEFINE_p_0) $(__THREAD_DEFINE_p_0)   --include-dir $(srcdir) $(__DLLFLAG_p_0) --include-dir $(srcdir)/../../samples $(__RCDEFDIR_p) --include-dir $(top_srcdir)/include
+	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_0) $(__DEBUG_DEFINE_p_0)  $(__EXCEPTIONS_DEFINE_p_0) $(__RTTI_DEFINE_p_0) $(__THREAD_DEFINE_p_0)  --include-dir $(srcdir) $(__DLLFLAG_p_0) --include-dir $(srcdir)/../../samples $(__RCDEFDIR_p) --include-dir $(top_srcdir)/include
 
 ipcserver_server.o: $(srcdir)/server.cpp
 	$(CXXC) -c -o $@ $(IPCSERVER_CXXFLAGS) $(srcdir)/server.cpp

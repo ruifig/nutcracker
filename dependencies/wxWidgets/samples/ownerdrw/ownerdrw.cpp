@@ -39,7 +39,7 @@ class OwnerDrawnFrame : public wxFrame
 {
 public:
     // ctor & dtor
-    OwnerDrawnFrame(wxFrame *frame, const wxChar *title, int x, int y, int w, int h);
+    OwnerDrawnFrame(wxFrame *frame, const wxString& title, int x, int y, int w, int h);
     ~OwnerDrawnFrame(){};
 
     // notifications
@@ -84,7 +84,7 @@ wxBEGIN_EVENT_TABLE(OwnerDrawnFrame, wxFrame)
                 OwnerDrawnFrame::OnListboxDblClick)
 wxEND_EVENT_TABLE()
 
-IMPLEMENT_APP(OwnerDrawnApp)
+wxIMPLEMENT_APP(OwnerDrawnApp);
 
 // init our app: create windows
 bool OwnerDrawnApp::OnInit(void)
@@ -92,9 +92,7 @@ bool OwnerDrawnApp::OnInit(void)
     if ( !wxApp::OnInit() )
         return false;
 
-    OwnerDrawnFrame *pFrame
-        = new OwnerDrawnFrame(NULL, wxT("wxWidgets Ownerdraw Sample"),
-                              50, 50, 450, 340);
+    new OwnerDrawnFrame(NULL, "wxWidgets Ownerdraw Sample", 50, 50, 450, 340);
 
     return true;
 }
@@ -110,11 +108,11 @@ void OwnerDrawnFrame::InitMenu()
     wxMenu *sub_menu  = new wxMenu;
 
     // vars used for menu construction
-    wxFont fontLarge(18, wxROMAN, wxNORMAL, wxBOLD, false),
-           fontUlined(12, wxDEFAULT, wxNORMAL, wxNORMAL, true),
-           fontItalic(12, wxMODERN, wxITALIC, wxBOLD, false),
+    wxFont fontLarge(wxFontInfo(18).Family(wxFONTFAMILY_ROMAN).Bold()),
+           fontUlined(wxFontInfo(12).Underlined()),
+           fontItalic(wxFontInfo(12).Italic().Bold()),
            // should be at least of the size of bitmaps
-           fontBmp(14, wxDEFAULT, wxNORMAL, wxNORMAL, false);
+           fontBmp(wxFontInfo(14));
 
     // sorry for my artistic skills...
     wxBitmap bmpBell(wxT("bell")),
@@ -257,7 +255,7 @@ void OwnerDrawnFrame::InitMenu()
 }
 
 // main frame constructor
-OwnerDrawnFrame::OwnerDrawnFrame(wxFrame *frame, const wxChar *title,
+OwnerDrawnFrame::OwnerDrawnFrame(wxFrame *frame, const wxString& title,
                                  int x, int y, int w, int h)
          : wxFrame(frame, wxID_ANY, title, wxPoint(x, y), wxSize(w, h))
 {

@@ -42,7 +42,7 @@ private:
 
     wxDatePickerCtrl* m_datepicker;
 
-    DECLARE_NO_COPY_CLASS(DatePickerCtrlTestCase)
+    wxDECLARE_NO_COPY_CLASS(DatePickerCtrlTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -106,6 +106,13 @@ void DatePickerCtrlTestCase::Range()
 
     m_datepicker->SetValue(dtStart - wxTimeSpan::Day());
     CPPUNIT_ASSERT_EQUAL( dtEnd, m_datepicker->GetValue() );
+
+
+    // Changing the range should clamp the current value to it if necessary.
+    const wxDateTime
+        dtBeforeEnd = dtEnd - wxDateSpan::Day();
+    m_datepicker->SetRange(dtStart, dtBeforeEnd);
+    CPPUNIT_ASSERT_EQUAL( dtBeforeEnd, m_datepicker->GetValue() );
 }
 
 #endif // wxUSE_DATEPICKCTRL

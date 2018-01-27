@@ -77,12 +77,12 @@ class ChoiceWidgetsPage : public ItemContainerWidgetsPage
 public:
     ChoiceWidgetsPage(WidgetsBookCtrl *book, wxImageList *imaglist);
 
-    virtual wxControl *GetWidget() const { return m_choice; }
-    virtual wxItemContainer* GetContainer() const { return m_choice; }
-    virtual void RecreateWidget() { CreateChoice(); }
+    virtual wxWindow *GetWidget() const wxOVERRIDE { return m_choice; }
+    virtual wxItemContainer* GetContainer() const wxOVERRIDE { return m_choice; }
+    virtual void RecreateWidget() wxOVERRIDE { CreateChoice(); }
 
     // lazy creation of the content
-    virtual void CreateContent();
+    virtual void CreateContent() wxOVERRIDE;
 
 protected:
     // event handlers
@@ -121,12 +121,7 @@ protected:
     wxCheckBox *m_chkSort;
 
     // the choice itself and the sizer it is in
-#ifdef __WXWINCE__
-    wxChoiceBase
-#else
-    wxChoice
-#endif
-                  *m_choice;
+    wxChoice *m_choice;
 
     wxSizer *m_sizerChoice;
 
@@ -215,13 +210,6 @@ void ChoiceWidgetsPage::CreateContent()
         wxT("&Set choice parameters"));
     wxSizer *sizerLeft = new wxStaticBoxSizer(box, wxVERTICAL);
 
-    static const wxString modes[] =
-    {
-        wxT("single"),
-        wxT("extended"),
-        wxT("multiple"),
-    };
-
     m_chkSort = CreateCheckBoxAndAddToSizer(sizerLeft, wxT("&Sort items"));
 
     wxButton *btn = new wxButton(this, ChoicePage_Reset, wxT("&Reset"));
@@ -297,7 +285,7 @@ void ChoiceWidgetsPage::Reset()
 
 void ChoiceWidgetsPage::CreateChoice()
 {
-    int flags = ms_defaultFlags;
+    int flags = GetAttrs().m_defaultFlags;
 
     if ( m_chkSort->GetValue() )
         flags |= wxCB_SORT;
@@ -321,7 +309,7 @@ void ChoiceWidgetsPage::CreateChoice()
                             flags);
 
     m_choice->Set(items);
-    m_sizerChoice->Add(m_choice, 1, wxGROW | wxALL, 5);
+    m_sizerChoice->Add(m_choice, 0, wxGROW | wxALL, 5);
     m_sizerChoice->Layout();
 }
 

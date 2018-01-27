@@ -28,7 +28,7 @@
 
 #include "joytest.h"
 
-// the application icon (under Windows and OS/2 it is in resources and even
+// the application icon (under Windows it is in resources and even
 // though we could still include the XPM here it would be unused)
 #ifndef wxHAS_IMAGES_IN_RESOURCES
     #include "../sample.xpm"
@@ -36,7 +36,7 @@
 
 MyFrame *frame = NULL;
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 // For drawing lines in a canvas
 long xpos = -1;

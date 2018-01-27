@@ -77,7 +77,7 @@ public:
     // this one is called on application startup and is a good place for the app
     // initialization (doing it here and not in the ctor allows to have an error
     // return: if OnInit() returns false, the application terminates)
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 };
 
 class MyPanel : public wxPanel
@@ -339,7 +339,7 @@ wxEND_EVENT_TABLE()
 // static object for many reasons) and also declares the accessor function
 // wxGetApp() which will return the reference of the right type (i.e. MyApp and
 // not wxApp)
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 // ============================================================================
 // implementation
@@ -357,9 +357,7 @@ bool MyApp::OnInit()
 
     // Create the main application window
     MyFrame *frame = new MyFrame(wxT("Calendar wxWidgets sample")
-#ifndef __WXWINCE__
                                  ,wxPoint(50, 50), wxSize(450, 340)
-#endif
                                  );
 
     frame->Show(true);
@@ -706,7 +704,7 @@ MyPanel::MyPanel(wxWindow *parent)
     m_calendar = DoCreateCalendar(wxDefaultDateTime,
                                   wxCAL_MONDAY_FIRST | wxCAL_SHOW_HOLIDAYS);
 
-    // adjust to vertical/horizontal display, check mostly dedicated to WinCE
+    // adjust to vertical/horizontal display
     bool horizontal = ( wxSystemSettings::GetMetric(wxSYS_SCREEN_X) > wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) );
     m_sizer = new wxBoxSizer( horizontal ? wxHORIZONTAL : wxVERTICAL );
 

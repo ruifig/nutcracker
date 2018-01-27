@@ -65,11 +65,11 @@ public:
     ColourPickerWidgetsPage(WidgetsBookCtrl *book, wxImageList *imaglist);
     virtual ~ColourPickerWidgetsPage(){};
 
-    virtual wxControl *GetWidget() const { return m_clrPicker; }
-    virtual void RecreateWidget() { RecreatePicker(); }
+    virtual wxWindow *GetWidget() const wxOVERRIDE { return m_clrPicker; }
+    virtual void RecreateWidget() wxOVERRIDE { RecreatePicker(); }
 
     // lazy creation of the content
-    virtual void CreateContent();
+    virtual void CreateContent() wxOVERRIDE;
 
 protected:
 
@@ -98,7 +98,8 @@ protected:
     // --------------
 
     wxCheckBox *m_chkColourTextCtrl,
-               *m_chkColourShowLabel;
+               *m_chkColourShowLabel,
+               *m_chkColourShowAlpha;
     wxBoxSizer *m_sizer;
 
 private:
@@ -145,6 +146,7 @@ void ColourPickerWidgetsPage::CreateContent()
     wxStaticBoxSizer *clrbox = new wxStaticBoxSizer(wxVERTICAL, this, wxT("&ColourPicker style"));
     m_chkColourTextCtrl = CreateCheckBoxAndAddToSizer(clrbox, wxT("With textctrl"));
     m_chkColourShowLabel = CreateCheckBoxAndAddToSizer(clrbox, wxT("With label"));
+    m_chkColourShowAlpha = CreateCheckBoxAndAddToSizer(clrbox, wxT("With opacity"));
     boxleft->Add(clrbox, 0, wxALL|wxGROW, 5);
 
     boxleft->Add(new wxButton(this, PickerPage_Reset, wxT("&Reset")),
@@ -189,6 +191,9 @@ long ColourPickerWidgetsPage::GetPickerStyle()
     if ( m_chkColourShowLabel->GetValue() )
         style |= wxCLRP_SHOW_LABEL;
 
+    if ( m_chkColourShowAlpha->GetValue() )
+        style |= wxCLRP_SHOW_ALPHA;
+
     return style;
 }
 
@@ -205,6 +210,7 @@ void ColourPickerWidgetsPage::Reset()
 {
     m_chkColourTextCtrl->SetValue((wxCLRP_DEFAULT_STYLE & wxCLRP_USE_TEXTCTRL) != 0);
     m_chkColourShowLabel->SetValue((wxCLRP_DEFAULT_STYLE & wxCLRP_SHOW_LABEL) != 0);
+    m_chkColourShowAlpha->SetValue((wxCLRP_DEFAULT_STYLE & wxCLRP_SHOW_ALPHA) != 0);
 }
 
 
@@ -227,7 +233,8 @@ void ColourPickerWidgetsPage::OnColourChange(wxColourPickerEvent& event)
 void ColourPickerWidgetsPage::OnCheckBox(wxCommandEvent &event)
 {
     if (event.GetEventObject() == m_chkColourTextCtrl ||
-        event.GetEventObject() == m_chkColourShowLabel)
+        event.GetEventObject() == m_chkColourShowLabel ||
+        event.GetEventObject() == m_chkColourShowAlpha)
         RecreatePicker();
 }
 

@@ -254,7 +254,7 @@ static void wxFreePoolGC( GdkGC *gc )
 // wxWindowDC
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxWindowDCImpl, wxGTKDCImpl)
+wxIMPLEMENT_ABSTRACT_CLASS(wxWindowDCImpl, wxGTKDCImpl);
 
 wxWindowDCImpl::wxWindowDCImpl( wxDC *owner ) :
    wxGTKDCImpl( owner )
@@ -663,6 +663,16 @@ void wxWindowDCImpl::DoDrawEllipticArc( wxCoord x, wxCoord y, wxCoord width, wxC
     {
         wxCoord start = wxCoord(sa * 64.0);
         wxCoord end = wxCoord((ea-sa) * 64.0);
+        // We want to draw always in the counter-clokwise direction.
+        if (end < 0)
+        {
+            end = end % (360*64) + 360*64;
+        }
+        // If end angle equals start engle we want to draw a full ellipse.
+        if (end == 0)
+        {
+            end = 360*64;
+        }
 
         if ( m_brush.IsNonTransparent() )
         {
@@ -832,32 +842,7 @@ void wxWindowDCImpl::DoDrawRectangle( wxCoord x, wxCoord y, wxCoord width, wxCoo
 
         if ( m_pen.IsNonTransparent() )
         {
-            if ((m_pen.GetWidth() == 2) && (m_pen.GetCap() == wxCAP_ROUND) &&
-                (m_pen.GetJoin() == wxJOIN_ROUND) && (m_pen.GetStyle() == wxPENSTYLE_SOLID))
-            {
-                // Use 2 1-line rects instead
-                gdk_gc_set_line_attributes( m_penGC, 1, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND );
-
-                if (m_signX == -1)
-                {
-                    // Different for RTL
-                    gdk_draw_rectangle( m_gdkwindow, m_penGC, FALSE, xx+1, yy, ww-2, hh-2 );
-                    gdk_draw_rectangle( m_gdkwindow, m_penGC, FALSE, xx, yy-1, ww, hh );
-                }
-                else
-                {
-                    gdk_draw_rectangle( m_gdkwindow, m_penGC, FALSE, xx, yy, ww-2, hh-2 );
-                    gdk_draw_rectangle( m_gdkwindow, m_penGC, FALSE, xx-1, yy-1, ww, hh );
-                }
-
-                // reset
-                gdk_gc_set_line_attributes( m_penGC, 2, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_ROUND );
-            }
-            else
-            {
-                // Just use X11 for other cases
-                gdk_draw_rectangle( m_gdkwindow, m_penGC, FALSE, xx, yy, ww-1, hh-1 );
-            }
+            gdk_draw_rectangle(m_gdkwindow, m_penGC, false, xx, yy, ww - 1, hh - 1);
         }
     }
 
@@ -1399,14 +1384,14 @@ void wxWindowDCImpl::DoDrawText(const wxString& text,
     DoDrawRotatedText(text, xLogical, yLogical, 0);
 }
 
-void wxWindowDCImpl::DoDrawRotatedText(const wxString& str, int xLogical, int yLogical, double angle)
+void wxWindowDCImpl::DoDrawRotatedText(const wxString& text, int xLogical, int yLogical, double angle)
 {
-    if (!m_gdkwindow || str.empty())
+    if (!m_gdkwindow || text.empty())
         return;
 
     wxCHECK_RET( IsOk(), wxT("invalid window dc") );
 
-    pango_layout_set_text(m_layout, wxGTK_CONV(str), -1);
+    pango_layout_set_text(m_layout, wxGTK_CONV(text), -1);
     const bool setAttrs = m_font.GTKSetPangoAttrs(m_layout);
 
     const GdkColor* bg_col = NULL;
@@ -1677,7 +1662,13 @@ void wxWindowDCImpl::SetPen( const wxPen &pen )
         case wxJOIN_BEVEL: { joinStyle = GDK_JOIN_BEVEL; break; }
         case wxJOIN_MITER: { joinStyle = GDK_JOIN_MITER; break; }
         case wxJOIN_ROUND:
-        default:           { joinStyle = GDK_JOIN_ROUND; break; }
+        default:
+            break;
+    }
+    if (width < 3)
+    {
+        // width 2 rounded join looks bad on X11 (missing one corner pixel)
+        joinStyle = GDK_JOIN_MITER;
     }
 
     gdk_gc_set_line_attributes( m_penGC, width, lineStyle, capStyle, joinStyle );
@@ -2017,7 +2008,7 @@ int wxWindowDCImpl::GetDepth() const
 // wxClientDCImpl
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxClientDCImpl, wxWindowDCImpl)
+wxIMPLEMENT_ABSTRACT_CLASS(wxClientDCImpl, wxWindowDCImpl);
 
 wxClientDCImpl::wxClientDCImpl( wxDC *owner )
           : wxWindowDCImpl( owner )
@@ -2049,7 +2040,7 @@ void wxClientDCImpl::DoGetSize(int *width, int *height) const
 // wxPaintDCImpl
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxPaintDCImpl, wxClientDCImpl)
+wxIMPLEMENT_ABSTRACT_CLASS(wxPaintDCImpl, wxClientDCImpl);
 
 // Limit the paint region to the window size. Sometimes
 // the paint region is too big, and this risks X11 errors
@@ -2110,14 +2101,14 @@ wxPaintDCImpl::wxPaintDCImpl( wxDC *owner, wxWindow *win )
 class wxDCModule : public wxModule
 {
 public:
-    bool OnInit();
-    void OnExit();
+    bool OnInit() wxOVERRIDE;
+    void OnExit() wxOVERRIDE;
 
 private:
-    DECLARE_DYNAMIC_CLASS(wxDCModule)
+    wxDECLARE_DYNAMIC_CLASS(wxDCModule);
 };
 
-IMPLEMENT_DYNAMIC_CLASS(wxDCModule, wxModule)
+wxIMPLEMENT_DYNAMIC_CLASS(wxDCModule, wxModule);
 
 bool wxDCModule::OnInit()
 {

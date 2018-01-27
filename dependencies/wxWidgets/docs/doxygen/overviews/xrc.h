@@ -48,18 +48,17 @@ text editor, for all but the smallest files it is advisable to use a
 specialised tool. Examples of these include:
 
 @e Non-free:
-@li wxDesigner <http://www.wxdesigner-software.de/>, a commercial dialog
-    designer/RAD tool.
 @li DialogBlocks <http://www.anthemion.co.uk/dialogblocks/>, a commercial
     dialog editor.
 
 @e Free:
-@li XRCed <http://xrced.sf.net/>, a wxPython-based dialog editor that you
-    can find in the wxPython/tools subdirectory of the wxWidgets SVN archive.
-@li wxFormBuilder <http://wxformbuilder.org/>, a C++-based dialog editor that
+@li XRCed <http://xrced.sourceforge.net/>, a wxPython-based dialog editor.
+@li wxFormBuilder <http://wxformbuilder.org/>, a C++-based form designer that
     can output C++, XRC or python.
+@li wxCrafter (free version) <http://www.codelite.org/wxcrafter/>, a C++-based
+    form designer that can output C++ or XRC.
 
-There's a more complete list at <http://www.wxwidgets.org/wiki/index.php/Tools>
+There's a more complete list at <https://wiki.wxwidgets.org/Tools>
 
 This small demonstration XRC file contains a simple dialog:
 @code
@@ -402,12 +401,12 @@ public:
     {
         Close();
     }
-    DECLARE_EVENT_TABLE();
+    wxDECLARE_EVENT_TABLE();
 };
 
-BEGIN_EVENT_TABLE(TestWnd,TestWnd_Base)
+wxBEGIN_EVENT_TABLE(TestWnd,TestWnd_Base)
     EVT_BUTTON(XRCID("B"), TestWnd::OnBPressed)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 @endcode
 
 It is also possible to access the wxSizerItem of a sizer that is part of a
@@ -452,7 +451,7 @@ public:
     virtual bool CanHandle(wxXmlNode *node);
 
     // Register with wxWidgets' dynamic class subsystem.
-    DECLARE_DYNAMIC_CLASS(MyControlXmlHandler)
+    wxDECLARE_DYNAMIC_CLASS(MyControlXmlHandler);
 };
 @endcode
 
@@ -460,7 +459,7 @@ The implementation of your custom XML handler will typically look as:
 
 @code
 // Register with wxWidgets' dynamic class subsystem.
-IMPLEMENT_DYNAMIC_CLASS(MyControlXmlHandler, wxXmlResourceHandler)
+wxIMPLEMENT_DYNAMIC_CLASS(MyControlXmlHandler, wxXmlResourceHandler);
 
 MyControlXmlHandler::MyControlXmlHandler()
 {

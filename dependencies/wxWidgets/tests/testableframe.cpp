@@ -18,7 +18,10 @@
 
 wxTestableFrame::wxTestableFrame() : wxFrame(NULL, wxID_ANY, "Test Frame")
 {
-    Move(2000, 200);
+    // Use fixed position to facilitate debugging.
+    Move(200, 200);
+
+    Show();
 }
 
 void wxTestableFrame::OnEvent(wxEvent& evt)

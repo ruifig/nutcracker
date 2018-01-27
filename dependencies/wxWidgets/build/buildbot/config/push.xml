@@ -10,76 +10,12 @@
     This allows the logs from builds done elsewhere to be included in the
     buildbot results, see:
 
-    http://www.wxwidgets.org/wiki/index.php/Development:_Buildbot#Sending_in_Logs_from_Builds_Done_Elsewhere
+    https://wiki.wxwidgets.org/Development:_Buildbot#Sending_in_Logs_from_Builds_Done_Elsewhere
 -->
 
 <bot xmlns:xi="http://www.w3.org/2001/XInclude">
 
 <xi:include href="include/push.xml"/>
-
-<build>
-    <name>wxOS2 Stable GCC</name>
-    <builddir>psh_os2_stable_gcc</builddir>
-
-    <steps>
-        <extractlogs/>
-        <show log="compiler"/>
-        <show log="update"/>
-        <show log="configure"/>
-        <show log="compile"/>
-        <show log="demos"/>
-        <show log="samples"/>
-        <show log="utils"/>
-        <show log="tests"/>
-    </steps>
-</build>
-
-<build>
-    <name>wxOS2 Stable OpenWatcom</name>
-    <builddir>psh_os2_stable_ow</builddir>
-
-    <steps>
-        <extractlogs/>
-        <show log="compiler"/>
-        <show log="update"/>
-        <show log="configure"/>
-        <show log="compile"/>
-        <show log="demos"/>
-        <show log="samples"/>
-    </steps>
-</build>
-
-<build>
-    <name>wxOS2 Trunk GCC</name>
-    <builddir>psh_os2_trunk_gcc</builddir>
-
-    <steps>
-        <extractlogs/>
-        <show log="compiler"/>
-        <show log="update"/>
-        <show log="configure"/>
-        <show log="compile"/>
-        <show log="demos"/>
-        <show log="samples"/>
-        <show log="utils"/>
-        <show log="tests"/>
-    </steps>
-</build>
-
-<build>
-    <name>wxOS2 Trunk OpenWatcom</name>
-    <builddir>psh_os2_trunk_ow</builddir>
-
-    <steps>
-        <extractlogs/>
-        <show log="compiler"/>
-        <show log="update"/>
-        <show log="configure"/>
-        <show log="compile"/>
-        <show log="demos"/>
-        <show log="samples"/>
-    </steps>
-</build>
 
 <build>
     <name>Solaris HEAD GTK1</name>

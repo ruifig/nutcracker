@@ -36,21 +36,21 @@ EXTRALIBS_GUI = @EXTRALIBS_GUI@
 CXXWARNINGS = @CXXWARNINGS@
 HOST_SUFFIX = @HOST_SUFFIX@
 SAMPLES_RPATH_FLAG = @SAMPLES_RPATH_FLAG@
+SAMPLES_CXXFLAGS = @SAMPLES_CXXFLAGS@
 wx_top_builddir = @wx_top_builddir@
 
 ### Variables: ###
 
 DESTDIR = 
-WX_RELEASE = 3.0
-WX_VERSION = $(WX_RELEASE).2
+WX_RELEASE = 3.1
+WX_VERSION = $(WX_RELEASE).0
 LIBDIRNAME = $(wx_top_builddir)/lib
 ABOUT_CXXFLAGS = -D__WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p) $(__DEBUG_DEFINE_p) \
 	$(__EXCEPTIONS_DEFINE_p) $(__RTTI_DEFINE_p) $(__THREAD_DEFINE_p) \
 	-I$(srcdir) $(__DLLFLAG_p) -I$(srcdir)/../../../samples $(CXXWARNINGS) \
-	$(CPPFLAGS) $(CXXFLAGS)
+	$(SAMPLES_CXXFLAGS) $(CPPFLAGS) $(CXXFLAGS)
 ABOUT_OBJECTS =  \
 	$(__about___win32rc) \
-	$(__about_os2_lib_res) \
 	about_about.o
 
 ### Conditionally set variables: ###
@@ -89,8 +89,6 @@ COND_PLATFORM_OS2_1___about___os2_emxbindcmd = $(NM) about$(EXEEXT) | if grep -q
 @COND_TOOLKIT_MSW@__RCDEFDIR_p_1 = --include-dir \
 @COND_TOOLKIT_MSW@	$(LIBDIRNAME)/wx/include/$(TOOLCHAIN_FULLNAME)
 @COND_PLATFORM_WIN32_1@__about___win32rc = about_sample_rc.o
-@COND_PLATFORM_OS2_1@__about_os2_lib_res = \
-@COND_PLATFORM_OS2_1@	$(top_srcdir)/include/wx/os2/wx.res
 @COND_PLATFORM_MACOSX_1@__about_app_Contents_PkgInfo___depname \
 @COND_PLATFORM_MACOSX_1@	= about.app/Contents/PkgInfo
 @COND_PLATFORM_MACOSX_1@__about_bundle___depname = about_bundle
@@ -196,7 +194,7 @@ data_files:
 	done
 
 about_sample_rc.o: $(srcdir)/../../../samples/sample.rc
-	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_2) $(__DEBUG_DEFINE_p_2)  $(__EXCEPTIONS_DEFINE_p_2) $(__RTTI_DEFINE_p_2) $(__THREAD_DEFINE_p_2)   --include-dir $(srcdir) $(__DLLFLAG_p_2) --include-dir $(srcdir)/../../../samples $(__RCDEFDIR_p_1) --include-dir $(top_srcdir)/include
+	$(WINDRES) -i$< -o$@    --define __WX$(TOOLKIT)__ $(__WXUNIV_DEFINE_p_2) $(__DEBUG_DEFINE_p_2)  $(__EXCEPTIONS_DEFINE_p_2) $(__RTTI_DEFINE_p_2) $(__THREAD_DEFINE_p_2)  --include-dir $(srcdir) $(__DLLFLAG_p_2) --include-dir $(srcdir)/../../../samples $(__RCDEFDIR_p_1) --include-dir $(top_srcdir)/include
 
 about_about.o: $(srcdir)/about.cpp
 	$(CXXC) -c -o $@ $(ABOUT_CXXFLAGS) $(srcdir)/about.cpp

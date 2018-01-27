@@ -42,7 +42,7 @@
 // resources
 //----------------------------------------------------------------------------
 
-// the application icon (under Windows and OS/2 it is in resources)
+// the application icon (under Windows it is in resources)
 #ifndef wxHAS_IMAGES_IN_RESOURCES
     #include "../sample.xpm"
 #endif
@@ -91,7 +91,7 @@ class App: public wxApp {
     friend class AppFrame;
 
 public:
-    //! the main function called durning application start
+    //! the main function called during application start
     virtual bool OnInit ();
 
     //! application exit function
@@ -108,7 +108,7 @@ protected:
 };
 
 // created dynamically by wxWidgets
-DECLARE_APP (App);
+wxDECLARE_APP(App);
 
 //----------------------------------------------------------------------------
 //! frame of the application APP_VENDOR-APP_NAME.
@@ -190,7 +190,7 @@ private:
 // implementation
 //============================================================================
 
-IMPLEMENT_APP (App)
+wxIMPLEMENT_APP(App);
 
 
 wxBEGIN_EVENT_TABLE(App, wxApp)
@@ -485,11 +485,11 @@ void AppFrame::CreateMenu ()
     menuEdit->Append (wxID_SELECTALL, _("&Select all\tCtrl+A"));
     menuEdit->Append (myID_SELECTLINE, _("Select &line\tCtrl+L"));
 
-    // hilight submenu
-    wxMenu *menuHilight = new wxMenu;
+    // highlight submenu
+    wxMenu *menuHighlight = new wxMenu;
     int Nr;
     for (Nr = 0; Nr < g_LanguagePrefsSize; Nr++) {
-        menuHilight->Append (myID_HILIGHTFIRST + Nr,
+        menuHighlight->Append (myID_HIGHLIGHTFIRST + Nr,
                              g_LanguagePrefs [Nr].name);
     }
 
@@ -500,7 +500,7 @@ void AppFrame::CreateMenu ()
 
     // View menu
     wxMenu *menuView = new wxMenu;
-    menuView->Append (myID_HILIGHTLANG, _("&Hilight language .."), menuHilight);
+    menuView->Append (myID_HIGHLIGHTLANG, _("&Highlight language .."), menuHighlight);
     menuView->AppendSeparator();
     menuView->AppendCheckItem (myID_FOLDTOGGLE, _("&Toggle current fold\tCtrl+T"));
     menuView->AppendCheckItem (myID_OVERTYPE, _("&Overwrite mode\tIns"));
@@ -546,6 +546,9 @@ void AppFrame::CreateMenu ()
     menuExtra->Append (myID_CHANGECASE, _("Change &case to .."), menuChangeCase);
     menuExtra->AppendSeparator();
     menuExtra->Append (myID_CONVERTEOL, _("Convert line &endings to .."), menuConvertEOL);
+    menuExtra->AppendCheckItem(myID_MULTIPLE_SELECTIONS, _("Toggle &multiple selections"));
+    menuExtra->AppendCheckItem(myID_MULTI_PASTE, _("Toggle multi-&paste"));
+    menuExtra->AppendCheckItem(myID_MULTIPLE_SELECTIONS_TYPING, _("Toggle t&yping on multiple selections"));
 
     // Window menu
     wxMenu *menuWindow = new wxMenu;
@@ -648,7 +651,7 @@ AppAbout::AppAbout (wxWindow *parent,
     wxBoxSizer *totalpane = new wxBoxSizer (wxVERTICAL);
     totalpane->Add (0, 20);
     wxStaticText *appname = new wxStaticText(this, wxID_ANY, *g_appname);
-    appname->SetFont (wxFont (24, wxDEFAULT, wxNORMAL, wxBOLD));
+    appname->SetFont (wxFontInfo(24).Bold());
     totalpane->Add (appname, 0, wxALIGN_CENTER | wxLEFT | wxRIGHT, 40);
     totalpane->Add (0, 10);
     totalpane->Add (aboutpane, 0, wxEXPAND | wxALL, 4);

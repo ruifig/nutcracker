@@ -20,6 +20,8 @@
     #include "wx/timer.h"
 #endif
 
+#if wxUSE_FSWATCHER
+
 #include "wx/evtloop.h"
 #include "wx/filename.h"
 #include "wx/filefn.h"
@@ -27,6 +29,15 @@
 #include "wx/fswatcher.h"
 
 #include "testfile.h"
+
+/*
+This test used to be disabled on OS X as it hung. Work around the apparent
+wxOSX differences between a non-GUI event loop and a GUI event loop (where
+the tests do run fine) until this gets resolved.
+*/
+#ifdef __WXOSX__
+    #define OSX_EVENT_LOOP_WORKAROUND
+#endif
 
 // ----------------------------------------------------------------------------
 // local functions
@@ -152,8 +163,7 @@ public:
         // just to be really sure we know what we remove
         CPPUNIT_ASSERT_EQUAL( "fswatcher_test", dir.GetDirs().Last() );
 
-        // FIXME-VC6: using non-static Rmdir() results in ICE
-        CPPUNIT_ASSERT( wxFileName::Rmdir(dir.GetFullPath(), wxPATH_RMDIR_RECURSIVE) );
+        CPPUNIT_ASSERT( dir.Rmdir(wxPATH_RMDIR_RECURSIVE) );
     }
 
     static wxFileName RandomName(const wxFileName& base, int length = 10)
@@ -190,10 +200,16 @@ public:
     enum { WAIT_DURATION = 3 };
 
     EventHandler(int types = wxFSW_EVENT_ALL) :
-        eg(EventGenerator::Get()), m_loop(0), m_count(0), m_watcher(0),
-        m_eventTypes(types)
+        eg(EventGenerator::Get()), m_loop(0),
+#ifdef OSX_EVENT_LOOP_WORKAROUND
+        m_loopActivator(NULL),
+#endif
+        m_count(0), m_watcher(0), m_eventTypes(types)
     {
         m_loop = new wxEventLoop();
+#ifdef OSX_EVENT_LOOP_WORKAROUND
+        m_loopActivator = new wxEventLoopActivator(m_loop);
+#endif
         Connect(wxEVT_IDLE, wxIdleEventHandler(EventHandler::OnIdle));
         Connect(wxEVT_FSWATCHER, wxFileSystemWatcherEventHandler(
                                             EventHandler::OnFileSystemEvent));
@@ -202,6 +218,9 @@ public:
     virtual ~EventHandler()
     {
         delete m_watcher;
+#ifdef OSX_EVENT_LOOP_WORKAROUND
+        delete m_loopActivator;
+#endif
         if (m_loop)
         {
             if (m_loop->IsRunning())
@@ -220,6 +239,13 @@ public:
     {
         wxIdleEvent* e = new wxIdleEvent();
         QueueEvent(e);
+
+#ifdef OSX_EVENT_LOOP_WORKAROUND
+        // The fs watcher test cases will hang on OS X if Yield() is not called.
+        // It seems that the OS X event loop and / or queueing behaves
+        // differently than on MSW and Linux.
+        m_loop->Yield(true);
+#endif
     }
 
     void Run()
@@ -386,6 +412,9 @@ public:
 protected:
     EventGenerator& eg;
     wxEventLoopBase* m_loop;    // loop reference
+#ifdef OSX_EVENT_LOOP_WORKAROUND
+    wxEventLoopActivator* m_loopActivator;
+#endif
     int m_count;                // idle events count
 
     wxFileSystemWatcher* m_watcher;
@@ -418,9 +447,7 @@ private:
     CPPUNIT_TEST_SUITE( FileSystemWatcherTestCase );
         CPPUNIT_TEST( TestEventCreate );
         CPPUNIT_TEST( TestEventDelete );
-#if !defined(__VISUALC__) || wxCHECK_VISUALC_VERSION(7)
         CPPUNIT_TEST( TestTrees );
-#endif
 
         // kqueue-based implementation doesn't collapse create/delete pairs in
         // renames and doesn't detect neither modifications nor access to the
@@ -454,23 +481,14 @@ private:
     void TestEventAttribute();
     void TestSingleWatchtypeEvent();
 #endif // wxHAS_INOTIFY
-#if !defined(__VISUALC__) || wxCHECK_VISUALC_VERSION(7)
-    void TestTrees();   // Visual C++ 6 can't build this
-#endif
+    void TestTrees();
     void TestNoEventsAfterRemove();
 
-    DECLARE_NO_COPY_CLASS(FileSystemWatcherTestCase)
+    wxDECLARE_NO_COPY_CLASS(FileSystemWatcherTestCase);
 };
 
-// the test currently hangs under OS X for some reason and this prevents tests
-// ran by buildbot from completing so disable it until someone has time to
-// debug it
-//
-// FIXME: debug and fix this!
-#ifndef __WXOSX__
 // register in the unnamed registry so that these tests are run by default
 CPPUNIT_TEST_SUITE_REGISTRATION( FileSystemWatcherTestCase );
-#endif
 
 // also include in its own registry so that these tests can be run alone
 CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( FileSystemWatcherTestCase,
@@ -479,6 +497,14 @@ CPPUNIT_TEST_SUITE_NAMED_REGISTRATION( FileSystemWatcherTestCase,
 void FileSystemWatcherTestCase::setUp()
 {
     wxLog::AddTraceMask(wxTRACE_FSWATCHER);
+
+    // Before each test, remove the dir if it exists.
+    // It would exist if the previous test run was aborted.
+    wxString tmp = wxStandardPaths::Get().GetTempDir();
+    wxFileName dir;
+    dir.AssignDir(tmp);
+    dir.AppendDir("fswatcher_test");
+    dir.Rmdir(wxPATH_RMDIR_RECURSIVE);
     EventGenerator::Get().GetWatchDir();
 }
 
@@ -718,7 +744,6 @@ void FileSystemWatcherTestCase::TestSingleWatchtypeEvent()
 // TestTrees
 // ----------------------------------------------------------------------------
 
-#if !defined(__VISUALC__) || wxCHECK_VISUALC_VERSION(7)
 void FileSystemWatcherTestCase::TestTrees()
 {
     class TreeTester : public EventHandler
@@ -806,12 +831,12 @@ void FileSystemWatcherTestCase::TestTrees()
             CPPUNIT_ASSERT(m_watcher);
 
             size_t treeitems = 1; // the trunk
-#ifndef __WINDOWS__
-            // When there's no file mask, wxMSW sets a single watch
+#if !defined(__WINDOWS__) && !defined(wxHAVE_FSEVENTS_FILE_NOTIFICATIONS)
+            // When there's no file mask, wxMSW and wxOSX set a single watch
             // on the trunk which is implemented recursively.
             // wxGTK always sets an additional watch for each subdir
             treeitems += subdirs + 1; // +1 for 'child'
-#endif // __WINDOWS__
+#endif // !__WINDOWS__ && !wxHAVE_FSEVENTS_FILE_NOTIFICATIONS
 
             // Store the initial count; there may already be some watches
             const int initial = m_watcher->GetWatchedPathsCount();
@@ -837,9 +862,9 @@ void FileSystemWatcherTestCase::TestTrees()
             // Except that in wxMSW this isn't true: each watch will be a
             // single, recursive dir; so fudge the count
             size_t fudge = 0;
-#ifdef __WINDOWS__
+#if defined(__WINDOWS__) || defined(wxHAVE_FSEVENTS_FILE_NOTIFICATIONS)
             fudge = 1;
-#endif // __WINDOWS__
+#endif // __WINDOWS__ || wxHAVE_FSEVENTS_FILE_NOTIFICATIONS
             m_watcher->AddTree(dir);
             CPPUNIT_ASSERT_EQUAL(plustree + fudge, m_watcher->GetWatchedPathsCount());
             m_watcher->RemoveTree(child);
@@ -875,7 +900,12 @@ void FileSystemWatcherTestCase::TestTrees()
             // When we use a filter, both wxMSW and wxGTK implementations set
             // an additional watch for each subdir (+1 for the root dir itself
             // and another +1 for "child").
+            // On OS X, if we use FSEvents then we still only have 1 watch.
+#ifdef wxHAVE_FSEVENTS_FILE_NOTIFICATIONS
+            const size_t treeitems = 1;
+#else
             const size_t treeitems = subdirs + 2;
+#endif
             m_watcher->AddTree(dir, wxFSW_EVENT_ALL, "*.txt");
 
             const int plustree = m_watcher->GetWatchedPathsCount();
@@ -926,8 +956,8 @@ void FileSystemWatcherTestCase::TestTrees()
             RemoveAllWatches();
 
             // Clean up
-            RmDir(singledir);
             RmDir(treedir);
+            RmDir(singledir);
 
             Exit();
         }
@@ -947,9 +977,17 @@ void FileSystemWatcherTestCase::TestTrees()
     };
 
     TreeTester tester;
+
+// The fs watcher test cases will hang on OS X if we call Run().
+// This is likely due to differences between the event loop
+// between OS X and the other ports.
+#ifdef OSX_EVENT_LOOP_WORKAROUND
+    tester.Init();
+    tester.GenerateEvent();
+#else
     tester.Run();
+#endif
 }
-#endif // !defined(__VISUALC__) || wxCHECK_VISUALC_VERSION(7)
 
 
 namespace
@@ -1008,3 +1046,5 @@ void FileSystemWatcherTestCase::TestNoEventsAfterRemove()
     NoEventsAfterRemoveEventTester tester;
     tester.Run();
 }
+
+#endif // wxUSE_FSWATCHER

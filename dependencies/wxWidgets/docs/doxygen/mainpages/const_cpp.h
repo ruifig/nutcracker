@@ -24,54 +24,44 @@ using @ifdef_ and not @if_.
 
 @beginDefList
 @itemdef{__WXBASE__, Only wxBase, no GUI features (same as @c wxUSE_GUI == 0)}
-@itemdef{__WXCOCOA__, OS X using wxCocoa Port}
 @itemdef{__WXDFB__, wxUniversal using DirectFB}
-@itemdef{__WXWINCE__, Windows CE}
 @itemdef{__WXGTK__, GTK+}
 @itemdef{__WXGTK12__, GTK+ 1.2 or higher}
 @itemdef{__WXGTK20__, GTK+ 2.0 or higher}
 @itemdef{__WXGTK24__, GTK+ 2.4 or higher}
-@itemdef{__WXGTK26__, GTK+ 2.6 or higher}
 @itemdef{__WXGTK210__, GTK+ 2.10 or higher}
-@itemdef{__WXMAC__, old define, same as @c __WXOSX__}
+@itemdef{__WXMAC__, old define, same as <tt>__WXOSX__</tt>}
 @itemdef{__WXMOTIF__, Motif}
 @itemdef{__WXMOTIF20__, Motif 2.0 or higher}
 @itemdef{__WXMSW__, GUI using <a href="http://en.wikipedia.org/wiki/Windows_User">Windows Controls</a>.
 Notice that for compatibility reasons, this symbol is defined for console
 applications under Windows as well, but it should only be used in the GUI code
-while @c __WINDOWS__ should be used for the platform tests.}
-@itemdef{__WXOSX__, OS X GUI using any Apple widget framework (Carbon, AppKit or UIKit)}
+while <tt>__WINDOWS__</tt> should be used for the platform tests.}
+@itemdef{__WXOSX__, OS X GUI using any Apple widget framework (AppKit or UIKit)}
 @itemdef{__WXOSX_IPHONE__, OS X iPhone (UIKit)}
-@itemdef{__WXOSX_CARBON__, Mac OS X using Carbon}
-@itemdef{__WXOSX_COCOA__, Mac OS X using Cocoa (AppKit)}
-@itemdef{__WXOSX_MAC__, Mac OS X (Carbon or Cocoa)}
-@itemdef{__WXOSX_OR_COCOA__, Any Mac OS X port (wxOSX-Carbon, wxOSX-Cocoa or 
-                        wxCocoa)}
-@itemdef{__WXPM__, OS/2 native Presentation Manager}
+@itemdef{__WXOSX_COCOA__, OS X using Cocoa (AppKit)}
+@itemdef{__WXOSX_MAC__, OS X (Cocoa)}
+@itemdef{__WXPM__, OS/2 native Presentation Manager (not used any longer).}
 @itemdef{__WXSTUBS__, Stubbed version ('template' wxWin implementation)}
 @itemdef{__WXXT__, Xt; mutually exclusive with WX_MOTIF, not implemented in wxWidgets 2.x}
-@itemdef{__WXX11__, wxX11 (__WXUNIVERSAL__ will be also defined)}
+@itemdef{__WXX11__, wxX11 (<tt>__WXUNIVERSAL__</tt> will be also defined)}
 @itemdef{__WXWINE__, WINE (i.e. WIN32 on Unix)}
 @itemdef{__WXUNIVERSAL__, wxUniversal port, always defined in addition
                         to one of the symbols above so this should be tested first.}
 @itemdef{__X__, any X11-based GUI toolkit except GTK+}
 @endDefList
 
-There are two wxWidgets ports to Mac OS X. One of them, wxOSX is the successor of the
-venerable wxMac, it currently exists in three versions: Carbon and Cocoa for the
-desktop and a very early iPhone port. And there is the Cocoa port named wxCocoa 
-which has not been updated very actively since beginning 2008. To summarize:
+wxOSX is the successor of the venerable wxMac, it currently exists in two
+versions: Cocoa for the desktop and a very early iPhone port. To summarize:
 
 @li If you want to test for wxOSX on the desktop, use
-    @c __WXOSX_MAC__.
+    <tt>__WXOSX_MAC__</tt>.
 @li If you want to test for wxOSX on the iPhone, use
-    @c __WXOSX_IPHONE__.
-@li If you want to test for any GUI Mac port under OS X, use
-    @c __WXOSX_OR_COCOA__.
-@li If you want to test for any port under Mac OS X, including, for
-    example, wxGTK and also wxBase, use @c __DARWIN__ (see below).
+    <tt>__WXOSX_IPHONE__</tt>.
+@li If you want to test for any port under OS X, including, for
+    example, wxGTK and also wxBase, use <tt>__DARWIN__</tt> (see below).
 
-The convention is to use the @c __WX prefix for these
+The convention is to use the <tt>__WX</tt> prefix for these
 symbols, although this has not always been followed.
 
 
@@ -83,13 +73,13 @@ symbols, although this has not always been followed.
 @itemdef{__AIX__, AIX}
 @itemdef{__BSD__, Any *BSD system}
 @itemdef{__CYGWIN__, Cygwin: Unix on Win32}
-@itemdef{__DARWIN__, Mac OS X (with BSD C library), using any port (see also @c __WXOSX__)}
+@itemdef{__DARWIN__, OS X (with BSD C library), using any port (see also <tt>__WXOSX__</tt>)}
 @itemdef{__DATA_GENERAL__, DG-UX}
 @itemdef{__FREEBSD__, FreeBSD}
 @itemdef{__HPUX__, HP-UX (Unix)}
 @itemdef{__GNU__, GNU Hurd}
 @itemdef{__LINUX__, Linux}
-@itemdef{__MACH__, Mach-O Architecture (Mac OS X only builds)}
+@itemdef{__MACH__, Mach-O Architecture (OS X only builds)}
 @itemdef{__OSF__, OSF/1}
 @itemdef{__QNX__, QNX Neutrino RTOS}
 @itemdef{__SGI__, IRIX}
@@ -102,12 +92,11 @@ symbols, although this has not always been followed.
 @itemdef{__UNIX__, any Unix}
 @itemdef{__UNIX_LIKE__, Unix, BeOS or VMS}
 @itemdef{__VMS__, VMS}
-@itemdef{__WINDOWS__, Any Windows platform, using any port (see also @c __WXMSW__)}
+@itemdef{__WINDOWS__, Any Windows platform, using any port (see also <tt>__WXMSW__</tt>)}
 @itemdef{__WIN16__, Win16 API (not supported since wxWidgets 2.6)}
 @itemdef{__WIN32__, Win32 API}
 @itemdef{__WIN64__, Win64 (mostly same as Win32 but data type sizes are different)}
 @itemdef{__WINE__, Wine}
-@itemdef{_WIN32_WCE, Windows CE version}
 @endDefList
 
 
@@ -126,28 +115,12 @@ compiler used.
 
 
 
-@section page_cppconst_hardware Hardware Type
-
-@beginDefList
-@itemdef{__SMARTPHONE__, Generic mobile devices with phone buttons and a small display}
-@itemdef{__PDA__, Personal digital assistant, usually with touch screen}
-@itemdef{__HANDHELD__, Small but powerful computer, usually with a keyboard}
-@itemdef{__POCKETPC__, Microsoft-powered PocketPC devices with touch-screen}
-@itemdef{__WINCE_STANDARDSDK__, Microsoft-powered Windows CE devices, for generic Windows CE applications}
-@itemdef{__WINCE_NET__, Microsoft-powered Windows CE .NET devices (_WIN32_WCE is 400 or greater)}
-@itemdef{WIN32_PLATFORM_WFSP, Microsoft-powered smartphone}
-@endDefList
-
-
-
 @section page_cppconst_compiler Compilers
 
 @beginDefList
 @itemdef{__BORLANDC__, Borland C++. The value of the macro corresponds
                         to the compiler version: 500 is 5.0.}
-@itemdef{__DJGPP__, DJGPP}
-@itemdef{__DIGITALMARS__, Digital Mars}
-@itemdef{__EVC4__, Embedded Visual C++ 4 (can be only used for building wxWinCE)}
+@itemdef{__DIGITALMARS__, Digital Mars (not used any more).}
 @itemdef{__GNUG__, Gnu C++ on any platform, see also wxCHECK_GCC_VERSION}
 @itemdef{__GNUWIN32__, Gnu-Win32 compiler, see also wxCHECK_W32API_VERSION}
 @itemdef{__INTELC__, Intel C++ compiler}
@@ -156,18 +129,19 @@ compiler used.
 @itemdef{__MINGW64__, MinGW-w64 in 64 bit builds}
 @itemdef{__MINGW64_TOOLCHAIN__, MinGW-w64 in either 32 or 64 bit builds}
 @itemdef{__SUNCC__, Sun CC, see also wxCHECK_SUNCC_VERSION}
-@itemdef{__SYMANTECC__, Symantec C++}
-@itemdef{__VISAGECPP__, IBM Visual Age (OS/2)}
+@itemdef{__SYMANTECC__, Symantec C++ (not used any more).}
+@itemdef{__VISAGECPP__, IBM Visual Age (OS/2) (not used any more).}
 @itemdef{__VISUALC__, Microsoft Visual C++, see also ::wxCHECK_VISUALC_VERSION.
                     The value of this macro corresponds to the compiler version:
                     @c 1020 for @c 4.2 (the first supported version), @c 1100 for
                     @c 5.0, @c 1200 for @c 6.0 and so on. For convenience, the symbols
                     __VISUALCn__ are also defined for each major compiler version from
-                    5 to 12, i.e. you can use tests such @ifdef_ __VISUALC7__ to test
-                    for compiler version being precisely 7.}
+                    5 to 12, i.e. you can use tests such as <tt>\#ifdef \_\_VISUALC7\_\_</tt>
+                    to test for compiler version being precisely 7.}
 @itemdef{__XLC__, AIX compiler}
 @itemdef{__WATCOMC__, Watcom C++. The value of this macro corresponds to
-                    the compiler version, @c 1100 is @c 11.0 and @c 1200 is OpenWatcom.}
+                    the compiler version, @c 1100 is @c 11.0 and @c 1200 is OpenWatcom
+                    (not used any more).}
 @endDefList
 
 
@@ -210,6 +184,7 @@ Currently the following symbols exist:
     decide whether some function should be overloaded for both
     <code>long</code> and <code>long long</code> types.}
 @itemdef{wxHAS_MULTIPLE_FILEDLG_FILTERS, Defined if wxFileDialog supports multiple ('|'-separated) filters.}
+@itemdef{wxHAS_NATIVE_WINDOW, Defined if wxNativeWindow class is available.}
 @itemdef{wxHAS_IMAGES_IN_RESOURCES, Defined if <a href="http://en.wikipedia.org/wiki/Resource_(Windows)">
     Windows resource files</a> or OS/2 resource files are available on the current platform.}
 @itemdef{wxHAS_POWER_EVENTS, Defined if wxPowerEvent are ever generated on the current platform.}
@@ -219,6 +194,13 @@ Currently the following symbols exist:
 @itemdef{wxHAS_RAW_KEY_CODES, Defined if raw key codes (see wxKeyEvent::GetRawKeyCode are supported.}
 @itemdef{wxHAS_REGEX_ADVANCED, Defined if advanced syntax is available in wxRegEx.}
 @itemdef{wxHAS_TASK_BAR_ICON, Defined if wxTaskBarIcon is available on the current platform.}
+@itemdef{wxHAS_MODE_T, Defined when wxWidgets defines @c mode_t typedef for the
+    compilers not providing it. If another library used in a wxWidgets
+    application, such as ACE (http://www.cs.wustl.edu/~schmidt/ACE.html), also
+    defines @c mode_t, this symbol can be predefined after including the other
+    library header, such as @c "ace/os_include/sys/os_types.h" in ACE case,
+    but before including any wxWidgets headers, to prevent a definition
+    conflict.}
 @endDefList
 
 
@@ -280,7 +262,7 @@ configuration.
         includes a number of wxWidgets headers thus making it unnecessary to include
         them explicitly. However if this is not defined, you do need to include them
         and so the usual idiom which allows to support both cases is to first include
-        @c wx/wxprec.h} and then, inside @ifndef_ WX_PRECOMP, individual
+        @c wx/wxprec.h} and then, inside <tt>\#ifndef WX_PRECOMP</tt>, individual
         headers you need.}
 @itemdef{_UNICODE and UNICODE, both are defined if wxUSE_UNICODE is set to @c 1}
 @itemdef{wxUSE_GUI,

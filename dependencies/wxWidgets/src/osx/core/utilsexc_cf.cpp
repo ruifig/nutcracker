@@ -72,7 +72,7 @@ class wxCFEventLoopSourcesManager : public wxEventLoopSourcesManagerBase
 {
 public:
     wxEventLoopSource *
-    AddSourceForFD(int fd, wxEventLoopSourceHandler *handler, int flags)
+    AddSourceForFD(int fd, wxEventLoopSourceHandler *handler, int flags) wxOVERRIDE
     {
         wxCHECK_MSG( fd != -1, NULL, "can't monitor invalid fd" );
 
@@ -160,7 +160,7 @@ wxStandardPaths& wxGUIAppTraits::GetStandardPaths()
     // Derive a class just to be able to create it: wxStandardPaths ctor is
     // protected to prevent its misuse, but it also means we can't create an
     // object of this class directly.
-    class wxStandardPathsDefault : public wxStandardPathsCF
+    class wxStandardPathsDefault : public wxStandardPaths
     {
     public:
         wxStandardPathsDefault() { }

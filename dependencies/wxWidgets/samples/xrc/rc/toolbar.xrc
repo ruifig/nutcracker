@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.3.0.1">
+<resource xmlns="http://www.wxwidgets.org/wxxrc" version="2.5.3.0">
 
 <object class="wxToolBar" name="main_toolbar">
     <style>wxTB_FLAT|wxTB_DOCKABLE</style>
@@ -26,6 +26,11 @@
         <longhelp>Disable autocentering of a dialog on its parent</longhelp>
     </object>  
     <object class="separator"/>
+     <object class="tool" name="aui_demo_tool_or_menuitem">
+        <bitmap>aui.xpm</bitmap>
+        <tooltip>wxAUI classes and controls</tooltip>
+        <longhelp>XRC construction of Advanced User Interface classes and controls</longhelp>
+    </object>
     <object class="tool" name="obj_ref_tool_or_menuitem">
       <bitmap>objrefdlg.xpm</bitmap>
       <tooltip>Object references and event ranges example</tooltip>

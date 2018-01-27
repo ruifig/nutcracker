@@ -71,8 +71,6 @@ const double RAD2DEG  = 180.0 / M_PI;
 static inline double dmax(double a, double b) { return a > b ? a : b; }
 static inline double dmin(double a, double b) { return a < b ? a : b; }
 
-static inline double DegToRad(double deg) { return (deg * M_PI) / 180.0; }
-
 //-----------------------------------------------------------------------------
 // temporary implementation of the missing GDK function
 //-----------------------------------------------------------------------------
@@ -261,7 +259,7 @@ static void wxFreePoolGC( GdkGC *gc )
 // wxWindowDCImpl
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxWindowDCImpl, wxDC)
+wxIMPLEMENT_ABSTRACT_CLASS(wxWindowDCImpl, wxDC);
 
 wxWindowDCImpl::wxWindowDCImpl(wxDC *owner)
               : wxGTKDCImpl(owner)
@@ -1477,7 +1475,7 @@ void wxWindowDCImpl::DoDrawRotatedText( const wxString &text, wxCoord x, wxCoord
     dc.SelectObject(wxNullBitmap);
 
     // Calculate the size of the rotated bounding box.
-    double rad = DegToRad(angle);
+    double rad = wxDegToRad(angle);
     double dx = cos(rad),
            dy = sin(rad);
 
@@ -2130,7 +2128,7 @@ int wxWindowDCImpl::GetDepth() const
 // wxPaintDCImpl
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxPaintDCImpl, wxClientDCImpl)
+wxIMPLEMENT_ABSTRACT_CLASS(wxPaintDCImpl, wxClientDCImpl);
 
 // Limit the paint region to the window size. Sometimes
 // the paint region is too big, and this risks X11 errors
@@ -2183,7 +2181,7 @@ wxPaintDCImpl::wxPaintDCImpl(wxDC *owner, wxWindow *win)
 // wxClientDCImpl
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_ABSTRACT_CLASS(wxClientDCImpl, wxWindowDCImpl)
+wxIMPLEMENT_ABSTRACT_CLASS(wxClientDCImpl, wxWindowDCImpl);
 
 wxClientDCImpl::wxClientDCImpl(wxDC *owner, wxWindow *win)
               : wxWindowDCImpl(owner, win)
@@ -2216,10 +2214,10 @@ public:
     void OnExit();
 
 private:
-    DECLARE_DYNAMIC_CLASS(wxDCModule)
+    wxDECLARE_DYNAMIC_CLASS(wxDCModule);
 };
 
-IMPLEMENT_DYNAMIC_CLASS(wxDCModule, wxModule)
+wxIMPLEMENT_DYNAMIC_CLASS(wxDCModule, wxModule);
 
 bool wxDCModule::OnInit()
 {

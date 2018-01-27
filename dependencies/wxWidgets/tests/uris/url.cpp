@@ -42,7 +42,7 @@ private:
     void GetInputStream();
     void CopyAndAssignment();
 
-    DECLARE_NO_COPY_CLASS(URLTestCase)
+    wxDECLARE_NO_COPY_CLASS(URLTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -79,7 +79,7 @@ void URLTestCase::GetInputStream()
     wxMemoryOutputStream ostream;
     CPPUNIT_ASSERT(in_stream->Read(ostream).GetLastError() == wxSTREAM_EOF);
 
-    CPPUNIT_ASSERT_EQUAL(13677, ostream.GetSize());
+    CPPUNIT_ASSERT_EQUAL(17334, ostream.GetSize());
 
     // we have to delete the object created by GetInputStream()
     delete in_stream;

@@ -48,9 +48,39 @@ public:
 
     /**
         Get the preferred size of the cell for its contents.
+
+        This method must be overridden in the derived classes to return the
+        minimal fitting size for displaying the content of the given grid cell.
+
+        @see GetBestHeight(), GetBestWidth()
     */
     virtual wxSize GetBestSize(wxGrid& grid, wxGridCellAttr& attr, wxDC& dc,
                                int row, int col) = 0;
+
+    /**
+        Get the preferred height of the cell at the given width.
+
+        Some renderers may not have a well-defined best size, but only be able
+        to provide the best height at the given width, e.g. this is the case of
+        the standard wxGridCellAutoWrapStringRenderer. In this case, they
+        should override this method, in addition to GetBestSize().
+
+        @see GetBestWidth()
+
+        @since 3.1.0
+    */
+    virtual wxSize GetBestHeight(wxGrid& grid, wxGridCellAttr& attr, wxDC& dc,
+                               int row, int col, int width);
+
+    /**
+        Get the preferred width of the cell at the given height.
+
+        See GetBestHeight(), this method is symmetric to it.
+
+        @since 3.1.0
+    */
+    virtual wxSize GetBestWidth(wxGrid& grid, wxGridCellAttr& attr, wxDC& dc,
+                               int row, int col, int height);
 
 protected:
     /**
@@ -1168,12 +1198,12 @@ public:
     virtual wxGridCellAttr *GetAttr(int row, int col,
                                     wxGridCellAttr::wxAttrKind kind) const;
 
-    /**
-        Setting attributes.
+    /*!
+        @name Setting attributes.
 
         All these functions take ownership of the attribute passed to them,
         i.e. will call DecRef() on it themselves later and so it should not be
-        destroyed by the caller. And the attribute can be @NULL to reset a
+        destroyed by the caller. The attribute can be @NULL to reset a
         previously set value.
      */
     //@{
@@ -1190,7 +1220,7 @@ public:
     //@}
 
     /**
-        Getting header renderers.
+        @name Getting header renderers.
 
         These functions return the renderers for the given row or column header
         label and the corner window. Unlike cell attributes, these objects are
@@ -1527,13 +1557,14 @@ public:
     virtual wxGrid *GetView() const;
 
 
-    /**
+    /*!
         @name Table Structure Modifiers
 
-        Notice that none of these functions are pure virtual as they don't have
+        Note that none of these functions are pure virtual as they don't have
         to be implemented if the table structure is never modified after
-        creation, i.e. neither rows nor columns are never added or deleted but
-        that you do need to implement them if they are called, i.e. if your
+        creation, i.e. neither rows nor columns are ever added or deleted.
+
+        Also note that you do need to implement them if they are called, i.e. if your
         code either calls them directly or uses the matching wxGrid methods, as
         by default they simply do nothing which is definitely inappropriate.
      */
@@ -1599,7 +1630,7 @@ public:
 
     //@}
 
-    /**
+    /*!
         @name Table Row and Column Labels
 
         By default the numbers are used for labeling rows and Latin letters for
@@ -2383,7 +2414,7 @@ public:
     //@}
 
 
-    /**
+    /*!
         @name Cell Formatting
 
         Note that wxGridCellAttr can be used alternatively to most of these
@@ -2466,6 +2497,8 @@ public:
 
         Vertical alignment should be one of @c wxALIGN_TOP, @c wxALIGN_CENTRE
         or @c wxALIGN_BOTTOM.
+
+        @deprecated Please use SetCellAlignment(row, col, horiz, vert) instead.
     */
     void SetCellAlignment(int align, int row, int col);
 
@@ -2485,10 +2518,14 @@ public:
     void SetCellTextColour(int row, int col, const wxColour& colour);
     /**
         Sets the text colour for the given cell.
+
+        @deprecated Please use SetCellTextColour(row, col, colour)
     */
     void SetCellTextColour(const wxColour& val, int row, int col);
     /**
         Sets the text colour for all cells by default.
+
+        @deprecated Please use SetDefaultCellTextColour(colour) instead.
     */
     void SetCellTextColour(const wxColour& colour);
 
@@ -2519,7 +2556,7 @@ public:
     //@}
 
 
-    /**
+    /*!
         @name Cell Values, Editors, and Renderers
 
         Note that wxGridCellAttr can be used alternatively to most of these

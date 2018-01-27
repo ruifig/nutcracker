@@ -121,10 +121,10 @@ public:
         GetEntitiesParser()->SetEncoding(wxFONTENCODING_ISO8859_1);
     }
 
-    wxObject* GetProduct() { return NULL; }
+    wxObject* GetProduct() wxOVERRIDE { return NULL; }
 
 protected:
-    virtual void AddText(const wxString& WXUNUSED(txt)) {}
+    virtual void AddText(const wxString& WXUNUSED(txt)) wxOVERRIDE {}
 
     wxDECLARE_NO_COPY_CLASS(HP_Parser);
 };
@@ -140,7 +140,6 @@ class HP_TagHandler : public wxHtmlTagHandler
         wxString m_name, m_page;
         int m_level;
         int m_id;
-        int m_index;
         int m_count;
         wxHtmlHelpDataItem *m_parentItem;
         wxHtmlBookRecord *m_book;
@@ -158,8 +157,8 @@ class HP_TagHandler : public wxHtmlTagHandler
             m_count = 0;
             m_parentItem = NULL;
         }
-        wxString GetSupportedTags() { return wxT("UL,OBJECT,PARAM"); }
-        bool HandleTag(const wxHtmlTag& tag);
+        wxString GetSupportedTags() wxOVERRIDE { return wxT("UL,OBJECT,PARAM"); }
+        bool HandleTag(const wxHtmlTag& tag) wxOVERRIDE;
 
         void Reset(wxHtmlHelpDataItems& data)
         {
@@ -260,7 +259,7 @@ wxString wxHtmlHelpDataItem::GetIndentedName() const
 }
 
 
-IMPLEMENT_DYNAMIC_CLASS(wxHtmlHelpData, wxObject)
+wxIMPLEMENT_DYNAMIC_CLASS(wxHtmlHelpData, wxObject);
 
 wxHtmlHelpData::wxHtmlHelpData()
 {

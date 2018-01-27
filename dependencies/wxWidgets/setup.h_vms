@@ -3,7 +3,7 @@
  * Template for the set.h file for VMS                                       *
  * Created from setup.h_in                                                   *
  * Author : J.Jansen (joukj@hrem.nano.tudelft.nl)                            *
- * Date : 21 January 2013                                                    *
+ * Date : 24 February 2016                                                   *
  *                                                                           *
  *****************************************************************************/
 
@@ -29,9 +29,6 @@
 #define _USE_STD_STAT 1
 
 #endif /* __cplusplus */
-
-/* fill in with the string wxGetOsDescription() will return */
-#define WXWIN_OS_DESCRIPTION "OpenVMS"
 
 /* the installation location prefix from configure */
 #undef wxINSTALL_PREFIX
@@ -95,14 +92,14 @@
 
 #define __WXGTK20__ 1
 
-/* Define this if your version of GTK+ is greater than 2.6 */
-#define __WXGTK26__ 1
-
 /* Define this if your version of GTK+ is greater than 2.10 */
 #define __WXGTK210__ 1
 
 /* Define this if your version of GTK+ is greater than 2.18 */
 #undef __WXGTK218__
+
+/* Define this if your version of GTK+ is greater than 2.20 */
+#undef __WXGTK220__
 
 #include <types.h>
 typedef pid_t GPid;
@@ -187,9 +184,9 @@ typedef pid_t GPid;
     #define wxUSE_GUI            1
 #endif
 
-#define WXWIN_COMPATIBILITY_2_6 1
-
 #define WXWIN_COMPATIBILITY_2_8 1
+
+#define WXWIN_COMPATIBILITY_3_0 1
 
 #define wxEVENTS_COMPATIBILITY_2_8 1
 
@@ -221,7 +218,7 @@ typedef pid_t GPid;
 #define wxUSE_WCHAR_T 1
 
 
-#define wxUSE_EXCEPTIONS    0
+#define wxUSE_EXCEPTIONS 1
 
 #define wxUSE_EXTENDED_RTTI 0
 
@@ -243,12 +240,14 @@ typedef pid_t GPid;
 
 #define wxUSE_STL 0
 
-#if defined(__DMC__) || defined(__WATCOMC__) \
+#if defined(__DMC__) \
         || (defined(_MSC_VER) && _MSC_VER < 1200)
     #define wxUSE_STD_DEFAULT  0
 #else
     #define wxUSE_STD_DEFAULT  1
 #endif
+
+#define wxUSE_STD_CONTAINERS_COMPATIBLY wxUSE_STD_DEFAULT
 
 #define wxUSE_STD_CONTAINERS wxUSE_STD_DEFAULT
 
@@ -420,6 +419,11 @@ typedef pid_t GPid;
 
 #define wxUSE_STC 1
 
+#ifdef VMS_GTK2
+#define wxUSE_ACTIVITYINDICATOR 1
+#else
+#define wxUSE_ACTIVITYINDICATOR 0
+#endif
 #define wxUSE_ANIMATIONCTRL 1
 #define wxUSE_BANNERWINDOW  1
 #define wxUSE_BUTTON       1
@@ -497,6 +501,8 @@ typedef pid_t GPid;
 
 #define wxUSE_REARRANGECTRL 1
 
+#define wxUSE_ADDREMOVECTRL 1
+
 #define wxUSE_ACCEL 1
 
 #define wxUSE_ARTPROVIDER_STD 1
@@ -563,6 +569,8 @@ typedef pid_t GPid;
 #define wxUSE_MSGDLG        1
 
 #define wxUSE_PROGRESSDLG 1
+
+#define wxUSE_NATIVE_PROGRESSDLG 1
 
 #define wxUSE_STARTUP_TIPS 1
 
@@ -701,17 +709,25 @@ typedef pid_t GPid;
 
 /* --- start MSW options --- */
 
-#ifndef wxUSE_UNICODE_MSLU
-    #define wxUSE_UNICODE_MSLU 0
-#endif
+#define wxUSE_GRAPHICS_GDIPLUS wxUSE_GRAPHICS_CONTEXT
 
-#define wxUSE_MFC           0
+#if defined(_MSC_VER) && _MSC_VER >= 1600
+    #define wxUSE_GRAPHICS_DIRECT2D wxUSE_GRAPHICS_CONTEXT
+#else
+    #define wxUSE_GRAPHICS_DIRECT2D 0
+#endif
 
 #define wxUSE_OLE           0
 
 #define wxUSE_OLE_AUTOMATION 0
 
 #define wxUSE_ACTIVEX 0
+
+#if defined(_MSC_VER) && _MSC_VER >= 1700
+    #define wxUSE_WINRT 0
+#else
+    #define wxUSE_WINRT 0
+#endif
 
 #define wxUSE_DC_CACHEING 1
 
@@ -729,12 +745,13 @@ typedef pid_t GPid;
 
 #define wxUSE_TASKBARICON_BALLOONS 0
 
+#define wxUSE_TASKBARBUTTON 0
+
 #define wxUSE_UXTHEME           0
 
 #define wxUSE_INKEDIT  0
 
 #define wxUSE_INICONF 0
-
 
 #define wxUSE_DATEPICKCTRL_GENERIC 0
 
@@ -873,14 +890,6 @@ typedef pid_t GPid;
  * Use GNOME VFS for MIME types
  */
 #define wxUSE_LIBGNOMEVFS 0
-/*
- * Use the Hildon framework
- */
-#define wxUSE_LIBHILDON 0
-/*
- * Use the Hildon 2.0 framework
- */
-#define wxUSE_LIBHILDON2 0
 
 #define wxUSE_DC_TRANSFORM_MATRIX 1
 
@@ -1177,6 +1186,9 @@ typedef pid_t GPid;
 /* Define if you have the dlerror function.  */
 #define HAVE_DLERROR 1
 
+/* Define if you have the dladdr function.  */
+#undef HAVE_DLADDR
+
 /* Define if you have Posix fnctl() function. */
 #define HAVE_FCNTL 1
 
@@ -1416,5 +1428,10 @@ typedef pid_t GPid;
 #define __VMS_BROKEN_TEMPLATES
 
 #include <stdlib.h>
+
+#include <limits.h>
+#define LLONG_MIN __INT64_MIN
+#define LLONG_MAX __INT64_MAX
+#define ULLONG_MAX __UINT64_MAX
 
 #endif /* __WX_SETUP_H__ */

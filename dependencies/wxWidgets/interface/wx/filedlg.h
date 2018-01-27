@@ -10,10 +10,11 @@ enum
     wxFD_OPEN              = 0x0001,
     wxFD_SAVE              = 0x0002,
     wxFD_OVERWRITE_PROMPT  = 0x0004,
+    wxFD_NO_FOLLOW         = 0x0008,
     wxFD_FILE_MUST_EXIST   = 0x0010,
-    wxFD_MULTIPLE          = 0x0020,
     wxFD_CHANGE_DIR        = 0x0080,
-    wxFD_PREVIEW           = 0x0100
+    wxFD_PREVIEW           = 0x0100,
+    wxFD_MULTIPLE          = 0x0200
 };
 
 #define wxFD_DEFAULT_STYLE      wxFD_OPEN
@@ -21,7 +22,7 @@ enum
 /**
     Default wildcard string used in wxFileDialog corresponding to all files.
 
-    It is defined as "*.*" under MSW and OS/2 and "*" everywhere else.
+    It is defined as "*.*" under MSW and "*" everywhere else.
 */
 const char wxFileSelectorDefaultWildcardStr[];
 
@@ -119,6 +120,13 @@ const char wxFileSelectorDefaultWildcardStr[];
     @style{wxFD_OVERWRITE_PROMPT}
            For save dialog only: prompt for a confirmation if a file will be
            overwritten.
+    @style{wxFD_NO_FOLLOW}
+           Directs the dialog to return the path and file name of the selected
+           shortcut file, not its target as it does by default. Currently this
+           flag is only implemented in wxMSW and the non-dereferenced link path
+           is always returned, even without this flag, under Unix and so using
+           it there doesn't do anything. This flag was added in wxWidgets
+           3.1.0.
     @style{wxFD_FILE_MUST_EXIST}
            For open dialog only: the user may only select files that actually
            exist. Notice that under OS X the file dialog with @c wxFD_OPEN

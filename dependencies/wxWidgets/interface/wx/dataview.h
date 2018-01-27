@@ -182,9 +182,6 @@ public:
         @return
             @true if this item should be enabled, @false otherwise.
 
-        @note Currently disabling items is not supported by the wxOSX/Carbon
-              implementation.
-
         @since 2.9.2
     */
     virtual bool IsEnabled(const wxDataViewItem &item,
@@ -821,15 +818,25 @@ wxEventType wxEVT_DATAVIEW_ITEM_DROP;
     through wxVariant which can be extended to support more data formats as necessary.
     Accordingly, all type information uses the strings returned from wxVariant::GetType.
 
+    This control supports single column sorting and on some platforms
+    (currently only those using the generic version, i.e. not wxGTK nor wxOSX)
+    also sorting by multiple columns at once. The latter must be explicitly
+    enabled using AllowMultiColumnSort(), which will also indicate whether this
+    feature is supported, as it changes the default behaviour of right clicking
+    the column header to add or remove it to the set of columns used for
+    sorting. If this behaviour is not appropriate, you may handle
+    @c wxEVT_DATAVIEW_COLUMN_HEADER_RIGHT_CLICK event yourself to prevent it
+    from happening. In this case you would presumably call ToggleSortByColumn()
+    from some other event handler to still allow the user to configure sort
+    order somehow.
+
     @beginStyleTable
     @style{wxDV_SINGLE}
            Single selection mode. This is the default.
     @style{wxDV_MULTIPLE}
            Multiple selection mode.
     @style{wxDV_ROW_LINES}
-           Use alternating colours for rows if supported by platform and theme.
-           Currently only supported by the native GTK and OS X implementations
-           but not by the generic one.
+           Use alternating colours for odd and even rows.
     @style{wxDV_HORIZ_RULES}
            Display the separator lines between rows.
     @style{wxDV_VERT_RULES}
@@ -895,6 +902,11 @@ wxEventType wxEVT_DATAVIEW_ITEM_DROP;
     you need to handle any mouse events not covered by the ones above, consider
     using a custom renderer for the cells that must handle them.
 
+    @note Under wxMSW this control uses wxSystemThemedControl for an explorer
+    style appearance by default since wxWidgets 3.1.0. If this is not desired,
+    you can call wxSystemThemedControl::EnableSystemTheme with @c false
+    argument to disable this.
+
     @library{wxadv}
     @category{ctrl,dvc}
     @appearance{dataviewctrl}
@@ -921,6 +933,24 @@ public:
         Destructor.
     */
     virtual ~wxDataViewCtrl();
+
+    /**
+        Call to allow using multiple columns for sorting.
+
+        When using multiple column for sorting, GetSortingColumns() method
+        should be used to retrieve all the columns which should be used to
+        effectively sort the data when processing the sorted event.
+
+        Currently multiple column sort is only implemented in the generic
+        version, i.e. this functionality is not available when using the native
+        wxDataViewCtrl implementation in wxGTK nor wxOSX.
+
+        @return @true if sorting by multiple columns could be enabled, @false
+            otherwise, typically because this feature is not supported.
+
+        @since 3.1.0
+    */
+    bool AllowMultiColumnSort(bool allow);
 
     /**
         Create the control. Useful for two step creation.
@@ -1239,8 +1269,6 @@ public:
 
         Doesn't do anything if the item or this column is not editable.
 
-        @note Currently not implemented in wxOSX/Carbon.
-
         @since 2.9.4
     */
     virtual void EditItem(const wxDataViewItem& item, const wxDataViewColumn *column);
@@ -1304,7 +1332,7 @@ public:
         style as in the case of single selection it returns the same thing as
         GetSelection().
 
-        Notice that under all platforms except Mac OS X the currently focused
+        Notice that under all platforms except OS X the currently focused
         item may be selected or not but under OS X the current item is always
         selected.
 
@@ -1395,6 +1423,22 @@ public:
     virtual wxDataViewColumn* GetSortingColumn() const;
 
     /**
+        Returns the columns which should be used for sorting the data in this
+        control.
+
+        This method is only useful when sorting by multiple columns had been
+        enabled using AllowMultiColumnSort() previously, otherwise
+        GetSortingColumn() is more convenient.
+
+        @return A possibly empty vector containing all the columns used
+            selected by the user for sorting. The sort order can be retrieved
+            from each column object separately.
+
+        @since 3.1.0
+    */
+    virtual wxVector<wxDataViewColumn *> GetSortingColumns() const;
+
+    /**
         Returns true if any items are currently selected.
 
         This method may be called for both the controls with single and
@@ -1418,6 +1462,15 @@ public:
         Return @true if the item is expanded.
     */
     virtual bool IsExpanded(const wxDataViewItem& item) const;
+
+    /**
+        Return @true if using more than one column for sorting is allowed.
+
+        See AllowMultiColumnSort() and GetSortingColumns().
+
+        @since 3.1.0
+     */
+    bool IsMultiColumnSortAllowed() const;
 
     /**
         Return @true if the item is selected.
@@ -1502,6 +1555,16 @@ public:
         @since 2.9.2
     */
     virtual bool SetRowHeight(int rowHeight);
+
+    /**
+        Toggle sorting by the given column.
+
+        This method should only be used when sorting by multiple columns is
+        allowed, see AllowMultiColumnSort(), and does nothing otherwise.
+
+        @since 3.1.0
+    */
+    virtual void ToggleSortByColumn(int column);
 };
 
 
@@ -1840,9 +1903,16 @@ class wxDataViewTextRenderer : public wxDataViewRenderer
 {
 public:
     /**
+        Returns the wxVariant type used with this renderer.
+
+        @since 3.1.0
+     */
+    static wxString GetDefaultType();
+
+    /**
         The ctor.
     */
-    wxDataViewTextRenderer(const wxString& varianttype = "string",
+    wxDataViewTextRenderer(const wxString& varianttype = GetDefaultType(),
                            wxDataViewCellMode mode = wxDATAVIEW_CELL_INERT,
                            int align = wxDVR_DEFAULT_ALIGNMENT );
 };
@@ -1866,9 +1936,16 @@ class wxDataViewIconTextRenderer : public wxDataViewRenderer
 {
 public:
     /**
+        Returns the wxVariant type used with this renderer.
+
+        @since 3.1.0
+     */
+    static wxString GetDefaultType();
+
+    /**
         The ctor.
     */
-    wxDataViewIconTextRenderer(const wxString& varianttype = "wxDataViewIconText",
+    wxDataViewIconTextRenderer(const wxString& varianttype = GetDefaultType(),
                                wxDataViewCellMode mode = wxDATAVIEW_CELL_INERT,
                                int align = wxDVR_DEFAULT_ALIGNMENT );
 };
@@ -1887,10 +1964,17 @@ class wxDataViewProgressRenderer : public wxDataViewRenderer
 {
 public:
     /**
+        Returns the wxVariant type used with this renderer.
+
+        @since 3.1.0
+     */
+    static wxString GetDefaultType();
+
+    /**
         The ctor.
     */
     wxDataViewProgressRenderer(const wxString& label = wxEmptyString,
-                               const wxString& varianttype = "long",
+                               const wxString& varianttype = GetDefaultType(),
                                wxDataViewCellMode mode = wxDATAVIEW_CELL_INERT,
                                int align = wxDVR_DEFAULT_ALIGNMENT );
 };
@@ -1933,9 +2017,16 @@ class wxDataViewToggleRenderer : public wxDataViewRenderer
 {
 public:
     /**
+        Returns the wxVariant type used with this renderer.
+
+        @since 3.1.0
+     */
+    static wxString GetDefaultType();
+
+    /**
         The ctor.
     */
-    wxDataViewToggleRenderer(const wxString& varianttype = "bool",
+    wxDataViewToggleRenderer(const wxString& varianttype = GetDefaultType(),
                              wxDataViewCellMode mode = wxDATAVIEW_CELL_INERT,
                              int align = wxDVR_DEFAULT_ALIGNMENT);
 };
@@ -2011,9 +2102,16 @@ class wxDataViewDateRenderer : public wxDataViewRenderer
 {
 public:
     /**
+        Returns the wxVariant type used with this renderer.
+
+        @since 3.1.0
+     */
+    static wxString GetDefaultType();
+
+    /**
         The ctor.
     */
-    wxDataViewDateRenderer(const wxString& varianttype = "datetime",
+    wxDataViewDateRenderer(const wxString& varianttype = GetDefaultType(),
                            wxDataViewCellMode mode = wxDATAVIEW_CELL_ACTIVATABLE,
                            int align = wxDVR_DEFAULT_ALIGNMENT);
 };
@@ -2043,9 +2141,16 @@ class wxDataViewCustomRenderer : public wxDataViewRenderer
 {
 public:
     /**
+        Returns the wxVariant type used with this renderer.
+
+        @since 3.1.0
+     */
+    static wxString GetDefaultType();
+
+    /**
         Constructor.
     */
-    wxDataViewCustomRenderer(const wxString& varianttype = "string",
+    wxDataViewCustomRenderer(const wxString& varianttype = GetDefaultType(),
                              wxDataViewCellMode mode = wxDATAVIEW_CELL_INERT,
                              int align = wxDVR_DEFAULT_ALIGNMENT);
 
@@ -2179,8 +2284,9 @@ public:
 
     /**
         Override this to react to a left click.  This method will only be
-        called in @c wxDATAVIEW_CELL_ACTIVATABLE mode.  This method is
-        deprecated, please use ActivateCell instead.
+        called in @c wxDATAVIEW_CELL_ACTIVATABLE mode.
+
+        @deprecated Use ActivateCell instead.
     */
     virtual bool LeftClick( wxPoint cursor,
                             wxRect cell,
@@ -2189,8 +2295,9 @@ public:
                             unsigned int col );
 
     /**
-       Override this to react to the activation of a cell.  This method is
-       deprecated, please use ActivateCell instead.
+       Override this to react to the activation of a cell.
+
+       @deprecated Use ActivateCell instead.
     */
     virtual bool Activate(wxRect cell,
                           wxDataViewModel * model,
@@ -2244,9 +2351,16 @@ class wxDataViewBitmapRenderer : public wxDataViewRenderer
 {
 public:
     /**
+        Returns the wxVariant type used with this renderer.
+
+        @since 3.1.0
+     */
+    static wxString GetDefaultType();
+
+    /**
         The ctor.
     */
-    wxDataViewBitmapRenderer(const wxString& varianttype = "wxBitmap",
+    wxDataViewBitmapRenderer(const wxString& varianttype = GetDefaultType(),
                              wxDataViewCellMode mode = wxDATAVIEW_CELL_INERT,
                              int align = wxDVR_DEFAULT_ALIGNMENT);
 };
@@ -3258,7 +3372,7 @@ public:
            Process a @c wxEVT_DATAVIEW_COLUMN_SORTED event.
     @event{EVT_DATAVIEW_COLUMN_REORDERED(id, func)}
            Process a @c wxEVT_DATAVIEW_COLUMN_REORDERED event.
-           Currently this even is only generated when using the native OSX
+           Currently this even is only generated when using the native OS X
            version.
     @event{EVT_DATAVIEW_ITEM_BEGIN_DRAG(id, func)}
            Process a @c wxEVT_DATAVIEW_ITEM_BEGIN_DRAG event.
@@ -3416,7 +3530,13 @@ public:
 
 
 
-    
+    /**
+        Returns the item affected by the event.
+
+        Notice that for @c wxEVT_DATAVIEW_ITEM_DROP_POSSIBLE and @c
+        wxEVT_DATAVIEW_ITEM_DROP event handlers, the item may be invalid,
+        indicating that the drop is about to happen outside of the item area.
+     */
     wxDataViewItem GetItem() const;
     void SetItem( const wxDataViewItem &item );
     void SetEditCanceled(bool editCancelled);

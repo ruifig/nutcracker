@@ -69,6 +69,7 @@ protected:
     virtual void *Entry()
     {
         wxSocketServer srv(LocalAddress(m_port), wxSOCKET_REUSEADDR);
+        CPPUNIT_ASSERT( srv.IsOk() );
 
         // FIXME: this is still not atomic, of course and the main thread could
         //        call Connect() before we have time to Accept() but there is
@@ -91,7 +92,7 @@ protected:
     int m_port;
     void (*m_accept)(wxSocketBase&);
 
-    DECLARE_NO_COPY_CLASS(SocketServerThread)
+    wxDECLARE_NO_COPY_CLASS(SocketServerThread);
 };
 
 // The test case for socket streams

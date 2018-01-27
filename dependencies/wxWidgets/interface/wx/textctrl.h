@@ -29,8 +29,6 @@
 
 // automatically detect the URLs and generate the events when mouse is
 // moved/clicked over an URL
-//
-// this is for Win32 richedit and wxGTK2 multiline controls only so far
 #define wxTE_AUTO_URL       0x1000
 
 // by default, the Windows text control doesn't show the selection when it
@@ -132,6 +130,9 @@ enum wxTextAttrFlags
     wxTEXT_ATTR_EFFECTS              = 0x00800000,
     wxTEXT_ATTR_OUTLINE_LEVEL        = 0x01000000,
 
+    wxTEXT_ATTR_AVOID_PAGE_BREAK_BEFORE = 0x20000000,
+    wxTEXT_ATTR_AVOID_PAGE_BREAK_AFTER =  0x40000000,
+
     /**
         Combines the styles @c wxTEXT_ATTR_FONT, @c wxTEXT_ATTR_EFFECTS, @c wxTEXT_ATTR_BACKGROUND_COLOUR,
         @c wxTEXT_ATTR_TEXT_COLOUR, @c wxTEXT_ATTR_CHARACTER_STYLE_NAME, @c wxTEXT_ATTR_URL.
@@ -147,7 +148,8 @@ enum wxTextAttrFlags
     wxTEXT_ATTR_PARAGRAPH = \
         (wxTEXT_ATTR_ALIGNMENT|wxTEXT_ATTR_LEFT_INDENT|wxTEXT_ATTR_RIGHT_INDENT|wxTEXT_ATTR_TABS|\
             wxTEXT_ATTR_PARA_SPACING_BEFORE|wxTEXT_ATTR_PARA_SPACING_AFTER|wxTEXT_ATTR_LINE_SPACING|\
-            wxTEXT_ATTR_BULLET|wxTEXT_ATTR_PARAGRAPH_STYLE_NAME|wxTEXT_ATTR_LIST_STYLE_NAME|wxTEXT_ATTR_OUTLINE_LEVEL),
+            wxTEXT_ATTR_BULLET|wxTEXT_ATTR_PARAGRAPH_STYLE_NAME|wxTEXT_ATTR_LIST_STYLE_NAME|wxTEXT_ATTR_OUTLINE_LEVEL|\
+            wxTEXT_ATTR_PAGE_BREAK|wxTEXT_ATTR_AVOID_PAGE_BREAK_BEFORE|wxTEXT_ATTR_AVOID_PAGE_BREAK_AFTER),
 
     /**
         Combines all previous values.
@@ -201,7 +203,9 @@ enum wxTextAttrEffects
     wxTEXT_ATTR_EFFECT_OUTLINE               = 0x00000040,
     wxTEXT_ATTR_EFFECT_ENGRAVE               = 0x00000080,
     wxTEXT_ATTR_EFFECT_SUPERSCRIPT           = 0x00000100,
-    wxTEXT_ATTR_EFFECT_SUBSCRIPT             = 0x00000200
+    wxTEXT_ATTR_EFFECT_SUBSCRIPT             = 0x00000200,
+    wxTEXT_ATTR_EFFECT_RTL                   = 0x00000400,
+    wxTEXT_ATTR_EFFECT_SUPPRESS_HYPHENATION  = 0x00001000
 };
 
 /**
@@ -939,7 +943,7 @@ public:
     @style{wxTE_PROCESS_ENTER}
            The control will generate the event @c wxEVT_TEXT_ENTER
            (otherwise pressing Enter key is either processed internally by the
-           control or used for navigation between dialog controls).
+           control or used to activate the default button of the dialog, if any).
     @style{wxTE_PROCESS_TAB}
            The control will receive @c wxEVT_CHAR events for TAB pressed -
            normally, TAB is used for passing to the next control in a dialog
@@ -954,16 +958,14 @@ public:
     @style{wxTE_READONLY}
            The text will not be user-editable.
     @style{wxTE_RICH}
-           Use rich text control under Win32, this allows to have more than
-           64KB of text in the control even under Win9x. This style is ignored
-           under other platforms.
+           Use rich text control under MSW, this allows to have more than 64KB
+           of text in the control. This style is ignored under other platforms.
     @style{wxTE_RICH2}
-           Use rich text control version 2.0 or 3.0 under Win32, this style is
+           Use rich text control version 2.0 or higher under MSW, this style is
            ignored under other platforms
     @style{wxTE_AUTO_URL}
            Highlight the URLs and generate the wxTextUrlEvents when mouse
-           events occur over them. This style is only supported for wxTE_RICH
-           Win32 and multi-line wxGTK2 text controls.
+           events occur over them.
     @style{wxTE_NOHIDESEL}
            By default, the Windows text control doesn't show the selection
            when it doesn't have focus - use this style to force it to always
@@ -1075,7 +1077,7 @@ public:
     stream.flush();
     @endcode
 
-    Note that even if your compiler doesn't support this (the symbol
+    Note that even if your build of wxWidgets doesn't support this (the symbol
     @c wxHAS_TEXT_WINDOW_STREAM has value of 0 then) you can still use
     wxTextCtrl itself in a stream-like manner:
 
@@ -1085,9 +1087,9 @@ public:
     *control << 123.456 << " some text\n";
     @endcode
 
-    However the possibility to create an ostream associated with wxTextCtrl may
-    be useful if you need to redirect the output of a function taking an
-    ostream as parameter to a text control.
+    However the possibility to create a @c std::ostream associated with wxTextCtrl may
+    be useful if you need to redirect the output of a function taking a
+    @c std::ostream as parameter to a text control.
 
     Another commonly requested need is to redirect @c std::cout to the text
     control. This may be done in the following way:
@@ -1143,8 +1145,7 @@ public:
         pressed in a text control which must have wxTE_PROCESS_ENTER style for
         this event to be generated.
     @event{EVT_TEXT_URL(id, func)}
-        A mouse event occurred over an URL in the text control (wxMSW and
-        wxGTK2 only currently).
+        A mouse event occurred over an URL in the text control.
     @event{EVT_TEXT_MAXLEN(id, func)}
         This event is generated when the user tries to enter more text into the
         control than the limit set by wxTextCtrl::SetMaxLength(), see its description.
@@ -1278,7 +1279,7 @@ public:
         The returned number is the number of logical lines, i.e. just the count
         of the number of newline characters in the control + 1, for wxGTK and
         wxOSX/Cocoa ports while it is the number of physical lines, i.e. the
-        count of lines actually shown in the control, in wxMSW and wxOSX/Carbon.
+        count of lines actually shown in the control, in wxMSW.
         Because of this discrepancy, it is not recommended to use this function.
 
         @remarks

@@ -51,7 +51,7 @@ class MyCanvas;
 class MyApp : public wxApp
 {
 public:
-    bool OnInit();
+    bool OnInit() wxOVERRIDE;
 };
 
 class MyFrame : public wxMDIParentFrame
@@ -104,7 +104,7 @@ class MyCanvas : public wxScrolledWindow
 {
 public:
     MyCanvas(MyChild *parent, const wxPoint& pos, const wxSize& size);
-    virtual void OnDraw(wxDC& dc);
+    virtual void OnDraw(wxDC& dc) wxOVERRIDE;
 
 private:
     int m_index;
@@ -149,7 +149,7 @@ wxEND_EVENT_TABLE()
 // MyApp
 // ---------------------------------------------------------------------------
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
@@ -336,7 +336,6 @@ void MyCanvas::OnDraw(wxDC& dc)
     wxBrush wB;
     wxPoint points[6];
     wxColour wC;
-    wxFont wF;
 
     dc.SetFont(*wxSWISS_FONT);
     dc.SetPen(*wxGREEN_PEN);
@@ -399,8 +398,10 @@ void MyCanvas::OnDraw(wxDC& dc)
             dc.DrawText(wxT("This is a Red string"), 50, 200);
             dc.DrawRotatedText(wxT("This is a 45 deg string"), 50, 200, 45);
             dc.DrawRotatedText(wxT("This is a 90 deg string"), 50, 200, 90);
-            wF = wxFont ( 18, wxROMAN, wxITALIC, wxBOLD, false, wxT("Times New Roman"));
-            dc.SetFont(wF);
+            dc.SetFont(wxFontInfo(18)
+                        .FaceName("Times New Roman")
+                        .Family(wxFONTFAMILY_ROMAN)
+                        .Italic().Bold());
             dc.SetTextForeground (wC);
             dc.DrawText(wxT("This is a Times-style string"), 50, 60);
 #if wxUSE_STATUSBAR
@@ -455,8 +456,10 @@ void MyCanvas::OnDraw(wxDC& dc)
             break;
 
         case 5:
-            wF = wxFont ( 18, wxROMAN, wxITALIC, wxBOLD, false, wxT("Times New Roman"));
-            dc.SetFont(wF);
+            dc.SetFont(wxFontInfo(18)
+                        .FaceName("Times New Roman")
+                        .Family(wxFONTFAMILY_ROMAN)
+                        .Italic().Bold());
             dc.DrawLine(0, 0, 200, 200);
             dc.DrawLine(200, 0, 0, 200);
             dc.DrawText(wxT("This is an 18pt string"), 50, 60);

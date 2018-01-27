@@ -121,7 +121,7 @@ public:
             including the terminating @c NUL character(s).
 
         @return
-            The number of character written (or which would have been written
+            The number of characters written (or which would have been written
             if it were non-@NULL) to @a dst or @c wxCONV_FAILED on error.
     */
     virtual size_t ToWChar(wchar_t* dst, size_t dstLen, const char* src,
@@ -148,8 +148,13 @@ public:
             including the terminating @c NUL character.
 
         @return
-            The number of character written (or which would have been written
-            if it were non-@NULL) to @a dst or @c wxCONV_FAILED on error.
+            If @dst is non-@NULL, the number of characters actually written to
+            it. If @dst is @NULL, the returned value is at least equal to the
+            number of characters that would have been written out if it were
+            non-@NULL, but can be larger than it under the platforms using
+            UTF-16 as @c wchar_t encoding (this allows a useful optimization in
+            the implementation of this function for UTF-32). In any case,
+            @c wxCONV_FAILED is returned on conversion error.
     */
     virtual size_t FromWChar(char* dst, size_t dstLen, const wchar_t* src,
                              size_t srcLen = wxNO_LEN) const;
@@ -478,6 +483,30 @@ public:
     bool IsOk() const;
 };
 
+/**
+    Conversion object always producing non-empty output for non-empty input.
+
+    Conversions done using this object never lose data, at the cost of possibly
+    producing the output in an unwanted encoding or misinterpreting input
+    encoding.
+
+    To be precise, converting Unicode to multibyte strings using this object
+    tries to use the current locale encoding first but if this doesn't work, it
+    falls back to using UTF-8. In the other direction, UTF-8 is tried first,
+    then the current locale encoding and if this fails too, input is
+    interpreted as using ISO 8859-1, which never fails.
+
+    It is almost always @e wrong to use this converter for multibyte-to-Unicode
+    direction as the program should know which encoding the input data is
+    supposed to use and use the appropriate converter instead. However it may
+    be useful in the Unicode-to-multibyte direction if the goal is to produce
+    the output in the current locale encoding if possible, but still output
+    something, instead of nothing at all, even if the Unicode string is not
+    representable in this encoding.
+
+    @since 3.1.0
+ */
+extern wxMBConv& wxConvWhateverWorks;
 
 
 /**

@@ -10,7 +10,7 @@
 
 // not all ports have support for EVT_CONTEXT_MENU yet, don't define
 // USE_CONTEXT_MENU for those which don't
-#if defined(__WXMOTIF__) || defined(__WXPM__) || defined(__WXX11__)
+#if defined(__WXMOTIF__) || defined(__WXX11__)
     #define USE_CONTEXT_MENU 0
 #else
     #define USE_CONTEXT_MENU 1
@@ -22,7 +22,7 @@ class MyApp: public wxApp
 public:
     MyApp() { }
 
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 
 private:
     wxDECLARE_NO_COPY_CLASS(MyApp);
@@ -40,9 +40,6 @@ public:
         {
             m_updated = -1;
 
-#ifdef __POCKETPC__
-            EnableContextMenu();
-#endif
         }
 
     // add one item to the listctrl in report mode
@@ -64,6 +61,9 @@ public:
     void OnListKeyDown(wxListEvent& event);
     void OnActivated(wxListEvent& event);
     void OnFocused(wxListEvent& event);
+    void OnItemRightClick(wxListEvent& event);
+    void OnChecked(wxListEvent& event);
+    void OnUnChecked(wxListEvent& event);
     void OnCacheHint(wxListEvent& event);
 
     void OnChar(wxKeyEvent& event);
@@ -82,9 +82,9 @@ private:
     void LogEvent(const wxListEvent& event, const wxChar *eventName);
     void LogColEvent(const wxListEvent& event, const wxChar *eventName);
 
-    virtual wxString OnGetItemText(long item, long column) const;
-    virtual int OnGetItemColumnImage(long item, long column) const;
-    virtual wxListItemAttr *OnGetItemAttr(long item) const;
+    virtual wxString OnGetItemText(long item, long column) const wxOVERRIDE;
+    virtual int OnGetItemColumnImage(long item, long column) const wxOVERRIDE;
+    virtual wxListItemAttr *OnGetItemAttr(long item) const wxOVERRIDE;
 
     long m_updated;
 
@@ -149,9 +149,13 @@ protected:
     void OnToggleMacUseGeneric(wxCommandEvent& event);
 #endif // __WXOSX__
     void OnFind(wxCommandEvent& event);
+    void OnToggleItemCheckbox(wxCommandEvent& event);
+    void OnGetItemCheckbox(wxCommandEvent& event);
+    void OnToggleCheckboxes(wxCommandEvent& event);
 
     void OnUpdateUIEnableInReport(wxUpdateUIEvent& event);
     void OnUpdateToggleMultiSel(wxUpdateUIEvent& event);
+    void OnUpdateToggleCheckboxes(wxUpdateUIEvent& event);
     void OnUpdateToggleHeader(wxUpdateUIEvent& event);
     void OnUpdateRowLines(wxUpdateUIEvent& event);
 
@@ -220,6 +224,9 @@ enum
     LIST_TOGGLE_MULTI_SEL,
     LIST_TOGGLE_HEADER,
     LIST_TOGGLE_BELL,
+    LIST_TOGGLE_CHECKBOX,
+    LIST_GET_CHECKBOX,
+    LIST_TOGGLE_CHECKBOXES,
     LIST_TOGGLE_FIRST,
     LIST_SHOW_COL_INFO,
     LIST_SHOW_SEL_INFO,

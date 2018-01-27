@@ -47,7 +47,7 @@ private:
 
 #if wxUSE_LONGLONG
         CPPUNIT_TEST( TestLongLong );
-        CPPUNIT_TEST( TestLongLong );
+        CPPUNIT_TEST( TestULongLong );
 #endif // wxUSE_LONGLONG
 
 #if wxUSE_UNICODE
@@ -79,7 +79,7 @@ private:
 #endif // wxUSE_UNICODE
 
 
-    DECLARE_NO_COPY_CLASS(TextStreamTestCase)
+    wxDECLARE_NO_COPY_CLASS(TextStreamTestCase);
 };
 
 // register in the unnamed registry so that these tests are run by default
@@ -92,7 +92,7 @@ TextStreamTestCase::TextStreamTestCase()
 {
 }
 
-#if defined(__WINDOWS__) || defined(__WXPM__)
+#if defined(__WINDOWS__)
 #   define NEWLINE "\r\n"
 #   define NEWLINELEN 2
 #elif defined(__WXMAC__) && !defined(__DARWIN__)

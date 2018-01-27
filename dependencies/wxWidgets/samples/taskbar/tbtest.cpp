@@ -27,7 +27,7 @@
     #include "wx/wx.h"
 #endif
 
-// the application icon (under Windows and OS/2 it is in resources)
+// the application icon (under Windows it is in resources)
 #ifndef wxHAS_IMAGES_IN_RESOURCES
     #include "../sample.xpm"
 #endif
@@ -52,7 +52,7 @@ static MyDialog *gs_dialog = NULL;
 // MyApp
 // ----------------------------------------------------------------------------
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
@@ -125,8 +125,7 @@ MyDialog::MyDialog(const wxString& title)
 
     m_taskBarIcon = new MyTaskBarIcon();
 
-    // we should be able to show up to 128 characters on recent Windows versions
-    // (and 64 on Win9x)
+    // we should be able to show up to 128 characters on Windows
     if ( !m_taskBarIcon->SetIcon(wxICON(sample),
                                  "wxTaskBarIcon Sample\n"
                                  "With a very, very, very, very\n"
@@ -148,9 +147,6 @@ MyDialog::MyDialog(const wxString& title)
 MyDialog::~MyDialog()
 {
     delete m_taskBarIcon;
-#if defined(__WXCOCOA__)
-    delete m_dockIcon;
-#endif
 }
 
 void MyDialog::OnAbout(wxCommandEvent& WXUNUSED(event))

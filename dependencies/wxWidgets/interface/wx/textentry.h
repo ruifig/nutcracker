@@ -213,6 +213,17 @@ public:
     virtual void Cut();
 
     /**
+        Convert all text entered into the control to upper case.
+
+        Call this method to ensure that all text entered into the control is
+        converted on the fly to upper case. If the control is not empty, its
+        existing contents is also converted to upper case.
+
+        @since 3.1.0
+     */
+    void ForceUpper();
+
+    /**
         Returns the insertion point, or cursor, position.
 
         This is defined as the zero based index of the character position to
@@ -459,19 +470,23 @@ public:
         Notice that hints are known as <em>cue banners</em> under MSW or
         <em>placeholder strings</em> under OS X.
 
-        @remarks For the platforms without native hints support (and currently
-            only the MSW port does have it and even there it is only used under
-            Windows Vista and later only), the implementation has several known
-            limitations. Notably, the hint display will not be properly updated
-            if you change wxTextEntry contents programmatically when the hint
-            is displayed using methods other than SetValue() or ChangeValue()
-            or others which use them internally (e.g. Clear()). In other words,
-            currently you should avoid calling methods such as WriteText() or
-            Replace() when using hints and the text control is empty.
+        @remarks Currently implemented natively on Windows (Vista and later
+            only), OS X and GTK+ (3.2 and later).
 
-        @remarks Hints can only be used for single line text controls,
-            native multi-line text controls don't support hints under any
-            platform and hence wxWidgets doesn't provide them neither.
+            For the platforms without native hints support, the implementation
+            has several known limitations. Notably, the hint display will not
+            be properly updated if you change wxTextEntry contents
+            programmatically when the hint is displayed using methods other
+            than SetValue() or ChangeValue() or others which use them
+            internally (e.g. Clear()). In other words, currently you should
+            avoid calling methods such as WriteText() or Replace() when using
+            hints and the text control is empty. If you bind to the control's
+            focus and wxEVT_TEXT events, you must call wxEvent::Skip() on them
+            so that the generic implementation works correctly.
+
+        @remarks Hints can be used for single line text controls under all
+            platforms, but only MSW and GTK+ 2 support them for multi-line text
+            controls, they are ignored for them under the other platforms.
 
         @since 2.9.0
      */

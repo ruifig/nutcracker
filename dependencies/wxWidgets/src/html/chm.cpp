@@ -51,13 +51,13 @@ public:
     const wxArrayString *GetFileNames()
     {
         return m_fileNames;
-    };
+    }
 
-    /// get the name of the archive representated by this class
-    const wxString GetArchiveName()
+    /// get the name of the archive represented by this class
+    const wxString GetArchiveName() const
     {
         return m_chmFileName;
-    };
+    }
 
     /// Find a file in the archive
     const wxString Find(const wxString& pattern,
@@ -909,7 +909,7 @@ wxString wxChmFSHandler::FindNext()
 
 class wxChmSupportModule : public wxModule
 {
-    DECLARE_DYNAMIC_CLASS(wxChmSupportModule)
+    wxDECLARE_DYNAMIC_CLASS(wxChmSupportModule);
 
 public:
     virtual bool OnInit()
@@ -921,6 +921,6 @@ public:
 }
 ;
 
-IMPLEMENT_DYNAMIC_CLASS(wxChmSupportModule, wxModule)
+wxIMPLEMENT_DYNAMIC_CLASS(wxChmSupportModule, wxModule);
 
 #endif // wxUSE_LIBMSPACK

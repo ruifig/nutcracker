@@ -39,14 +39,16 @@
     #include "wx/msw/uxtheme.h"
 #endif
 
+#include "wx/msw/wrapwin.h"
+#include <shlwapi.h>
+
 #define GetEditHwnd() ((HWND)(GetEditHWND()))
 
 // ----------------------------------------------------------------------------
 // Classes used by auto-completion implementation.
 // ----------------------------------------------------------------------------
 
-// standard VC6 SDK (WINVER == 0x0400) does not know about IAutoComplete
-#if wxUSE_OLE && (WINVER >= 0x0500)
+#if wxUSE_OLE
     #define HAS_AUTOCOMPLETE
 #endif
 
@@ -55,7 +57,7 @@
 #include "wx/msw/ole/oleutils.h"
 #include <shldisp.h>
 
-#if defined(__MINGW32__) || defined (__WATCOMC__) || defined(__CYGWIN__)
+#if defined(__MINGW32__) || defined(__CYGWIN__)
     // needed for IID_IAutoComplete, IID_IAutoComplete2 and ACO_AUTOSUGGEST
     #include <shlguid.h>
 
@@ -81,9 +83,6 @@
 // above.
 #include <initguid.h>
 
-namespace
-{
-
 // Normally this interface and its IID are defined in shobjidl.h header file
 // included in the platform SDK but MinGW and Cygwin don't have it so redefine
 // the interface ourselves and, as long as we do it all, do it for all
@@ -95,6 +94,9 @@ public:
     virtual HRESULT wxSTDCALL GetDropDownStatus(DWORD *, LPWSTR *) = 0;
     virtual HRESULT wxSTDCALL ResetEnumerator() = 0;
 };
+
+namespace
+{
 
 DEFINE_GUID(wxIID_IAutoCompleteDropDown,
     0x3cd141f4, 0x3c6a, 0x11d2, 0xbc, 0xaa, 0x00, 0xc0, 0x4f, 0xd9, 0x29, 0xdb);
@@ -357,7 +359,7 @@ IMPLEMENT_IUNKNOWN_METHODS(wxIEnumString)
 
 // This class gathers the all auto-complete-related stuff we use. It is
 // allocated on demand by wxTextEntry when AutoComplete() is called.
-class wxTextAutoCompleteData wxBIND_OR_CONNECT_HACK_ONLY_BASE_CLASS
+class wxTextAutoCompleteData
 {
 public:
     // The constructor associates us with the given text entry.
@@ -438,9 +440,7 @@ public:
             pAutoComplete2->Release();
         }
 
-        wxBIND_OR_CONNECT_HACK(m_win, wxEVT_CHAR_HOOK, wxKeyEventHandler,
-                               wxTextAutoCompleteData::OnCharHook,
-                               this);
+        m_win->Bind(wxEVT_CHAR_HOOK, &wxTextAutoCompleteData::OnCharHook, this);
     }
 
     ~wxTextAutoCompleteData()
@@ -506,10 +506,8 @@ public:
                 // neither as, due to our use of ACO_AUTOAPPEND, we get
                 // EN_CHANGE notifications from the control every time
                 // IAutoComplete auto-appends something to it.
-                wxBIND_OR_CONNECT_HACK(m_win, wxEVT_AFTER_CHAR,
-                                        wxKeyEventHandler,
-                                        wxTextAutoCompleteData::OnAfterChar,
-                                        this);
+                m_win->Bind(wxEVT_AFTER_CHAR,
+                            &wxTextAutoCompleteData::OnAfterChar, this);
             }
 
             UpdateStringsFromCustomCompleter();
@@ -780,24 +778,6 @@ void wxTextEntry::GetSelection(long *from, long *to) const
 
 bool wxTextEntry::DoAutoCompleteFileNames(int flags)
 {
-    typedef HRESULT (WINAPI *SHAutoComplete_t)(HWND, DWORD);
-    static SHAutoComplete_t s_pfnSHAutoComplete = (SHAutoComplete_t)-1;
-    static wxDynamicLibrary s_dllShlwapi;
-    if ( s_pfnSHAutoComplete == (SHAutoComplete_t)-1 )
-    {
-        if ( !s_dllShlwapi.Load(wxT("shlwapi.dll"), wxDL_VERBATIM | wxDL_QUIET) )
-        {
-            s_pfnSHAutoComplete = NULL;
-        }
-        else
-        {
-            wxDL_INIT_FUNC(s_pfn, SHAutoComplete, s_dllShlwapi);
-        }
-    }
-
-    if ( !s_pfnSHAutoComplete )
-        return false;
-
     DWORD dwFlags = 0;
     if ( flags & wxFILE )
         dwFlags |= SHACF_FILESYS_ONLY;
@@ -809,7 +789,7 @@ bool wxTextEntry::DoAutoCompleteFileNames(int flags)
         return false;
     }
 
-    HRESULT hr = (*s_pfnSHAutoComplete)(GetEditHwnd(), dwFlags);
+    HRESULT hr = ::SHAutoComplete(GetEditHwnd(), dwFlags);
     if ( FAILED(hr) )
     {
         wxLogApiError(wxT("SHAutoComplete()"), hr);
@@ -918,7 +898,7 @@ void wxTextEntry::SetEditable(bool editable)
 }
 
 // ----------------------------------------------------------------------------
-// max length
+// input restrictions
 // ----------------------------------------------------------------------------
 
 void wxTextEntry::SetMaxLength(unsigned long len)
@@ -931,6 +911,15 @@ void wxTextEntry::SetMaxLength(unsigned long len)
     }
 
     ::SendMessage(GetEditHwnd(), EM_LIMITTEXT, len, 0);
+}
+
+void wxTextEntry::ForceUpper()
+{
+    ConvertToUpperCase();
+
+    const HWND hwnd = GetEditHwnd();
+    const LONG styleOld = ::GetWindowLong(hwnd, GWL_STYLE);
+    ::SetWindowLong(hwnd, GWL_STYLE, styleOld | ES_UPPERCASE);
 }
 
 // ----------------------------------------------------------------------------
@@ -983,7 +972,6 @@ wxString wxTextEntry::GetHint() const
 
 bool wxTextEntry::DoSetMargins(const wxPoint& margins)
 {
-#if !defined(__WXWINCE__)
     bool res = true;
 
     if ( margins.x != -1 )
@@ -1002,22 +990,15 @@ bool wxTextEntry::DoSetMargins(const wxPoint& margins)
     }
 
     return res;
-#else
-    return false;
-#endif
 }
 
 wxPoint wxTextEntry::DoGetMargins() const
 {
-#if !defined(__WXWINCE__)
     LRESULT lResult = ::SendMessage(GetEditHwnd(), EM_GETMARGINS,
                                     0, 0);
     int left = LOWORD(lResult);
     int top = -1;
     return wxPoint(left, top);
-#else
-    return wxPoint(-1, -1);
-#endif
 }
 
 #endif // wxUSE_TEXTCTRL || wxUSE_COMBOBOX

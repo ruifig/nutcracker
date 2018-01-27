@@ -131,9 +131,9 @@ static int str16len(const char *s)
 // event tables
 // ----------------------------------------------------------------------------
 
-    BEGIN_EVENT_TABLE(wxWindow, wxWindowBase)
-        EVT_SYS_COLOUR_CHANGED(wxWindow::OnSysColourChanged)
-    END_EVENT_TABLE()
+wxBEGIN_EVENT_TABLE(wxWindow, wxWindowBase)
+    EVT_SYS_COLOUR_CHANGED(wxWindow::OnSysColourChanged)
+wxEND_EVENT_TABLE()
 
 // ============================================================================
 // implementation
@@ -1252,8 +1252,8 @@ void wxWindow::DoSetSizeIntr(int x, int y, int width, int height,
 
     if (x == -1)
         x = oldX;
-    if (x == -1)
-        x = oldY;
+    if (y == -1)
+        y = oldY;
 
     if ( !(sizeFlags & wxSIZE_ALLOW_MINUS_ONE) )
     {

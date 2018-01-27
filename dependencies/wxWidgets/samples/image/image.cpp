@@ -64,7 +64,7 @@
 class MyApp: public wxApp
 {
 public:
-    virtual bool OnInit();
+    virtual bool OnInit() wxOVERRIDE;
 };
 
 // ----------------------------------------------------------------------------
@@ -78,8 +78,10 @@ public:
 
     void OnAbout( wxCommandEvent &event );
     void OnNewFrame( wxCommandEvent &event );
+    void OnNewFrameHiDPI(wxCommandEvent&);
     void OnImageInfo( wxCommandEvent &event );
     void OnThumbnail( wxCommandEvent &event );
+    void OnUpdateNewFrameHiDPI(wxUpdateUIEvent&);
 
 #ifdef wxHAVE_RAW_BITMAP
     void OnTestRawBitmap( wxCommandEvent &event );
@@ -123,9 +125,10 @@ enum
 class MyImageFrame : public wxFrame
 {
 public:
-    MyImageFrame(wxFrame *parent, const wxString& desc, const wxImage& image)
+    MyImageFrame(wxFrame *parent, const wxString& desc, const wxImage& image, double scale = 1.0)
     {
-        Create(parent, desc, wxBitmap(image), image.GetImageCount(desc));
+        Create(parent, desc, wxBitmap(image, wxBITMAP_SCREEN_DEPTH, scale),
+            image.GetImageCount(desc));
     }
 
     MyImageFrame(wxFrame *parent, const wxString& desc, const wxBitmap& bitmap)
@@ -342,12 +345,12 @@ private:
                     wxT("compression = 1, memory = 9, strategy = 2, filter = 5"),
                 };
 
-                int sel = wxGetSingleChoiceIndex(wxT("Select compression option (Cancel to use default)\n"),
-                                                 wxT("PNG Compression Options"),
-                                                 WXSIZEOF(compressionChoices),
-                                                 compressionChoices,
-                                                 this);
-                if (sel != -1)
+                sel = wxGetSingleChoiceIndex(wxT("Select compression option (Cancel to use default)\n"),
+                                             wxT("PNG Compression Options"),
+                                             WXSIZEOF(compressionChoices),
+                                             compressionChoices,
+                                             this);
+                if ( sel != -1 )
                 {
                     const int zc[] = {9, 9, 9, 9, 1, 1, 9, 9, 9, 9, 1, 1};
                     const int zm[] = {8, 9, 8, 9, 8, 9, 8, 9, 8, 9, 8, 9};
@@ -622,17 +625,19 @@ enum
     ID_QUIT  = wxID_EXIT,
     ID_ABOUT = wxID_ABOUT,
     ID_NEW = 100,
+    ID_NEW_HIDPI,
     ID_INFO,
     ID_SHOWRAW,
     ID_GRAPHICS,
     ID_SHOWTHUMBNAIL
 };
 
-IMPLEMENT_DYNAMIC_CLASS( MyFrame, wxFrame )
+wxIMPLEMENT_DYNAMIC_CLASS( MyFrame, wxFrame );
 wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU    (ID_ABOUT, MyFrame::OnAbout)
     EVT_MENU    (ID_QUIT,  MyFrame::OnQuit)
     EVT_MENU    (ID_NEW,   MyFrame::OnNewFrame)
+    EVT_MENU    (ID_NEW_HIDPI,   MyFrame::OnNewFrameHiDPI)
     EVT_MENU    (ID_INFO,  MyFrame::OnImageInfo)
     EVT_MENU    (ID_SHOWTHUMBNAIL, MyFrame::OnThumbnail)
 #ifdef wxHAVE_RAW_BITMAP
@@ -645,6 +650,7 @@ wxBEGIN_EVENT_TABLE(MyFrame, wxFrame)
     EVT_MENU(wxID_COPY, MyFrame::OnCopy)
     EVT_MENU(wxID_PASTE, MyFrame::OnPaste)
 #endif // wxUSE_CLIPBOARD
+    EVT_UPDATE_UI(ID_NEW_HIDPI, MyFrame::OnUpdateNewFrameHiDPI)
 wxEND_EVENT_TABLE()
 
 MyFrame::MyFrame()
@@ -657,6 +663,7 @@ MyFrame::MyFrame()
 
     wxMenu *menuImage = new wxMenu;
     menuImage->Append( ID_NEW, wxT("&Show any image...\tCtrl-O"));
+    menuImage->Append(ID_NEW_HIDPI, wxS("Show any image as &HiDPI...\tCtrl-H"));
     menuImage->Append( ID_INFO, wxT("Show image &information...\tCtrl-I"));
 #ifdef wxHAVE_RAW_BITMAP
     menuImage->AppendSeparator();
@@ -761,6 +768,19 @@ void MyFrame::OnNewFrame( wxCommandEvent &WXUNUSED(event) )
     wxString filename = LoadUserImage(image);
     if ( !filename.empty() )
         new MyImageFrame(this, filename, image);
+}
+
+void MyFrame::OnNewFrameHiDPI(wxCommandEvent&)
+{
+    wxImage image;
+    wxString filename = LoadUserImage(image);
+    if (!filename.empty())
+        new MyImageFrame(this, filename, image, GetContentScaleFactor());
+}
+
+void MyFrame::OnUpdateNewFrameHiDPI(wxUpdateUIEvent& event)
+{
+    event.Enable(GetContentScaleFactor() > 1);
 }
 
 void MyFrame::OnImageInfo( wxCommandEvent &WXUNUSED(event) )
@@ -964,7 +984,7 @@ void MyFrame::OnThumbnail( wxCommandEvent &WXUNUSED(event) )
 // MyApp
 //-----------------------------------------------------------------------------
 
-IMPLEMENT_APP(MyApp)
+wxIMPLEMENT_APP(MyApp);
 
 bool MyApp::OnInit()
 {
