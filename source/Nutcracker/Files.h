@@ -68,7 +68,7 @@ protected:
 // Used to sort files and folders
 struct ProjectItemCompare
 {
-	bool operator() (const std::shared_ptr<BaseItem>& a, const std::shared_ptr<BaseItem>& b)
+	bool operator() (const std::shared_ptr<BaseItem>& a, const std::shared_ptr<BaseItem>& b) const
 	{
 		if (a->type != b->type)
 			return a->type < b->type;

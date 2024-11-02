@@ -46,7 +46,9 @@ void LocalsWnd::updateState()
 	const auto& locals = info->callstack[info->currentCallstackFrame].locals;
 
 	for (auto& v : locals)
+	{
 		addEntry(root, v, idcounter);
+	}
 
 	adjustSize(this->GetSize().GetX());
 
