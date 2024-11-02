@@ -1,5 +1,3 @@
-[TOC]
-
 **NOTE** : This no no longer under development since I don't use Squirrel nowadays.
 
 # Nutcracker IDE (Squirrel scripting Editor) #
